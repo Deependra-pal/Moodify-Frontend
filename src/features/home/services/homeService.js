@@ -10,7 +10,7 @@ const homeService = {
    * @returns {Promise<object>} Response data containing songs
    */
   getRecommendations: async (emotion) => {
-    const response = await api.post('/api/spotify/recommend', { emotion });
+    const response = await api.post('/spotify/recommend', { emotion });
     return response.data;
   },
 
@@ -20,7 +20,7 @@ const homeService = {
    * @returns {Promise<object>} Response data containing songs
    */
   searchSongs: async (query) => {
-    const response = await api.get(`/api/spotify/search?query=${encodeURIComponent(query)}`);
+    const response = await api.get(`/spotify/search?query=${encodeURIComponent(query)}`);
     return response.data;
   }
 };

@@ -10,7 +10,7 @@ const authService = {
    * @param {string} password
    */
   login: async (email, password) => {
-    const response = await api.post('/api/auth/login', { email, password });
+    const response = await api.post('/auth/login', { email, password });
     return response.data;
   },
 
@@ -21,7 +21,7 @@ const authService = {
    * @param {string} password
    */
   register: async (username, email, password) => {
-    const response = await api.post('/api/auth/register', { username, email, password });
+    const response = await api.post('/auth/register', { username, email, password });
     return response.data;
   },
 
@@ -29,7 +29,7 @@ const authService = {
    * Log out user
    */
   logout: async () => {
-    const response = await api.post('/api/auth/logout');
+    const response = await api.post('/auth/logout');
     return response.data;
   },
 
@@ -37,7 +37,7 @@ const authService = {
    * Retrieve currently authenticated user info
    */
   getMe: async () => {
-    const response = await api.get('/api/auth/me');
+    const response = await api.get('/auth/me');
     return response.data;
   }
 };

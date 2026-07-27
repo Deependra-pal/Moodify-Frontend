@@ -8,7 +8,7 @@ const favoriteService = {
    * Fetch all user favorite tracks
    */
   getFavorites: async () => {
-    const response = await api.get('/api/favorites');
+    const response = await api.get('/favorites');
     return response.data;
   },
 
@@ -17,7 +17,7 @@ const favoriteService = {
    * @param {object} songDetails - { songName, artist, album, image, spotifyUri, spotifyUrl }
    */
   addFavorite: async (songDetails) => {
-    const response = await api.post('/api/favorites', songDetails);
+    const response = await api.post('/favorites', songDetails);
     return response.data;
   },
 
@@ -26,7 +26,7 @@ const favoriteService = {
    * @param {string} favoriteId
    */
   removeFavorite: async (favoriteId) => {
-    const response = await api.delete(`/api/favorites/${favoriteId}`);
+    const response = await api.delete(`/favorites/${favoriteId}`);
     return response.data;
   },
 
@@ -34,7 +34,7 @@ const favoriteService = {
    * Clear all tracks from user favorites
    */
   clearFavorites: async () => {
-    const response = await api.delete('/api/favorites');
+    const response = await api.delete('/favorites');
     return response.data;
   }
 };

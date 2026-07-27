@@ -8,7 +8,7 @@ const profileService = {
    * Fetch active user profile, stats and metrics
    */
   getProfile: async () => {
-    const response = await api.get('/api/profile');
+    const response = await api.get('/profile');
     return response.data;
   },
 
@@ -17,7 +17,7 @@ const profileService = {
    * @param {object} profileDetails - { fullName, username, bio, profilePicture }
    */
   updateProfile: async (profileDetails) => {
-    const response = await api.put('/api/profile', profileDetails);
+    const response = await api.put('/profile', profileDetails);
     return response.data;
   }
 };

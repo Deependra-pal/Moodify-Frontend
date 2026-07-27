@@ -8,7 +8,7 @@ const historyService = {
    * Fetch user play history list
    */
   getHistory: async () => {
-    const response = await api.get('/api/history');
+    const response = await api.get('/history');
     return response.data;
   },
 
@@ -17,7 +17,7 @@ const historyService = {
    * @param {object} songDetails - { songName, artist, album, image, spotifyUri, spotifyUrl }
    */
   saveHistory: async (songDetails) => {
-    const response = await api.post('/api/history', songDetails);
+    const response = await api.post('/history', songDetails);
     return response.data;
   },
 
@@ -25,7 +25,7 @@ const historyService = {
    * Clear entire play history logs
    */
   clearHistory: async () => {
-    const response = await api.delete('/api/history');
+    const response = await api.delete('/history');
     return response.data;
   }
 };
