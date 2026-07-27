@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import axios from 'axios';
 import useRecommendations from '../features/home/hooks/useRecommendations';
 import { getSpotifyAccessToken, logoutSpotify } from '../utils/spotifyAuth';
 
@@ -78,9 +79,9 @@ export const PlayerProvider = ({ children }) => {
       if (!state) {
         return;
       }
-      
+
       const currentTrack = state.track_window.current_track;
-      
+
       setIsPlaying(!state.paused);
       setPlaybackPosition(state.position);
       setDuration(state.duration);
@@ -193,26 +194,27 @@ export const PlayerProvider = ({ children }) => {
     try {
       const activeToken = await getSpotifyAccessToken();
       const targetUri = track.uri || track.spotifyUri;
-      
-      const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${activeToken || spotifyToken}`
-        },
-        body: JSON.stringify({
-          uris: [targetUri]
-        })
-      });
 
-      if (response.ok || response.status === 204 || response.status === 202) {
+      const response = await axios.put(
+        `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+        {
+          uris: [targetUri]
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${activeToken || spotifyToken}`
+          }
+        }
+      );
+
+      if (response.status === 200 || response.status === 204 || response.status === 202) {
         setCurrentSong(track);
         setIsPlaying(true);
         setPlaybackPosition(0);
         setIsPlayerVisible(true);
       } else {
-        const errJson = await response.json().catch(() => ({}));
-        console.error('Spotify Play API Failed. HTTP Status:', response.status, 'Response:', errJson);
+        console.error('Spotify Play API Failed. HTTP Status:', response.status, 'Response:', response.data);
       }
     } catch (err) {
       console.error('Play API exception:', err);
