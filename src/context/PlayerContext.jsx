@@ -2,10 +2,12 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 import axios from 'axios';
 import useRecommendations from '../features/home/hooks/useRecommendations';
 import { getSpotifyAccessToken, logoutSpotify } from '../utils/spotifyAuth';
+import { HistoryContext } from '../features/history/context/HistoryContext';
 
 export const PlayerContext = createContext(null);
 
 export const PlayerProvider = ({ children }) => {
+  const { saveHistory } = useContext(HistoryContext) || {};
   const [currentSong, setCurrentSong] = useState(null);
   const [currentSongIndex, setCurrentSongIndex] = useState(-1);
   const [playbackPosition, setPlaybackPosition] = useState(0); // in ms
@@ -213,6 +215,22 @@ export const PlayerProvider = ({ children }) => {
         setIsPlaying(true);
         setPlaybackPosition(0);
         setIsPlayerVisible(true);
+
+        // Save to backend listening history
+        if (saveHistory) {
+          try {
+            await saveHistory({
+              songName: track.name || track.songName,
+              artist: track.artist,
+              album: track.album || 'Unknown Album',
+              image: track.image || '',
+              spotifyUri: targetUri,
+              spotifyUrl: track.spotifyUrl || ''
+            });
+          } catch (historyErr) {
+            console.error('Failed to save track to history:', historyErr);
+          }
+        }
       } else {
         console.error('Spotify Play API Failed. HTTP Status:', response.status, 'Response:', response.data);
       }
@@ -221,7 +239,7 @@ export const PlayerProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [deviceId, spotifyToken, recommendedSongs]);
+  }, [deviceId, spotifyToken, recommendedSongs, saveHistory]);
 
   // Pause track directly on SDK player
   const pauseTrack = useCallback(async () => {

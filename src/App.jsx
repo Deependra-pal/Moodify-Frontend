@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import { RecommendationProvider } from './features/recommendation/context/RecommendationContext';
 import { PlayerProvider } from './context/PlayerContext';
+import { FavoritesProvider } from './features/favorites/context/FavoritesContext';
+import { HistoryProvider } from './features/history/context/HistoryContext';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import LoginPage from './features/auth/pages/LoginPage';
@@ -20,9 +22,11 @@ import ProfilePage from './features/profile/pages/ProfilePage';
 const App = () => {
   return (
     <AuthProvider>
-      <RecommendationProvider>
-        <PlayerProvider>
-          <BrowserRouter>
+      <FavoritesProvider>
+        <HistoryProvider>
+          <RecommendationProvider>
+            <PlayerProvider>
+              <BrowserRouter>
             <Routes>
               {/* Public Authentication Routes */}
               <Route path="/login" element={<LoginPage />} />
@@ -83,9 +87,11 @@ const App = () => {
               {/* Catch-all Fallback Redirect */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </BrowserRouter>
-        </PlayerProvider>
-      </RecommendationProvider>
+              </BrowserRouter>
+            </PlayerProvider>
+          </RecommendationProvider>
+        </HistoryProvider>
+      </FavoritesProvider>
     </AuthProvider>
   );
 };
