@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import favoriteService from '../services/favoriteService';
 import useAuth from '../../auth/hooks/useAuth';
 
@@ -12,10 +12,21 @@ export const FavoritesProvider = ({ children }) => {
 
   const { isAuthenticated } = useAuth();
 
+  const favoritesRef = useRef(favorites);
+  const isLoadedRef = useRef(isLoaded);
+
+  useEffect(() => {
+    favoritesRef.current = favorites;
+  }, [favorites]);
+
+  useEffect(() => {
+    isLoadedRef.current = isLoaded;
+  }, [isLoaded]);
+
   // Fetch all favorites (uses cached state if already loaded unless forced)
   const fetchFavorites = useCallback(async (force = false) => {
-    if (isLoaded && !force) {
-      return favorites;
+    if (isLoadedRef.current && !force) {
+      return favoritesRef.current;
     }
     setLoading(true);
     setError(null);
@@ -35,7 +46,7 @@ export const FavoritesProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [isLoaded, favorites]);
+  }, []);
 
   // Add track to favorites
   const addFavorite = useCallback(async (songDetails) => {

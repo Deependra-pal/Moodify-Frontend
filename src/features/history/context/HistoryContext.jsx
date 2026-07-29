@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import historyService from '../services/historyService';
 import useAuth from '../../auth/hooks/useAuth';
 
@@ -12,10 +12,21 @@ export const HistoryProvider = ({ children }) => {
 
   const { isAuthenticated } = useAuth();
 
+  const historyRef = useRef(history);
+  const isLoadedRef = useRef(isLoaded);
+
+  useEffect(() => {
+    historyRef.current = history;
+  }, [history]);
+
+  useEffect(() => {
+    isLoadedRef.current = isLoaded;
+  }, [isLoaded]);
+
   // Fetch listening history (uses cached state if already loaded unless forced)
   const fetchHistory = useCallback(async (force = false) => {
-    if (isLoaded && !force) {
-      return history;
+    if (isLoadedRef.current && !force) {
+      return historyRef.current;
     }
     setLoading(true);
     setError(null);
@@ -35,7 +46,7 @@ export const HistoryProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [isLoaded, history]);
+  }, []);
 
   // Save played track to history
   const saveHistory = useCallback(async (songDetails) => {
