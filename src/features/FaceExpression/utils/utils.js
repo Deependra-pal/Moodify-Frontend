@@ -104,7 +104,7 @@ export const detectExpression = ({
           currentExpression = "Surprised 😲";
         } else if (smileAvg > 0.35) {
           currentExpression = "Happy 😊";
-        } else if (frownAvg > 0.001 && smileAvg < 0.001) {
+        } else if (frownAvg > 0.01 && smileAvg < 0.01) {
           currentExpression = "Sad 😢";
         } else {
           currentExpression = "Neutral 😐";
