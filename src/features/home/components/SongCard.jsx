@@ -19,71 +19,133 @@ const SongCard = ({
   disabled = false
 }) => {
   return (
-    <div className="bg-[#181818] border border-neutral-900 rounded-xl p-4 hover:bg-[#282828] group transition-all duration-200 shadow-md hover:shadow-xl relative flex flex-col justify-between">
-      <div className="relative aspect-square w-full rounded-lg bg-neutral-950 overflow-hidden mb-4 border border-neutral-800">
-        <img
-          src={imageUrl || defaultAlbum}
-          alt={title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none pointer-events-none"
-        />
+    <>
+      {/* Mobile Spotify-style Compact List Row Layout */}
+      <div className="flex md:hidden items-center justify-between p-3 bg-[#181818]/60 hover:bg-[#282828]/60 active:bg-[#282828]/80 transition-all border border-neutral-900 rounded-xl gap-3 w-full">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="relative h-12 w-12 shrink-0 rounded bg-neutral-950 overflow-hidden border border-neutral-800">
+            <img
+              src={imageUrl || defaultAlbum}
+              alt={title}
+              className="w-full h-full object-cover select-none pointer-events-none"
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h4 className={`font-bold text-sm truncate select-none ${isPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
+              {title}
+            </h4>
+            <p className="text-xs text-neutral-400 truncate select-none">
+              {artist} {album && <span className="text-neutral-600 font-normal"> • {album}</span>}
+            </p>
+          </div>
+        </div>
 
-        {/* Play Overlay Button */}
-        <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-200 ${
-          isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-        }`}>
+        <div className="flex items-center gap-3 shrink-0">
+          {spotifyUrl && (
+            <a
+              href={spotifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-neutral-450 hover:text-[#1db954] cursor-pointer transition-colors"
+              title="Open in Spotify"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+          <button
+            onClick={onFavoriteClick}
+            disabled={disabled}
+            className={`p-2 transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
+              isFavorite ? 'text-red-500 fill-current hover:text-red-400' : 'text-neutral-500 hover:text-neutral-350'
+            }`}
+          >
+            <Heart className="h-4.5 w-4.5" />
+          </button>
           <button
             onClick={(e) => {
               if (onPlayClick) onPlayClick(e);
             }}
             disabled={disabled}
-            className={`h-12 w-12 rounded-full bg-[#1db954] text-black flex items-center justify-center font-bold shadow-lg transform transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${
-              isPlaying ? 'translate-y-0 scale-105' : 'translate-y-4 group-hover:translate-y-0'
+            className={`h-9 w-9 rounded-full text-black flex items-center justify-center font-bold shadow-md transform transition-all duration-200 active:scale-90 cursor-pointer ${
+              isPlaying ? 'bg-neutral-200 hover:bg-neutral-300' : 'bg-[#1db954] hover:bg-[#1ed760]'
             }`}
           >
             {isPlaying ? (
-              <Pause className="h-5 w-5 fill-current text-black" />
+              <Pause className="h-4 w-4 fill-current text-black" />
             ) : (
-              <Play className="h-5 w-5 fill-current text-black ml-0.5" />
+              <Play className="h-4 w-4 fill-current text-black ml-0.5" />
             )}
           </button>
         </div>
       </div>
 
-      <div className="space-y-1">
-        <h4 className={`font-bold text-sm truncate select-none transition-colors ${isPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
-          {title}
-        </h4>
-        <p className="text-xs text-neutral-400 truncate select-none">{artist}</p>
-        {album && (
-          <p className="text-[10px] text-neutral-500 truncate select-none">
-            {album}
-          </p>
-        )}
-        <div className="flex items-center justify-between gap-2 pt-2 border-t border-neutral-900/60 mt-2">
-          {spotifyUrl ? (
-            <a
-              href={spotifyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[10px] text-[#1db954] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+      {/* Desktop Card Layout */}
+      <div className="hidden md:flex flex-col justify-between bg-[#181818] border border-neutral-900 rounded-xl p-4 hover:bg-[#282828] group transition-all duration-200 shadow-md hover:shadow-xl relative">
+        <div className="relative aspect-square w-full rounded-lg bg-neutral-950 overflow-hidden mb-4 border border-neutral-800">
+          <img
+            src={imageUrl || defaultAlbum}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 select-none pointer-events-none"
+          />
+
+          {/* Play Overlay Button */}
+          <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity duration-200 ${
+            isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          }`}>
+            <button
+              onClick={(e) => {
+                if (onPlayClick) onPlayClick(e);
+              }}
+              disabled={disabled}
+              className={`h-12 w-12 rounded-full bg-[#1db954] text-black flex items-center justify-center font-bold shadow-lg transform transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${
+                isPlaying ? 'translate-y-0 scale-105' : 'translate-y-4 group-hover:translate-y-0'
+              }`}
             >
-              Link <ExternalLink className="h-3 w-3" />
-            </a>
-          ) : (
-            <span className="text-[10px] text-neutral-600">No URL</span>
+              {isPlaying ? (
+                <Pause className="h-5 w-5 fill-current text-black" />
+              ) : (
+                <Play className="h-5 w-5 fill-current text-black ml-0.5" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <h4 className={`font-bold text-sm truncate select-none transition-colors ${isPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
+            {title}
+          </h4>
+          <p className="text-xs text-neutral-400 truncate select-none">{artist}</p>
+          {album && (
+            <p className="text-[10px] text-neutral-500 truncate select-none">
+              {album}
+            </p>
           )}
-          <button
-            onClick={onFavoriteClick}
-            disabled={disabled}
-            className={`transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
-              isFavorite ? 'text-red-500 fill-current hover:text-red-400' : 'text-neutral-500 hover:text-neutral-350'
-            }`}
-          >
-            <Heart className="h-4 w-4" />
-          </button>
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-neutral-900/60 mt-2">
+            {spotifyUrl ? (
+              <a
+                href={spotifyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-[#1db954] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                Link <ExternalLink className="h-3 w-3" />
+              </a>
+            ) : (
+              <span className="text-[10px] text-neutral-600">No URL</span>
+            )}
+            <button
+              onClick={onFavoriteClick}
+              disabled={disabled}
+              className={`transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
+                isFavorite ? 'text-red-500 fill-current hover:text-red-400' : 'text-neutral-500 hover:text-neutral-350'
+              }`}
+            >
+              <Heart className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

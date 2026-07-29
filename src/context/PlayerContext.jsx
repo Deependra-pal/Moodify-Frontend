@@ -180,12 +180,14 @@ export const PlayerProvider = ({ children }) => {
 
   // Trigger Spotify Playback
   const playTrack = useCallback(async (track, playlist = []) => {
+    console.log('playTrack invoked with:', { track, playlistSize: playlist.length, deviceId });
     const activePlaylist = playlist.length > 0 ? playlist : recommendedSongs;
     const index = activePlaylist.findIndex(
       (p) => (p.uri && p.uri === track.uri) || (p.spotifyUrl && p.spotifyUrl === track.spotifyUrl) || (p.name === track.name && p.artist === track.artist)
     );
 
     if (!deviceId) {
+      console.warn('playTrack aborting: deviceId is missing');
       return;
     }
 
@@ -196,6 +198,7 @@ export const PlayerProvider = ({ children }) => {
     try {
       const activeToken = await getSpotifyAccessToken();
       const targetUri = track.uri || track.spotifyUri;
+      console.log('Attempting playback of targetUri:', targetUri);
 
       const response = await axios.put(
         `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
@@ -211,6 +214,7 @@ export const PlayerProvider = ({ children }) => {
       );
 
       if (response.status === 200 || response.status === 204 || response.status === 202) {
+        console.log('Playback API request succeeded');
         setCurrentSong(track);
         setIsPlaying(true);
         setPlaybackPosition(0);
@@ -235,7 +239,7 @@ export const PlayerProvider = ({ children }) => {
         console.error('Spotify Play API Failed. HTTP Status:', response.status, 'Response:', response.data);
       }
     } catch (err) {
-      console.error('Play API exception:', err);
+      console.error('Play API exception:', err.response?.data || err.message || err);
     } finally {
       setIsLoading(false);
     }

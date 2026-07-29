@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import useProfile from '../hooks/useProfile';
 import useAuth from '../../auth/hooks/useAuth';
-import { User, Mail, Save, Calendar, Play, RefreshCw, BarChart2, CheckCircle2, AlertTriangle, LogOut } from 'lucide-react';
+import { User, Mail, Save, Calendar, Play, RefreshCw, BarChart2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import defaultAlbum from '../../../assets/default_album.png';
 
 /**
@@ -334,16 +334,6 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Bottom Action Area: Logout Button */}
-        <div className="flex justify-center pt-6 border-t border-neutral-900/60">
-          <button
-            onClick={logout}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#242424] hover:bg-red-500/10 hover:text-red-500 border border-neutral-800 hover:border-red-500/20 active:scale-95 px-8 py-3.5 rounded-full text-sm font-bold transition-all duration-200 cursor-pointer shadow-lg"
-          >
-            <LogOut className="h-4 w-4" />
-            Log Out Account
-          </button>
-        </div>
       </main>
     </div>
   );

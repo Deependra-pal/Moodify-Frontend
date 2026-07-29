@@ -54,7 +54,10 @@ export const HistoryProvider = ({ children }) => {
     try {
       const response = await historyService.saveHistory(songDetails);
       if (response && response.success && response.data?.history) {
-        setHistory((prev) => [response.data.history, ...prev]);
+        setHistory((prev) => {
+          const filtered = prev.filter((item) => item.spotifyUri !== response.data.history.spotifyUri);
+          return [response.data.history, ...filtered];
+        });
         return response.data.history;
       }
       throw new Error(response.message || 'Failed to save history');

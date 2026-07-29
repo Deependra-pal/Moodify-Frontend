@@ -186,7 +186,7 @@ const HomePage = () => {
               ) : songs.length > 0 ? (
                 // Real Song Cards from Backend
                 <div className="max-h-[360px] sm:max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {songs.map((song, index) => {
                       const isFav = !!getFavoriteItem(song);
                       const isCurrentPlaying =
@@ -223,7 +223,7 @@ const HomePage = () => {
                     <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider select-none">
                       Preview Placeholders (Offline Demo)
                     </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 opacity-45">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 opacity-45">
                       <SongCard title="Song Name Placeholder" artist="Artist Placeholder" album="Album Placeholder" />
                       <SongCard title="Song Name Placeholder" artist="Artist Placeholder" album="Album Placeholder" />
                       <SongCard title="Song Name Placeholder" artist="Artist Placeholder" album="Album Placeholder" />
