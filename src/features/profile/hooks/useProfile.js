@@ -47,7 +47,7 @@ const useProfile = () => {
       throw new Error(response.message || 'Failed to update profile');
     } catch (err) {
       console.error('Error updating profile:', err);
-      
+
       // If validation error from backend is field-specific:
       if (err.response?.data) {
         const data = err.response.data;
