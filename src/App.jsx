@@ -27,66 +27,66 @@ const App = () => {
           <RecommendationProvider>
             <PlayerProvider>
               <BrowserRouter>
-            <Routes>
-              {/* Public Authentication Routes */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+                <Routes>
+                  {/* Public Authentication Routes */}
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
 
-              {/* Protected Main Application Routes */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <HomePage />
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/callback"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <HomePage />
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/favorites"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <FavoritesPage />
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/history"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <HistoryPage />
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <ProfilePage />
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
+                  {/* Protected Main Application Routes */}
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <AppLayout>
+                          <HomePage />
+                        </AppLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/callback"
+                    element={
+                      <ProtectedRoute>
+                        <AppLayout>
+                          <HomePage />
+                        </AppLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/favorites"
+                    element={
+                      <ProtectedRoute>
+                        <AppLayout>
+                          <FavoritesPage />
+                        </AppLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/history"
+                    element={
+                      <ProtectedRoute>
+                        <AppLayout>
+                          <HistoryPage />
+                        </AppLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <AppLayout>
+                          <ProfilePage />
+                        </AppLayout>
+                      </ProtectedRoute>
+                    }
+                  />
 
-              {/* Catch-all Fallback Redirect */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                  {/* Catch-all Fallback Redirect */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
               </BrowserRouter>
             </PlayerProvider>
           </RecommendationProvider>

@@ -10,6 +10,7 @@ import useFavorites from '../../favorites/hooks/useFavorites';
 import { usePlayer } from '../../../context/PlayerContext';
 import { exchangeCodeForToken } from '../../../utils/spotifyAuth';
 import { Music, AlertCircle, RefreshCw, Search } from 'lucide-react';
+import api from '../../../services/api';
 
 /**
  * HomePage container component.
@@ -44,8 +45,18 @@ const HomePage = () => {
         try {
           const token = await exchangeCodeForToken(code);
           setSpotifyToken(token);
-          // Redirect browser to clean route path '/'
-          navigate('/', { replace: true });
+
+          // Inform backend that Spotify account has been connected
+          try {
+            await api.put('/spotify/connect');
+          } catch (connectErr) {
+            console.error('Failed to sync Spotify connection to backend database:', connectErr);
+          }
+
+          // Redirect browser back to original page or path '/'
+          const redirectPath = window.localStorage.getItem('spotify_redirect_back_path') || '/';
+          window.localStorage.removeItem('spotify_redirect_back_path');
+          navigate(redirectPath, { replace: true });
         } catch (err) {
           console.error('Failed to exchange Spotify auth code:', err);
         }
