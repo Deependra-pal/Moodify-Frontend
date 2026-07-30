@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import CameraPlaceholder from '../../FaceExpression/components/CameraPlaceholder';
-import RecommendationEmptyState from '../components/RecommendationEmptyState';
 import SongCard from '../components/SongCard';
 import useRecommendations from '../hooks/useRecommendations';
 import useFavorites from '../../favorites/hooks/useFavorites';
@@ -14,8 +13,7 @@ import api from '../../../services/api';
 
 /**
  * HomePage container component.
- * Integrates scanning triggers, custom recommendations hook, loading views,
- * and actual API-returned track cards from the Spotify backend service.
+ * Guides the user step-by-step through a centered vertical flow: Welcome -> Scan -> Recommendation.
  */
 const HomePage = () => {
   const navigate = useNavigate();
@@ -51,7 +49,6 @@ const HomePage = () => {
             console.error('Failed to sync Spotify connection to backend database:', connectErr);
           }
 
-          // Redirect browser back to original page or path '/'
           const redirectPath = window.localStorage.getItem('spotify_redirect_back_path') || '/';
           window.localStorage.removeItem('spotify_redirect_back_path');
           navigate(redirectPath, { replace: true });
@@ -106,143 +103,134 @@ const HomePage = () => {
   }, [getFavoriteItem, addFavorite, removeFavorite]);
 
   return (
-    <div className="min-h-screen w-full bg-[#121212] text-white flex flex-col font-sans">
-      {/* Top Navigation */}
+    <div className="min-h-screen w-full bg-[#121212] text-white flex flex-col font-sans select-none animate-in fade-in duration-300">
       <Navbar />
 
-      {/* Main Body Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
-
-        {/* Hero Welcome Message */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-12">
+        {/* STEP 1: Welcome Tagline & Header */}
         <HeroSection />
 
-        {/* Dashboard Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* STEP 2, 3, 4: Emotion Scan and Live Detection Dashboard */}
+        <div className="w-full">
+          <CameraPlaceholder
+            currentEmotion={currentEmotion}
+            onRecommend={handleRecommend}
+            isLoadingSongs={loading}
+          />
+        </div>
 
-          {/* Left Panel: Camera/Emotion Detection */}
-          <div className="lg:col-span-5 space-y-6">
-            <CameraPlaceholder
-              currentEmotion={currentEmotion}
-              onRecommend={handleRecommend}
-              isLoadingSongs={loading}
-            />
-          </div>
-
-          {/* Right Panel: Recommended Song Listings */}
-          <div className="lg:col-span-7 h-full flex flex-col min-h-0 bg-[#181818] border border-neutral-900 rounded-2xl p-4 sm:p-6 shadow-xl">
-            <div className="flex items-center justify-between mb-4 shrink-0">
-              <h2 className="text-lg font-bold tracking-tight text-neutral-200 flex items-center gap-2">
-                <Music className="h-5 w-5 text-[#1db954]" />
-                Recommended Tracks
+        {/* STEP 5: Search & Recommendations Section (Always Visible) */}
+        <div className="bg-[#181818] border border-neutral-900 rounded-2xl p-5 sm:p-7 shadow-xl space-y-6 w-full animate-in slide-in-from-bottom-6 duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <h2 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
+                <Music className="h-5.5 w-5.5 text-[#1db954]" />
+                {songs.length > 0 ? 'Recommended for your mood' : 'Search Tracks'}
               </h2>
-              <span className="text-xs text-neutral-500 font-semibold tracking-wider bg-neutral-900 border border-neutral-800 px-2.5 py-1 rounded-full">
-                {songs.length} Tracks
-              </span>
+              <p className="text-xs text-neutral-455 font-semibold leading-normal">
+                {songs.length > 0 
+                  ? 'A curated collection of tracks matching your facial expression and emotional vibe.' 
+                  : 'Search for your favorite songs, artists, or singers manually without a face scan.'
+                }
+              </p>
             </div>
-
-            {/* Custom Search Input Bar */}
-            <form onSubmit={handleSearchSubmit} className="mb-4 flex items-center gap-2 shrink-0">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by artist, singer, or track name..."
-                  className="w-full bg-[#242424] border border-neutral-800 rounded-lg pl-10 pr-4 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#1db954] transition-colors"
-                />
-                <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-neutral-500" />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="bg-[#1db954] hover:bg-[#1ed760] text-black active:scale-95 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer shadow-md shrink-0 flex items-center gap-1.5 disabled:opacity-50"
-              >
-                Search
-              </button>
-            </form>
-
-            {/* Error Message Display */}
-            {error && (
-              <div className="mb-4 flex items-start gap-2 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20 shrink-0">
-                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 animate-pulse" />
-                <div className="space-y-1">
-                  <p className="font-semibold">Failed to retrieve Spotify recommendations</p>
-                  <p className="text-xs text-neutral-400">{error}</p>
-                </div>
+            {songs.length > 0 && (
+              <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                {currentEmotion && (
+                  <button
+                    onClick={() => handleRecommend(currentEmotion)}
+                    disabled={loading}
+                    className="flex items-center gap-1.5 bg-[#242424] hover:bg-neutral-800 hover:border-neutral-700 border border-neutral-800 active:scale-95 px-3 py-1.5 rounded-full text-[10px] font-bold text-[#1db954] transition-all cursor-pointer disabled:opacity-50"
+                    title={`Get fresh songs for ${currentEmotion}`}
+                  >
+                    <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+                    Refresh Vibes
+                  </button>
+                )}
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-full">
+                  {songs.length} tracks
+                </span>
               </div>
             )}
-
-            {/* Content Area */}
-            <div className="flex-1 min-h-0 overflow-hidden relative">
-              {loading ? (
-                // Spotify-inspired Loading Spinner
-                <div className="flex flex-col items-center justify-center h-full space-y-4">
-                  <RefreshCw className="h-10 w-10 text-[#1db954] animate-spin" />
-                  <p className="text-sm font-semibold tracking-wider text-neutral-400">
-                    Retrieving tracks matching vibes...
-                  </p>
-                </div>
-              ) : songs.length > 0 ? (
-                // Real Song Cards from Backend
-                <div className="max-h-[360px] sm:max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {songs.map((song, index) => {
-                      const isFav = !!getFavoriteItem(song);
-                      const isCurrentPlaying =
-                        isPlaying &&
-                        currentSong &&
-                        ((currentSong.uri && currentSong.uri === (song.uri || song.spotifyUri)) ||
-                          (currentSong.spotifyUrl && currentSong.spotifyUrl === song.spotifyUrl) ||
-                          (currentSong.name === song.name && currentSong.artist === song.artist));
-
-                      const isPlayingFromHome = isCurrentPlaying && playbackSource === 'home';
-
-                      return (
-                        <SongCard
-                          key={`${song.uri || index}-${index}`}
-                          title={song.name}
-                          artist={song.artist}
-                          album={song.album}
-                          imageUrl={song.image}
-                          spotifyUrl={song.spotifyUrl}
-                          isPlaying={isPlayingFromHome}
-                          isNowPlaying={isCurrentPlaying}
-                          isFavorite={isFav}
-                          onPlayClick={() => playTrack(song, songs, 'home')}
-                          onFavoriteClick={() => handleFavoriteToggle(song)}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                // Empty State
-                <div className="max-h-[360px] sm:max-h-[500px] flex flex-col justify-start gap-6 overflow-y-auto pr-2 custom-scrollbar">
-                  <RecommendationEmptyState />
-
-                  {/* Mock previews to guide layout */}
-                  <div className="space-y-4 pt-4 border-t border-neutral-900/60 shrink-0">
-                    <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider select-none">
-                      Preview Placeholders (Offline Demo)
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 opacity-45">
-                      <SongCard title="Song Name Placeholder" artist="Artist Placeholder" album="Album Placeholder" />
-                      <SongCard title="Song Name Placeholder" artist="Artist Placeholder" album="Album Placeholder" />
-                      <SongCard title="Song Name Placeholder" artist="Artist Placeholder" album="Album Placeholder" />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
 
+          {/* Custom Search bar next to curations */}
+          <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full max-w-md">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by artist or track name..."
+                className="w-full bg-[#242424] border border-neutral-800 rounded-full pl-10 pr-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#1db954] transition-colors"
+              />
+              <Search className="absolute left-4 top-3.5 h-3.5 w-3.5 text-neutral-500" />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-[#1db954] hover:bg-[#1ed760] text-black active:scale-95 px-5 py-2.5 rounded-full text-xs font-black transition-all duration-150 cursor-pointer disabled:opacity-50 shrink-0 shadow-md"
+            >
+              Search
+            </button>
+          </form>
+
+          {error && (
+            <div className="flex items-start gap-2 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20 w-full">
+              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 animate-pulse" />
+              <div className="space-y-1">
+                <p className="font-semibold">Failed to retrieve Spotify recommendations</p>
+                <p className="text-xs text-neutral-455">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16 space-y-4">
+              <RefreshCw className="h-10 w-10 text-[#1db954] animate-spin" />
+              <p className="text-sm font-semibold tracking-wider text-neutral-450">
+                Retrieving tracks...
+              </p>
+            </div>
+          ) : songs.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-2">
+              {songs.map((song, index) => {
+                const isFav = !!getFavoriteItem(song);
+                const isCurrentPlaying =
+                  isPlaying &&
+                  currentSong &&
+                  ((currentSong.uri && currentSong.uri === (song.uri || song.spotifyUri)) ||
+                    (currentSong.spotifyUrl && currentSong.spotifyUrl === song.spotifyUrl) ||
+                    (currentSong.name === song.name && currentSong.artist === song.artist));
+
+                const isPlayingFromHome = isCurrentPlaying && playbackSource === 'home';
+
+                return (
+                  <SongCard
+                    key={`${song.uri || index}-${index}`}
+                    title={song.name}
+                    artist={song.artist}
+                    album={song.album}
+                    imageUrl={song.image}
+                    spotifyUrl={song.spotifyUrl}
+                    isPlaying={isPlayingFromHome}
+                    isNowPlaying={isCurrentPlaying}
+                    isFavorite={isFav}
+                    onPlayClick={() => playTrack(song, songs, 'home')}
+                    onFavoriteClick={() => handleFavoriteToggle(song)}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-neutral-500 text-xs font-semibold select-none border-t border-neutral-900/60 pt-6">
+              💡 Tip: Start the face scanner above to detect your current mood automatically, or type keywords in the search bar to find songs manually!
+            </div>
+          )}
         </div>
       </main>
-
-
     </div>
   );
 };
 
 export default HomePage;
-

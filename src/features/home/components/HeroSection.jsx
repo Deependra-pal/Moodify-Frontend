@@ -17,13 +17,16 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="py-6 text-left">
-      <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white flex flex-wrap gap-x-2">
-        <span>{getGreeting()},</span>
-        <span className="text-[#1db954]">{user?.username || 'Guest'}</span>
+    <div className="text-center sm:text-left space-y-3 max-w-2xl select-none">
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1db954]/10 border border-[#1db954]/20 text-[#1db954] text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+        <span>👋</span>
+        <span>{getGreeting()}, {user?.fullName || user?.username || 'Guest'}</span>
+      </div>
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white leading-tight">
+        Discover music based on your emotions
       </h1>
-      <p className="mt-2 text-sm sm:text-base text-neutral-400 max-w-xl">
-        Welcome to Moodify. Enable your camera feed to detect your current facial expression, map your emotions to Spotify features, and stream mood-appropriate music.
+      <p className="text-xs sm:text-sm md:text-base text-neutral-450 font-medium leading-relaxed">
+        Moodify uses secure web-camera scanning to capture your facial expression in real time, map your feelings to musical vibes, and instantly curate the perfect soundtrack.
       </p>
     </div>
   );
