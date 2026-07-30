@@ -57,21 +57,33 @@ const CameraPlaceholder = ({
       });
 
       setStatus('Accessing Webcam...');
-      // 3. Prompt user for camera feed
+      // 3. Prompt user for camera feed using flexible ideal parameters
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480, facingMode: 'user' }
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          facingMode: 'user'
+        }
       });
 
       streamRef.current = stream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play();
+        
+        // Play stream, falling back gracefully to loadedmetadata events if needed
+        try {
+          await videoRef.current.play();
           setStatus('Active Tracking');
-          // Start the detection loop
           animationRef.current = requestAnimationFrame(detectExpressionLoop);
-        };
+        } catch (playErr) {
+          console.warn('Initial play promise rejected, waiting for metadata:', playErr);
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play().catch(console.error);
+            setStatus('Active Tracking');
+            animationRef.current = requestAnimationFrame(detectExpressionLoop);
+          };
+        }
       }
     } catch (err) {
       console.error('Error starting camera/models:', err);
@@ -261,6 +273,7 @@ const CameraPlaceholder = ({
             ref={videoRef}
             className="absolute inset-0 w-full h-full object-cover"
             style={{ transform: 'scaleX(-1)' }}
+            autoPlay
             playsInline
             muted
           />
