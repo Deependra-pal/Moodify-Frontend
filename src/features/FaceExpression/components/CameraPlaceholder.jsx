@@ -39,25 +39,44 @@ const CameraPlaceholder = ({
     setDetectedEmotion('None');
     detectionStartTimeRef.current = null;
     try {
-      // 1. Load Fileset Resolver
+      // 1. Verify mediaDevices API is available (detect Insecure HTTP contexts on mobile)
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Insecure HTTP context. HTTPS is required on mobile to access the camera.');
+      }
+
+      // 2. Load Fileset Resolver
       const vision = await FilesetResolver.forVisionTasks(
         'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm'
       );
 
-      // 2. Create Face Landmarker instance
-      landmarkerRef.current = await FaceLandmarker.createFromOptions(vision, {
-        baseOptions: {
-          modelAssetPath:
-            'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
-          delegate: 'GPU'
-        },
-        outputFaceBlendshapes: true,
-        runningMode: 'VIDEO',
-        numFaces: 1
-      });
+      // 3. Create Face Landmarker instance with CPU fallback
+      try {
+        landmarkerRef.current = await FaceLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+            delegate: 'GPU'
+          },
+          outputFaceBlendshapes: true,
+          runningMode: 'VIDEO',
+          numFaces: 1
+        });
+      } catch (gpuErr) {
+        console.warn('Failed with GPU delegate, falling back to CPU:', gpuErr);
+        landmarkerRef.current = await FaceLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+            delegate: 'CPU'
+          },
+          outputFaceBlendshapes: true,
+          runningMode: 'VIDEO',
+          numFaces: 1
+        });
+      }
 
       setStatus('Accessing Webcam...');
-      // 3. Prompt user for camera feed using flexible ideal parameters
+      // 4. Prompt user for camera feed using flexible ideal parameters
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640 },
@@ -87,7 +106,7 @@ const CameraPlaceholder = ({
       }
     } catch (err) {
       console.error('Error starting camera/models:', err);
-      setStatus('Failed: Camera or Model Error');
+      setStatus(`Failed: ${err.message || 'Camera or Model Error'}`);
       setCameraEnabled(false);
     }
   };
