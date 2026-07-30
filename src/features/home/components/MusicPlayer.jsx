@@ -49,11 +49,6 @@ const MusicPlayer = () => {
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
 
-  // Swipe gesture states
-  const [dragY, setDragY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const touchStartY = useRef(0);
-
   // Listen for back navigation when full screen player is expanded (Android Back Button)
   useEffect(() => {
     const handlePopState = (e) => {
@@ -80,30 +75,6 @@ const MusicPlayer = () => {
       }
     }
   }, [isExpanded]);
-
-  // Swipe touch handlers
-  const handleTouchStart = (e) => {
-    if (e.target.closest('input[type="range"]')) return;
-    touchStartY.current = e.touches[0].clientY;
-    setIsDragging(true);
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    const currentY = e.touches[0].clientY;
-    const deltaY = currentY - touchStartY.current;
-    if (deltaY > 0) {
-      setDragY(deltaY);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    if (dragY > 120) {
-      setIsExpanded(false);
-    }
-    setDragY(0);
-  };
 
   // Check if current playing song is favorited
   const isCurrentFavorite = useMemo(() => {
@@ -385,22 +356,12 @@ const MusicPlayer = () => {
         </div>
       </div>
 
-      {/* ----------------- FULL SCREEN MUSIC PLAYER (Slide-up modal overlay with swipe gestures) ----------------- */}
+      {/* ----------------- FULL SCREEN MUSIC PLAYER (Slide-up modal overlay) ----------------- */}
       <div
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{
-          transform: isExpanded
-            ? `translate3d(0, ${dragY}px, 0) scale(${Math.max(0.96, 1 - dragY / 3000)})`
-            : 'translate3d(0, 100%, 0) scale(0.95)',
-          opacity: isExpanded
-            ? Math.max(0.2, 1 - dragY / 400)
-            : 0,
-          transition: isDragging ? 'none' : 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s cubic-bezier(0.25, 1, 0.5, 1)'
-        }}
-        className={`fixed inset-0 z-50 bg-gradient-to-b from-[#241212] via-[#121212] to-[#121212] flex flex-col justify-between px-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pt-[calc(1.5rem+env(safe-area-inset-top,0px))] ${
-          isExpanded ? '' : 'pointer-events-none'
+        className={`fixed inset-0 z-50 bg-gradient-to-b from-[#241212] via-[#121212] to-[#121212] flex flex-col justify-between px-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pt-[calc(1.5rem+env(safe-area-inset-top,0px))] transition-all duration-300 ease-out ${
+          isExpanded
+            ? 'translate-y-0 opacity-100 scale-100'
+            : 'translate-y-full opacity-0 scale-95 pointer-events-none'
         }`}
       >
         {/* TOP BAR: Header and minimize chevron */}
