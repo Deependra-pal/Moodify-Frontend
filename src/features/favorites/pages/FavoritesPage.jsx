@@ -54,27 +54,27 @@ const FavoritesPage = () => {
   return (
     <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
       {/* Header Banner */}
-      <header className="bg-gradient-to-b from-red-900/40 to-[#121212] px-4 sm:px-6 py-12 border-b border-neutral-900/60">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
-          <div className="h-32 w-32 md:h-40 md:w-40 bg-gradient-to-br from-red-600 to-red-950 rounded-2xl flex items-center justify-center shadow-2xl shrink-0">
-            <Heart className="h-16 w-16 md:h-20 md:w-20 text-white fill-current animate-pulse" />
+      <header className="bg-gradient-to-b from-red-900/40 to-[#121212] px-4 sm:px-6 py-6 sm:py-8 md:py-12 border-b border-neutral-900/60">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6">
+          <div className="h-24 w-24 sm:h-32 sm:w-32 md:h-40 md:w-40 bg-gradient-to-br from-red-600 to-red-950 rounded-2xl flex items-center justify-center shadow-2xl shrink-0">
+            <Heart className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 text-white fill-current animate-pulse" />
           </div>
-          <div className="flex-1 flex flex-col md:flex-row md:items-end justify-between gap-6 w-full min-w-0">
-            <div className="space-y-2 text-center md:text-left min-w-0">
-              <span className="text-xs uppercase font-black tracking-widest text-red-500">
+          <div className="flex-1 flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 w-full min-w-0">
+            <div className="space-y-1 sm:space-y-2 text-center sm:text-left min-w-0">
+              <span className="text-[10px] sm:text-xs uppercase font-black tracking-widest text-red-500">
                 Collection
               </span>
-              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-white leading-none">
                 My Favorite Tracks
               </h1>
-              <p className="text-sm font-semibold text-neutral-400">
+              <p className="text-xs sm:text-sm font-semibold text-neutral-400">
                 {favorites.length} songs favorited • Your personal emotional soundtrack
               </p>
             </div>
             {favorites.length > 0 && (
               <button
                 onClick={handleClearAll}
-                className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-neutral-400 hover:text-white border border-neutral-800 hover:border-neutral-700 bg-neutral-950/40 hover:bg-neutral-900 rounded-lg cursor-pointer transition-all active:scale-95 shrink-0 self-center md:self-end mb-1"
+                className="px-3.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400 hover:text-white border border-neutral-800 hover:border-neutral-700 bg-neutral-950/40 hover:bg-neutral-900 rounded-lg cursor-pointer transition-all active:scale-95 shrink-0 self-center sm:self-end sm:mb-1"
                 title="Clear all favorites"
               >
                 Clear All
@@ -85,7 +85,7 @@ const FavoritesPage = () => {
       </header>
 
       {/* Main Grid View */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8 min-h-[75vh]">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:py-8 min-h-[75vh]">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to fetch favorites</p>
