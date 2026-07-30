@@ -120,22 +120,22 @@ const ProfilePage = () => {
   return (
     <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
       {/* Header Profile Info Banner */}
-      <header className="bg-gradient-to-b from-[#1b2b1b] to-[#121212] px-4 sm:px-6 py-12 border-b border-neutral-900/60">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
+      <header className="bg-gradient-to-b from-[#1b2b1b] to-[#121212] px-4 sm:px-6 py-6 sm:py-8 md:py-12 border-b border-neutral-900/60">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
           {/* Avatar Banner */}
-          <div className="h-28 w-28 md:h-36 md:w-36 bg-gradient-to-br from-[#282828] to-[#181818] rounded-full flex items-center justify-center shadow-2xl shrink-0 border border-neutral-700/30 text-white font-black text-3xl md:text-4xl">
+          <div className="h-20 w-20 sm:h-28 sm:w-28 md:h-36 md:w-36 bg-gradient-to-br from-[#282828] to-[#181818] rounded-full flex items-center justify-center shadow-2xl shrink-0 border border-neutral-700/30 text-white font-black text-2xl sm:text-3xl md:text-4xl">
             {profile ? getInitials(profile.fullName || profile.username) : 'U'}
           </div>
 
-          <div className="space-y-2 text-center md:text-left min-w-0">
-            <span className="text-[10px] uppercase font-black tracking-widest text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20 px-2.5 py-1 rounded-full">
+          <div className="space-y-1.5 sm:space-y-2 text-center sm:text-left min-w-0">
+            <span className="text-[10px] sm:text-xs uppercase font-black tracking-widest text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20 px-2.5 py-1 rounded-full">
               User Account
             </span>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-white truncate">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-white truncate leading-none mt-1 sm:mt-2">
               {profile?.fullName || profile?.username}
             </h1>
-            <p className="text-sm font-semibold text-neutral-400 flex items-center justify-center md:justify-start gap-1.5">
-              <Calendar className="h-4 w-4 text-[#1db954]" />
+            <p className="text-xs sm:text-sm font-semibold text-neutral-400 flex items-center justify-center sm:justify-start gap-1.5 mt-0.5 sm:mt-1">
+              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#1db954]" />
               {formatJoinedDate(profile?.joinedDate)}
             </p>
           </div>
@@ -143,7 +143,7 @@ const ProfilePage = () => {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8 space-y-8 min-h-[75vh]">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:py-8 space-y-8 min-h-[75vh]">
         
         {/* Metrics Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

@@ -99,20 +99,20 @@ const HistoryPage = () => {
   return (
     <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
       {/* Header Banner */}
-      <header className="bg-gradient-to-b from-[#1b1b3a] to-[#121212] px-4 sm:px-6 py-12 border-b border-neutral-900/60">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-            <div className="h-32 w-32 md:h-36 md:w-36 bg-gradient-to-br from-[#535353] to-[#191919] rounded-2xl flex items-center justify-center shadow-2xl shrink-0 border border-neutral-800">
-              <History className="h-16 w-16 text-neutral-300 animate-pulse" />
+      <header className="bg-gradient-to-b from-[#1b1b3a] to-[#121212] px-4 sm:px-6 py-6 sm:py-8 md:py-12 border-b border-neutral-900/60">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left w-full sm:w-auto">
+            <div className="h-20 w-20 sm:h-28 sm:w-28 md:h-36 md:w-36 bg-gradient-to-br from-[#535353] to-[#191919] rounded-2xl flex items-center justify-center shadow-2xl shrink-0 border border-neutral-800">
+              <History className="h-10 w-10 sm:h-14 sm:w-14 md:h-16 md:w-16 text-neutral-300 animate-pulse" />
             </div>
-            <div className="space-y-2 min-w-0">
-              <span className="text-xs uppercase font-black tracking-widest text-[#1db954]">
+            <div className="space-y-1 sm:space-y-2 min-w-0">
+              <span className="text-[10px] sm:text-xs uppercase font-black tracking-widest text-[#1db954]">
                 History Log
               </span>
-              <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-white leading-none">
                 Listening History
               </h1>
-              <p className="text-sm font-semibold text-neutral-400">
+              <p className="text-xs sm:text-sm font-semibold text-neutral-400">
                 Review tracks you've scanned or favorited previously
               </p>
             </div>
@@ -122,9 +122,9 @@ const HistoryPage = () => {
           {displayHistory.length > 0 && (
             <button
               onClick={clearHistory}
-              className="flex items-center gap-2 bg-[#282828] hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 active:scale-95 border border-neutral-800 px-5 py-3 rounded-full text-xs font-bold transition-all cursor-pointer"
+              className="flex items-center gap-2 bg-[#282828] hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 active:scale-95 border border-neutral-800 px-4 py-2.5 sm:px-5 sm:py-3 rounded-full text-[10px] sm:text-xs font-bold transition-all cursor-pointer shrink-0 self-center sm:self-auto"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Clear All History
             </button>
           )}
@@ -132,7 +132,7 @@ const HistoryPage = () => {
       </header>
 
       {/* Main viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8 min-h-[75vh]">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:py-8 min-h-[75vh]">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to load history</p>
