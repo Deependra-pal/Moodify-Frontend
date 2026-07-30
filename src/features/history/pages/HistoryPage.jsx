@@ -116,7 +116,7 @@ const HistoryPage = () => {
       </header>
 
       {/* Main viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8 min-h-[75vh]">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to load history</p>

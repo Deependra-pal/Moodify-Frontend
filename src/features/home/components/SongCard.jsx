@@ -16,12 +16,15 @@ const SongCard = ({
   isFavorite = false,
   onPlayClick,
   onFavoriteClick,
-  disabled = false
+  disabled = false,
+  isRemoving = false
 }) => {
   return (
     <>
       {/* Mobile Spotify-style Compact List Row Layout */}
-      <div className="flex md:hidden items-center justify-between p-3 bg-[#181818]/60 hover:bg-[#282828]/60 active:bg-[#282828]/80 transition-all border border-neutral-900 rounded-xl gap-3 w-full">
+      <div className={`flex md:hidden items-center justify-between p-3 bg-[#181818]/60 hover:bg-[#282828]/60 active:bg-[#282828]/80 border border-neutral-900 rounded-xl gap-3 w-full transition-all duration-300 ease-out ${
+        isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
+      }`}>
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <div className="relative h-12 w-12 shrink-0 rounded bg-neutral-950 overflow-hidden border border-neutral-800">
             <img
@@ -80,7 +83,9 @@ const SongCard = ({
       </div>
 
       {/* Desktop Card Layout */}
-      <div className="hidden md:flex flex-col justify-between bg-[#181818] border border-neutral-900 rounded-xl p-4 hover:bg-[#282828] group transition-all duration-200 shadow-md hover:shadow-xl relative">
+      <div className={`hidden md:flex flex-col justify-between bg-[#181818] border border-neutral-900 rounded-xl p-4 hover:bg-[#282828] group shadow-md hover:shadow-xl relative transition-all duration-300 ease-out ${
+        isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
+      }`}>
         <div className="relative aspect-square w-full rounded-lg bg-neutral-950 overflow-hidden mb-4 border border-neutral-800">
           <img
             src={imageUrl || defaultAlbum}
