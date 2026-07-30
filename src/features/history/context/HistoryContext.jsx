@@ -51,9 +51,39 @@ export const HistoryProvider = ({ children }) => {
   // Save played track to history
   const saveHistory = useCallback(async (songDetails) => {
     setError(null);
+    
+    // 1. Optimistic UI: Immediately move the song to the top of the local state array
+    setHistory((prev) => {
+      const existingIndex = prev.findIndex((item) => item.spotifyUri === songDetails.spotifyUri);
+      
+      let newEntry;
+      if (existingIndex !== -1) {
+        newEntry = {
+          ...prev[existingIndex],
+          playedAt: new Date().toISOString()
+        };
+      } else {
+        newEntry = {
+          _id: `temp-${Date.now()}`,
+          songName: songDetails.songName,
+          artist: songDetails.artist,
+          album: songDetails.album,
+          image: songDetails.image,
+          spotifyUri: songDetails.spotifyUri,
+          spotifyUrl: songDetails.spotifyUrl,
+          playedAt: new Date().toISOString()
+        };
+      }
+      
+      const filtered = prev.filter((item) => item.spotifyUri !== songDetails.spotifyUri);
+      return [newEntry, ...filtered];
+    });
+
+    // 2. Perform background synchronization with database
     try {
       const response = await historyService.saveHistory(songDetails);
       if (response && response.success && response.data?.history) {
+        // Hydrate backend values (replace temp entry with server document)
         setHistory((prev) => {
           const filtered = prev.filter((item) => item.spotifyUri !== response.data.history.spotifyUri);
           return [response.data.history, ...filtered];
@@ -62,7 +92,7 @@ export const HistoryProvider = ({ children }) => {
       }
       throw new Error(response.message || 'Failed to save history');
     } catch (err) {
-      console.error('Error saving history:', err);
+      console.error('Error saving history, reverting optimistic change:', err);
       setError(err.response?.data?.message || err.message || 'Something went wrong');
       throw err;
     }

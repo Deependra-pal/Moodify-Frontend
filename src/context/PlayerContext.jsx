@@ -212,6 +212,24 @@ export const PlayerProvider = ({ children }) => {
       const targetUri = track.uri || track.spotifyUri;
       console.log('Attempting playback of targetUri:', targetUri);
 
+      // Save to backend listening history immediately (Intent to play)
+      if (saveHistory) {
+        try {
+          saveHistory({
+            songName: track.name || track.songName,
+            artist: track.artist,
+            album: track.album || 'Unknown Album',
+            image: track.image || '',
+            spotifyUri: targetUri,
+            spotifyUrl: track.spotifyUrl || ''
+          }).catch((historyErr) => {
+            console.error('Failed to save track to history:', historyErr);
+          });
+        } catch (historyErr) {
+          console.error('Failed to dispatch save track to history:', historyErr);
+        }
+      }
+
       const response = await axios.put(
         `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
         {
@@ -231,22 +249,6 @@ export const PlayerProvider = ({ children }) => {
         setIsPlaying(true);
         setPlaybackPosition(0);
         setIsPlayerVisible(true);
-
-        // Save to backend listening history
-        if (saveHistory) {
-          try {
-            await saveHistory({
-              songName: track.name || track.songName,
-              artist: track.artist,
-              album: track.album || 'Unknown Album',
-              image: track.image || '',
-              spotifyUri: targetUri,
-              spotifyUrl: track.spotifyUrl || ''
-            });
-          } catch (historyErr) {
-            console.error('Failed to save track to history:', historyErr);
-          }
-        }
       } else {
         console.error('Spotify Play API Failed. HTTP Status:', response.status, 'Response:', response.data);
       }

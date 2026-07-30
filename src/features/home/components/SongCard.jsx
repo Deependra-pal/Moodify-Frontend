@@ -22,9 +22,14 @@ const SongCard = ({
   return (
     <>
       {/* Mobile Spotify-style Compact List Row Layout */}
-      <div className={`flex md:hidden items-center justify-between p-3 bg-[#181818]/60 hover:bg-[#282828]/60 active:bg-[#282828]/80 border border-neutral-900 rounded-xl gap-3 w-full transition-all duration-300 ease-out ${
-        isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
-      }`}>
+      <div 
+        onClick={(e) => {
+          if (!disabled && onPlayClick) onPlayClick(e);
+        }}
+        className={`flex md:hidden items-center justify-between p-3 bg-[#181818]/60 hover:bg-[#282828]/60 active:bg-[#282828]/80 border border-neutral-900 rounded-xl gap-3 w-full cursor-pointer transition-all duration-300 ease-out ${
+          isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
+        }`}
+      >
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <div className="relative h-12 w-12 shrink-0 rounded bg-neutral-950 overflow-hidden border border-neutral-800">
             <img
@@ -37,7 +42,7 @@ const SongCard = ({
             <h4 className={`font-bold text-sm truncate select-none ${isPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
               {title}
             </h4>
-            <p className="text-xs text-neutral-400 truncate select-none">
+            <p className="text-xs text-neutral-450 truncate select-none">
               {artist} {album && <span className="text-neutral-600 font-normal"> • {album}</span>}
             </p>
           </div>
@@ -49,6 +54,7 @@ const SongCard = ({
               href={spotifyUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="p-2 text-neutral-450 hover:text-[#1db954] cursor-pointer transition-colors"
               title="Open in Spotify"
             >
@@ -56,7 +62,10 @@ const SongCard = ({
             </a>
           )}
           <button
-            onClick={onFavoriteClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onFavoriteClick) onFavoriteClick(e);
+            }}
             disabled={disabled}
             className={`p-2 transition-colors cursor-pointer active:scale-90 duration-100 ${
               isFavorite ? 'text-red-500 hover:text-red-400' : 'text-neutral-500 active:text-red-500'
@@ -66,6 +75,7 @@ const SongCard = ({
           </button>
           <button
             onClick={(e) => {
+              e.stopPropagation();
               if (onPlayClick) onPlayClick(e);
             }}
             disabled={disabled}
@@ -83,9 +93,14 @@ const SongCard = ({
       </div>
 
       {/* Desktop Card Layout */}
-      <div className={`hidden md:flex flex-col justify-between bg-[#181818] border border-neutral-900 rounded-xl p-4 hover:bg-[#282828] group shadow-md hover:shadow-xl relative transition-all duration-300 ease-out ${
-        isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
-      }`}>
+      <div 
+        onClick={(e) => {
+          if (!disabled && onPlayClick) onPlayClick(e);
+        }}
+        className={`hidden md:flex flex-col justify-between bg-[#181818] border border-neutral-900 rounded-xl p-4 hover:bg-[#282828] group shadow-md hover:shadow-xl relative cursor-pointer transition-all duration-300 ease-out ${
+          isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
+        }`}
+      >
         <div className="relative aspect-square w-full rounded-lg bg-neutral-950 overflow-hidden mb-4 border border-neutral-800">
           <img
             src={imageUrl || defaultAlbum}
@@ -99,6 +114,7 @@ const SongCard = ({
           }`}>
             <button
               onClick={(e) => {
+                e.stopPropagation();
                 if (onPlayClick) onPlayClick(e);
               }}
               disabled={disabled}
@@ -131,6 +147,7 @@ const SongCard = ({
                 href={spotifyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
                 className="text-[10px] text-[#1db954] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
               >
                 Link <ExternalLink className="h-3 w-3" />
@@ -139,7 +156,10 @@ const SongCard = ({
               <span className="text-[10px] text-neutral-600">No URL</span>
             )}
             <button
-              onClick={onFavoriteClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onFavoriteClick) onFavoriteClick(e);
+              }}
               disabled={disabled}
               className={`transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
                 isFavorite ? 'text-red-500 hover:text-red-400' : 'text-neutral-500 hover:text-red-500'
