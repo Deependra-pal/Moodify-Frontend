@@ -33,7 +33,7 @@ export const HistoryProvider = ({ children }) => {
     try {
       const response = await historyService.getHistory();
       if (response && response.success) {
-        const data = (response.data.history || []).slice(0, 20);
+        const data = response.data.history || [];
         setHistory(data);
         setIsLoaded(true);
         return data;
@@ -51,11 +51,11 @@ export const HistoryProvider = ({ children }) => {
   // Save played track to history
   const saveHistory = useCallback(async (songDetails) => {
     setError(null);
-    
+
     // 1. Optimistic UI: Immediately move the song to the top of the local state array
     setHistory((prev) => {
       const existingIndex = prev.findIndex((item) => item.spotifyUri === songDetails.spotifyUri);
-      
+
       let newEntry;
       if (existingIndex !== -1) {
         newEntry = {
@@ -74,9 +74,9 @@ export const HistoryProvider = ({ children }) => {
           playedAt: new Date().toISOString()
         };
       }
-      
+
       const filtered = prev.filter((item) => item.spotifyUri !== songDetails.spotifyUri);
-      return [newEntry, ...filtered].slice(0, 20);
+      return [newEntry, ...filtered];
     });
 
     // 2. Perform background synchronization with database
@@ -86,7 +86,7 @@ export const HistoryProvider = ({ children }) => {
         // Hydrate backend values (replace temp entry with server document)
         setHistory((prev) => {
           const filtered = prev.filter((item) => item.spotifyUri !== response.data.history.spotifyUri);
-          return [response.data.history, ...filtered].slice(0, 20);
+          return [response.data.history, ...filtered];
         });
         return response.data.history;
       }
