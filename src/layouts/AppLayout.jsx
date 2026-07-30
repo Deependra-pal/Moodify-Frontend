@@ -25,21 +25,24 @@ const AppLayout = ({ children }) => {
   }, [location.pathname]);
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#121212] text-white flex flex-col md:flex-row">
-      {/* Fixed Sidebar panel */}
-      <Sidebar />
+    <div className="h-screen w-screen overflow-hidden bg-[#121212] text-white flex flex-col">
+      {/* Top container: Sidebar + Main Scroll Viewport */}
+      <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
+        {/* Navigation Sidebar */}
+        <Sidebar />
 
-      {/* Main viewport panels */}
-      <div
-        ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto"
-      >
-        <div className={`flex flex-col min-h-full w-full ${
-          isPlayerActive
-            ? 'pb-[calc(7rem+env(safe-area-inset-bottom,0px))]'
-            : 'pb-[calc(4rem+env(safe-area-inset-bottom,0px))]'
-        } md:pb-[20px]`}>
-          {children}
+        {/* Scrollable Viewport */}
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto"
+        >
+          <div className={`flex flex-col min-h-full w-full ${
+            isPlayerActive
+              ? 'pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] md:pb-8'
+              : 'pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-8'
+          }`}>
+            {children}
+          </div>
         </div>
       </div>
 

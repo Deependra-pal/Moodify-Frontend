@@ -24,7 +24,7 @@ const Sidebar = () => {
   return (
     <>
       {/* --- DESKTOP SIDEBAR --- */}
-      <aside className="hidden md:flex flex-col w-60 h-screen bg-black border-r border-neutral-900 shrink-0 sticky top-0 text-neutral-400 p-6 select-none justify-between">
+      <aside className="hidden md:flex flex-col w-60 h-full bg-black border-r border-neutral-900 shrink-0 text-neutral-400 p-6 select-none justify-between">
         
         <div className="space-y-8">
           {/* Brand Logo */}

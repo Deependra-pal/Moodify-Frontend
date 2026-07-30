@@ -236,10 +236,7 @@ const HomePage = () => {
         </div>
       </main>
 
-      {/* Footer Info */}
-      <footer className="bg-[#0b0b0b] border-t border-neutral-900 py-6 text-center text-xs text-neutral-600">
-        Moodify Platform • Built on React Vite & Tailwind • Active User Session
-      </footer>
+
     </div>
   );
 };
