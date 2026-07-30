@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import useFavorites from '../hooks/useFavorites';
 import SongCard from '../../home/components/SongCard';
 import { Heart, Music, RefreshCw } from 'lucide-react';
@@ -16,7 +16,7 @@ const FavoritesPage = () => {
     fetchFavorites();
   }, [fetchFavorites]);
 
-  const handleClearAll = async () => {
+  const handleClearAll = useCallback(async () => {
     if (window.confirm('Are you sure you want to clear all your favorites?')) {
       try {
         await clearAllFavorites();
@@ -24,7 +24,18 @@ const FavoritesPage = () => {
         console.error('Clear all favorites error:', err);
       }
     }
-  };
+  }, [clearAllFavorites]);
+
+  const playlistObjs = useMemo(() => {
+    return favorites.map((f) => ({
+      name: f.songName,
+      artist: f.artist,
+      album: f.album,
+      image: f.image,
+      uri: f.spotifyUri,
+      spotifyUrl: f.spotifyUrl
+    }));
+  }, [favorites]);
 
   return (
     <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
@@ -86,23 +97,7 @@ const FavoritesPage = () => {
                     (currentSong.spotifyUrl && currentSong.spotifyUrl === fav.spotifyUrl) ||
                     (currentSong.name === fav.songName && currentSong.artist === fav.artist));
 
-                const playObj = {
-                  name: fav.songName,
-                  artist: fav.artist,
-                  album: fav.album,
-                  image: fav.image,
-                  uri: fav.spotifyUri,
-                  spotifyUrl: fav.spotifyUrl
-                };
-
-                const playlistObjs = favorites.map((f) => ({
-                  name: f.songName,
-                  artist: f.artist,
-                  album: f.album,
-                  image: f.image,
-                  uri: f.spotifyUri,
-                  spotifyUrl: f.spotifyUrl
-                }));
+                const playObj = playlistObjs[index];
 
                 return (
                   <SongCard

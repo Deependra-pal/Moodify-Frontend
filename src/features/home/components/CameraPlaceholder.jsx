@@ -8,16 +8,22 @@ import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
  * on a live mirrored camera feed inside the Spotify-inspired template.
  */
 const CameraPlaceholder = ({
-  detectedEmotion,
-  setDetectedEmotion,
-  isScanning,
-  setIsScanning,
+  currentEmotion,
   onRecommend,
   isLoadingSongs
 }) => {
+  const [detectedEmotion, setDetectedEmotion] = useState(currentEmotion || 'None');
+  const [isScanning, setIsScanning] = useState(false);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [status, setStatus] = useState('Camera Offline');
   const [faceDetected, setFaceDetected] = useState(false);
+
+  // Sync with global currentEmotion when it changes
+  useEffect(() => {
+    if (currentEmotion) {
+      setDetectedEmotion(currentEmotion);
+    }
+  }, [currentEmotion]);
 
   const videoRef = useRef(null);
   const landmarkerRef = useRef(null);
@@ -81,6 +87,7 @@ const CameraPlaceholder = ({
     setFaceDetected(false);
     setDetectedEmotion('None');
     detectionStartTimeRef.current = null;
+    setIsScanning(false);
 
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -150,11 +157,13 @@ const CameraPlaceholder = ({
           if (detectionStartTimeRef.current === null) {
             detectionStartTimeRef.current = Date.now();
             setStatus('Locking Expression (2s)...');
+            setIsScanning(true);
           } else {
             const elapsed = Date.now() - detectionStartTimeRef.current;
             if (elapsed < 2000) {
               const secondsLeft = Math.ceil((2000 - elapsed) / 1000);
               setStatus(`Analyzing face (${secondsLeft}s)...`);
+              setIsScanning(true);
             } else {
               // Lock confirmed! Stop loop and release camera tracks
               if (streamRef.current) {
@@ -174,6 +183,7 @@ const CameraPlaceholder = ({
               setFaceDetected(false);
               setStatus('Scan Completed');
               detectionStartTimeRef.current = null;
+              setIsScanning(false);
 
               // Immediately fetch song recommendations
               onRecommend(currentExpression);

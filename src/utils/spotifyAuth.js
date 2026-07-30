@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || 'e5cabb5b267544fe83de156f9aeb760f';
+
 const generateRandomString = (length) => {
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const values = window.crypto.getRandomValues(new Uint8Array(length));
@@ -39,7 +41,7 @@ export const loginWithSpotify = async () => {
 
   const params = {
     response_type: 'code',
-    client_id: 'e5cabb5b267544fe83de156f9aeb760f',
+    client_id: SPOTIFY_CLIENT_ID,
     scope: 'streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state',
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
@@ -59,7 +61,7 @@ export const exchangeCodeForToken = async (code) => {
     const response = await axios.post(
       'https://accounts.spotify.com/api/token',
       new URLSearchParams({
-        client_id: 'e5cabb5b267544fe83de156f9aeb760f',
+        client_id: SPOTIFY_CLIENT_ID,
         grant_type: 'authorization_code',
         code: code,
         redirect_uri: redirectUri,
@@ -112,7 +114,7 @@ export const getSpotifyAccessToken = async () => {
     const response = await axios.post(
       'https://accounts.spotify.com/api/token',
       new URLSearchParams({
-        client_id: 'e5cabb5b267544fe83de156f9aeb760f',
+        client_id: SPOTIFY_CLIENT_ID,
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
       }),

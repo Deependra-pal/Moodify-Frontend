@@ -1,9 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import useHistory from '../hooks/useHistory';
 import useFavorites from '../../favorites/hooks/useFavorites';
 import { usePlayer } from '../../../context/PlayerContext';
 import { History, Trash2, Play, Pause, Heart, RefreshCw } from 'lucide-react';
 import defaultAlbum from '../../../assets/default_album.png';
+
+// Relative play timestamp formatter (Pure helper moved outside to avoid re-creation)
+const formatPlayedAt = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+  if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+};
 
 /**
  * History page displaying the chronological timeline of played tracks.
@@ -19,35 +38,28 @@ const HistoryPage = () => {
     fetchFavorites();
   }, [fetchHistory, fetchFavorites]);
 
-  // Relative play timestamp formatter
-  const formatPlayedAt = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
+  // Pre-mapped history playlist memoized to prevent N^2 allocations or inline mappings
+  const historyPlaylist = useMemo(() => {
+    return history.map(t => ({
+      name: t.songName,
+      artist: t.artist,
+      album: t.album || 'Unknown Album',
+      image: t.image || '',
+      uri: t.spotifyUri || '',
+      spotifyUrl: t.spotifyUrl || ''
+    }));
+  }, [history]);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hr${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  };
-
-  const getFavoriteItem = (track) => {
+  const getFavoriteItem = useCallback((track) => {
     const trackUri = track.spotifyUri;
     return favorites.find(
       (fav) =>
         (trackUri && fav.spotifyUri === trackUri) ||
         (fav.songName === track.songName && fav.artist === track.artist)
     );
-  };
+  }, [favorites]);
 
-  const handleFavoriteToggle = async (track) => {
+  const handleFavoriteToggle = useCallback(async (track) => {
     const favItem = getFavoriteItem(track);
     try {
       if (favItem) {
@@ -66,7 +78,7 @@ const HistoryPage = () => {
     } catch (err) {
       console.error('Failed to toggle favorite on history screen:', err);
     }
-  };
+  }, [getFavoriteItem, addFavorite, removeFavorite]);
 
   return (
     <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
@@ -134,14 +146,7 @@ const HistoryPage = () => {
             <div className="divide-y divide-neutral-900/60 w-full">
               {history.map((track, index) => {
                 const isFavorited = !!getFavoriteItem(track);
-                const trackToPlay = {
-                  name: track.songName,
-                  artist: track.artist,
-                  album: track.album || 'Unknown Album',
-                  image: track.image || '',
-                  uri: track.spotifyUri || '',
-                  spotifyUrl: track.spotifyUrl || ''
-                };
+                const trackToPlay = historyPlaylist[index];
                 const isCurrentPlaying =
                   isPlaying &&
                   currentSong &&
@@ -161,14 +166,6 @@ const HistoryPage = () => {
                           if (isCurrentPlaying) {
                             pauseTrack();
                           } else {
-                            const historyPlaylist = history.map(t => ({
-                              name: t.songName,
-                              artist: t.artist,
-                              album: t.album || 'Unknown Album',
-                              image: t.image || '',
-                              uri: t.spotifyUri || '',
-                              spotifyUrl: t.spotifyUrl || ''
-                            }));
                             playTrack(trackToPlay, historyPlaylist);
                           }
                         }}

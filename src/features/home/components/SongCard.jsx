@@ -149,5 +149,5 @@ const SongCard = ({
   );
 };
 
-export default SongCard;
+export default React.memo(SongCard);
 

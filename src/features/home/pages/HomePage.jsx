@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
@@ -20,13 +20,11 @@ import api from '../../../services/api';
 const HomePage = () => {
   const navigate = useNavigate();
   const { songs, loading, error, fetchRecommendations, currentEmotion, searchTracks } = useRecommendations();
-  const [detectedEmotion, setDetectedEmotion] = useState(currentEmotion || 'None');
-  const [isScanning, setIsScanning] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { favorites, fetchFavorites, addFavorite, removeFavorite } = useFavorites();
   const { playTrack, currentSong, isPlaying, setSpotifyToken } = usePlayer();
 
-  const handleSearchSubmit = async (e) => {
+  const handleSearchSubmit = useCallback(async (e) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     try {
@@ -34,7 +32,7 @@ const HomePage = () => {
     } catch (err) {
       console.error('Failed to search custom tracks:', err);
     }
-  };
+  }, [searchQuery, searchTracks]);
 
   // Listen to Spotify authorization callback redirect
   useEffect(() => {
@@ -70,30 +68,23 @@ const HomePage = () => {
     fetchFavorites();
   }, [fetchFavorites]);
 
-  // Keep detected emotion in sync with context
-  useEffect(() => {
-    if (currentEmotion) {
-      setDetectedEmotion(currentEmotion);
-    }
-  }, [currentEmotion]);
-
-  const handleRecommend = async (emotion) => {
+  const handleRecommend = useCallback(async (emotion) => {
     try {
       await fetchRecommendations(emotion);
     } catch (err) {
       console.error('Failed to load recommended tracks:', err);
     }
-  };
+  }, [fetchRecommendations]);
 
-  const getFavoriteItem = (song) => {
+  const getFavoriteItem = useCallback((song) => {
     return favorites.find(
       (fav) =>
         (song.uri && fav.spotifyUri === song.uri) ||
         (fav.songName === song.name && fav.artist === song.artist)
     );
-  };
+  }, [favorites]);
 
-  const handleFavoriteToggle = async (song) => {
+  const handleFavoriteToggle = useCallback(async (song) => {
     const favItem = getFavoriteItem(song);
     try {
       if (favItem) {
@@ -112,7 +103,7 @@ const HomePage = () => {
     } catch (err) {
       console.error('Failed to toggle favorite on homepage card:', err);
     }
-  };
+  }, [getFavoriteItem, addFavorite, removeFavorite]);
 
   return (
     <div className="min-h-screen w-full bg-[#121212] text-white flex flex-col font-sans">
@@ -131,10 +122,7 @@ const HomePage = () => {
           {/* Left Panel: Camera/Emotion Detection */}
           <div className="lg:col-span-5 space-y-6">
             <CameraPlaceholder
-              detectedEmotion={detectedEmotion}
-              setDetectedEmotion={setDetectedEmotion}
-              isScanning={isScanning}
-              setIsScanning={setIsScanning}
+              currentEmotion={currentEmotion}
               onRecommend={handleRecommend}
               isLoadingSongs={loading}
             />
