@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import useHistory from '../hooks/useHistory';
 import useFavorites from '../../favorites/hooks/useFavorites';
 import { usePlayer } from '../../../context/PlayerContext';
@@ -33,14 +33,30 @@ const HistoryPage = () => {
   const { favorites, fetchFavorites, addFavorite, removeFavorite } = useFavorites();
   const { playTrack, pauseTrack, isPlaying, currentSong } = usePlayer();
 
+  // Local snapshot of history list to maintain page stability while browsing
+  // Pre-fill with context cache to prevent layout flashes on back-navigation
+  const [displayHistory, setDisplayHistory] = useState(history);
+
   useEffect(() => {
-    fetchHistory();
+    // Force fetch to get freshest DB records on mount, then write to displayHistory
+    fetchHistory(true).then((data) => {
+      if (data) {
+        setDisplayHistory(data);
+      }
+    });
     fetchFavorites();
   }, [fetchHistory, fetchFavorites]);
 
+  // Instantly clear displayHistory if history context gets emptied
+  useEffect(() => {
+    if (history.length === 0) {
+      setDisplayHistory([]);
+    }
+  }, [history]);
+
   // Pre-mapped history playlist memoized to prevent N^2 allocations or inline mappings
   const historyPlaylist = useMemo(() => {
-    return history.map(t => ({
+    return displayHistory.map(t => ({
       name: t.songName,
       artist: t.artist,
       album: t.album || 'Unknown Album',
@@ -48,7 +64,7 @@ const HistoryPage = () => {
       uri: t.spotifyUri || '',
       spotifyUrl: t.spotifyUrl || ''
     }));
-  }, [history]);
+  }, [displayHistory]);
 
   const getFavoriteItem = useCallback((track) => {
     const trackUri = track.spotifyUri;
@@ -103,7 +119,7 @@ const HistoryPage = () => {
           </div>
 
           {/* Action Button */}
-          {history.length > 0 && (
+          {displayHistory.length > 0 && (
             <button
               onClick={clearHistory}
               className="flex items-center gap-2 bg-[#282828] hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 active:scale-95 border border-neutral-800 px-5 py-3 rounded-full text-xs font-bold transition-all cursor-pointer"
@@ -124,14 +140,14 @@ const HistoryPage = () => {
           </div>
         )}
 
-        {loading ? (
+        {loading && displayHistory.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 space-y-4">
             <RefreshCw className="h-10 w-10 text-[#1db954] animate-spin" />
             <p className="text-sm font-semibold tracking-wider text-neutral-400">
               Fetching play logs...
             </p>
           </div>
-        ) : history.length > 0 ? (
+        ) : displayHistory.length > 0 ? (
           <div className="bg-[#181818] border border-neutral-900 rounded-2xl overflow-hidden shadow-xl">
             {/* Header Columns */}
             <div className="grid grid-cols-12 px-3 sm:px-6 py-3 border-b border-neutral-900 text-xs font-black tracking-wider text-neutral-500 uppercase select-none">
@@ -144,7 +160,7 @@ const HistoryPage = () => {
 
             {/* List Rows */}
             <div className="divide-y divide-neutral-900/60 w-full">
-              {history.map((track, index) => {
+              {displayHistory.map((track, index) => {
                 const isFavorited = !!getFavoriteItem(track);
                 const trackToPlay = historyPlaylist[index];
                 const isCurrentPlaying =
@@ -157,12 +173,20 @@ const HistoryPage = () => {
                 return (
                   <div
                     key={track._id || index}
-                    className="grid grid-cols-12 items-center px-3 sm:px-6 py-4 hover:bg-[#282828]/60 transition-colors duration-150 group"
+                    onClick={() => {
+                      if (isCurrentPlaying) {
+                        pauseTrack();
+                      } else {
+                        playTrack(trackToPlay, historyPlaylist);
+                      }
+                    }}
+                    className="grid grid-cols-12 items-center px-3 sm:px-6 py-4 hover:bg-[#282828]/60 cursor-pointer transition-colors duration-150 group"
                   >
                     {/* Play / Pause / Load Control */}
                     <div className="col-span-2 sm:col-span-1 flex justify-center">
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           if (isCurrentPlaying) {
                             pauseTrack();
                           } else {
@@ -192,7 +216,7 @@ const HistoryPage = () => {
                         className="h-10 w-10 rounded object-cover border border-neutral-800 shrink-0 select-none"
                       />
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-bold text-xs sm:text-sm truncate select-none text-neutral-200">
+                        <h4 className={`font-bold text-xs sm:text-sm truncate select-none ${isCurrentPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
                           {track.songName}
                         </h4>
                         <p className="text-[10px] sm:text-xs text-neutral-450 truncate select-none">
@@ -214,7 +238,10 @@ const HistoryPage = () => {
                     {/* Favorite Button */}
                     <div className="col-span-1 flex justify-center">
                       <button
-                        onClick={() => handleFavoriteToggle(track)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFavoriteToggle(track);
+                        }}
                         className={`transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
                           isFavorited ? 'text-red-500 hover:text-red-400' : 'text-neutral-600 hover:text-red-500 active:text-red-500'
                         }`}

@@ -179,6 +179,42 @@ export const PlayerProvider = ({ children }) => {
     };
   }, [isPlaying, duration]);
 
+  // Pause track directly on SDK player
+  const pauseTrack = useCallback(async () => {
+    if (playerRef.current) {
+      try {
+        await playerRef.current.pause();
+        setIsPlaying(false);
+      } catch (err) {
+        console.error('Spotify SDK pause failure:', err);
+      }
+    }
+  }, []);
+
+  // Resume track directly on SDK player
+  const resumeTrack = useCallback(async () => {
+    if (playerRef.current) {
+      try {
+        await playerRef.current.resume();
+        setIsPlaying(true);
+      } catch (err) {
+        console.error('Spotify SDK resume failure:', err);
+      }
+    }
+  }, []);
+
+  // Seek track to absolute position (ms)
+  const seekTrack = useCallback(async (posMs) => {
+    if (playerRef.current) {
+      try {
+        await playerRef.current.seek(posMs);
+        setPlaybackPosition(posMs);
+      } catch (err) {
+        console.error('Spotify SDK seek failure:', err);
+      }
+    }
+  }, []);
+
   // Trigger Spotify Playback
   const playTrack = useCallback(async (track, playlist = []) => {
     console.log('playTrack invoked with:', { track, playlistSize: playlist.length, deviceId });
@@ -189,6 +225,25 @@ export const PlayerProvider = ({ children }) => {
       window.localStorage.setItem('pending_track_to_play', JSON.stringify({ track, playlist }));
       window.localStorage.setItem('spotify_redirect_back_path', window.location.pathname);
       setShowConnectModal(true);
+      return;
+    }
+
+    // Check if the clicked song is the same as the current playing song
+    const isSameSong = currentSong && (
+      (track.uri && track.uri === currentSong.uri) ||
+      (track.spotifyUri && track.spotifyUri === currentSong.uri) ||
+      (track.spotifyUrl && track.spotifyUrl === currentSong.spotifyUrl) ||
+      (track.name === currentSong.name && track.artist === currentSong.artist)
+    );
+
+    if (isSameSong) {
+      if (isPlaying) {
+        console.log('playTrack: Same song is playing, toggling pause');
+        await pauseTrack();
+      } else {
+        console.log('playTrack: Same song is paused, toggling resume');
+        await resumeTrack();
+      }
       return;
     }
 
@@ -257,7 +312,7 @@ export const PlayerProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [deviceId, spotifyToken, recommendedSongs, saveHistory]);
+  }, [deviceId, spotifyToken, recommendedSongs, saveHistory, currentSong, isPlaying, pauseTrack, resumeTrack]);
 
   // Autoplay pending track when Spotify is connected and the device is ready
   useEffect(() => {
@@ -278,41 +333,7 @@ export const PlayerProvider = ({ children }) => {
     }
   }, [spotifyToken, deviceId, playTrack]);
 
-  // Pause track directly on SDK player
-  const pauseTrack = useCallback(async () => {
-    if (playerRef.current) {
-      try {
-        await playerRef.current.pause();
-        setIsPlaying(false);
-      } catch (err) {
-        console.error('Spotify SDK pause failure:', err);
-      }
-    }
-  }, []);
 
-  // Resume track directly on SDK player
-  const resumeTrack = useCallback(async () => {
-    if (playerRef.current) {
-      try {
-        await playerRef.current.resume();
-        setIsPlaying(true);
-      } catch (err) {
-        console.error('Spotify SDK resume failure:', err);
-      }
-    }
-  }, []);
-
-  // Seek track to absolute position (ms)
-  const seekTrack = useCallback(async (posMs) => {
-    if (playerRef.current) {
-      try {
-        await playerRef.current.seek(posMs);
-        setPlaybackPosition(posMs);
-      } catch (err) {
-        console.error('Spotify SDK seek failure:', err);
-      }
-    }
-  }, []);
 
   // Skip Next from local playlist or recommended list
   const skipNext = useCallback(() => {
