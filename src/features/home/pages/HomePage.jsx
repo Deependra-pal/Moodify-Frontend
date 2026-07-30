@@ -111,7 +111,7 @@ const HomePage = () => {
       <Navbar />
 
       {/* Main Body Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
 
         {/* Hero Welcome Message */}
         <HeroSection />
@@ -129,7 +129,7 @@ const HomePage = () => {
           </div>
 
           {/* Right Panel: Recommended Song Listings */}
-          <div className="lg:col-span-7 h-full flex flex-col min-h-0 bg-[#181818] border border-neutral-900 rounded-2xl p-6 shadow-xl">
+          <div className="lg:col-span-7 h-full flex flex-col min-h-0 bg-[#181818] border border-neutral-900 rounded-2xl p-4 sm:p-6 shadow-xl">
             <div className="flex items-center justify-between mb-4 shrink-0">
               <h2 className="text-lg font-bold tracking-tight text-neutral-200 flex items-center gap-2">
                 <Music className="h-5 w-5 text-[#1db954]" />

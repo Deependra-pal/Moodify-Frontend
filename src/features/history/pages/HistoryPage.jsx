@@ -83,7 +83,7 @@ const HistoryPage = () => {
   return (
     <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
       {/* Header Banner */}
-      <header className="bg-gradient-to-b from-[#1b1b3a] to-[#121212] px-6 py-12 border-b border-neutral-900/60">
+      <header className="bg-gradient-to-b from-[#1b1b3a] to-[#121212] px-4 sm:px-6 py-12 border-b border-neutral-900/60">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
             <div className="h-32 w-32 md:h-36 md:w-36 bg-gradient-to-br from-[#535353] to-[#191919] rounded-2xl flex items-center justify-center shadow-2xl shrink-0 border border-neutral-800">
@@ -116,7 +116,7 @@ const HistoryPage = () => {
       </header>
 
       {/* Main viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-8">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to load history</p>
@@ -134,7 +134,7 @@ const HistoryPage = () => {
         ) : history.length > 0 ? (
           <div className="bg-[#181818] border border-neutral-900 rounded-2xl overflow-hidden shadow-xl">
             {/* Header Columns */}
-            <div className="grid grid-cols-12 px-6 py-3 border-b border-neutral-900 text-xs font-black tracking-wider text-neutral-500 uppercase select-none">
+            <div className="grid grid-cols-12 px-3 sm:px-6 py-3 border-b border-neutral-900 text-xs font-black tracking-wider text-neutral-500 uppercase select-none">
               <span className="col-span-2 sm:col-span-1 text-center">Play</span>
               <span className="col-span-6 sm:col-span-5 md:col-span-6">Track Info</span>
               <span className="hidden sm:block sm:col-span-3 md:col-span-2">Album</span>
@@ -157,7 +157,7 @@ const HistoryPage = () => {
                 return (
                   <div
                     key={track._id || index}
-                    className="grid grid-cols-12 items-center px-6 py-4 hover:bg-[#282828]/60 transition-colors duration-150 group"
+                    className="grid grid-cols-12 items-center px-3 sm:px-6 py-4 hover:bg-[#282828]/60 transition-colors duration-150 group"
                   >
                     {/* Play / Pause / Load Control */}
                     <div className="col-span-2 sm:col-span-1 flex justify-center">

@@ -23,7 +23,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  
+
   // UX states
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -109,7 +109,7 @@ const LoginPage = () => {
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-[#121212] px-4 py-8 text-white">
       <div className="w-full max-w-md space-y-5 rounded-2xl bg-[#181818] p-6 shadow-2xl border border-neutral-900">
-        
+
         {/* Header/Logo */}
         <div className="flex flex-col items-center text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1db954] shadow-md shadow-[#1db954]/20 animate-pulse">
@@ -139,7 +139,7 @@ const LoginPage = () => {
 
         <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-3.5">
-            
+
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
@@ -158,9 +158,8 @@ const LoginPage = () => {
                   disabled={isSubmitting}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`block w-full rounded-lg bg-[#242424] py-2 pl-9 pr-3 text-xs text-white placeholder-neutral-500 border ${
-                    errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-transparent focus:border-[#1db954] focus:ring-[#1db954]/20'
-                  } outline-none focus:ring-2 transition-all duration-200`}
+                  className={`block w-full rounded-lg bg-[#242424] py-2 pl-9 pr-3 text-xs text-white placeholder-neutral-500 border ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-transparent focus:border-[#1db954] focus:ring-[#1db954]/20'
+                    } outline-none focus:ring-2 transition-all duration-200`}
                   placeholder="name@example.com"
                 />
               </div>
@@ -189,9 +188,8 @@ const LoginPage = () => {
                   disabled={isSubmitting}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`block w-full rounded-lg bg-[#242424] py-2 pl-9 pr-10 text-xs text-white placeholder-neutral-500 border ${
-                    errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-transparent focus:border-[#1db954] focus:ring-[#1db954]/20'
-                  } outline-none focus:ring-2 transition-all duration-200`}
+                  className={`block w-full rounded-lg bg-[#242424] py-2 pl-9 pr-10 text-xs text-white placeholder-neutral-500 border ${errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-transparent focus:border-[#1db954] focus:ring-[#1db954]/20'
+                    } outline-none focus:ring-2 transition-all duration-200`}
                   placeholder="••••••••"
                 />
                 <button

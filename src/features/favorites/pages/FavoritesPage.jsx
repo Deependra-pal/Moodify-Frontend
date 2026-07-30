@@ -40,7 +40,7 @@ const FavoritesPage = () => {
   return (
     <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
       {/* Header Banner */}
-      <header className="bg-gradient-to-b from-red-900/40 to-[#121212] px-6 py-12 border-b border-neutral-900/60">
+      <header className="bg-gradient-to-b from-red-900/40 to-[#121212] px-4 sm:px-6 py-12 border-b border-neutral-900/60">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
           <div className="h-32 w-32 md:h-40 md:w-40 bg-gradient-to-br from-red-600 to-red-950 rounded-2xl flex items-center justify-center shadow-2xl shrink-0">
             <Heart className="h-16 w-16 md:h-20 md:w-20 text-white fill-current animate-pulse" />
@@ -71,7 +71,7 @@ const FavoritesPage = () => {
       </header>
 
       {/* Main Grid View */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-8">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to fetch favorites</p>

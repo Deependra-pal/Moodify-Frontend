@@ -120,7 +120,7 @@ const ProfilePage = () => {
   return (
     <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
       {/* Header Profile Info Banner */}
-      <header className="bg-gradient-to-b from-[#1b2b1b] to-[#121212] px-6 py-12 border-b border-neutral-900/60">
+      <header className="bg-gradient-to-b from-[#1b2b1b] to-[#121212] px-4 sm:px-6 py-12 border-b border-neutral-900/60">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
           {/* Avatar Banner */}
           <div className="h-28 w-28 md:h-36 md:w-36 bg-gradient-to-br from-[#282828] to-[#181818] rounded-full flex items-center justify-center shadow-2xl shrink-0 border border-neutral-700/30 text-white font-black text-3xl md:text-4xl">
@@ -143,7 +143,7 @@ const ProfilePage = () => {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-8 space-y-8">
         
         {/* Metrics Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -180,7 +180,7 @@ const ProfilePage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Block: Edit Profile Details */}
-          <div className="lg:col-span-7 bg-[#181818] border border-neutral-900 rounded-2xl p-6 shadow-xl space-y-6">
+          <div className="lg:col-span-7 bg-[#181818] border border-neutral-900 rounded-2xl p-4 sm:p-6 shadow-xl space-y-6">
             <h2 className="text-lg font-bold tracking-tight text-neutral-200 border-b border-neutral-900 pb-3">
               Profile Metadata Settings
             </h2>
