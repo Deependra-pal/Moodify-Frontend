@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import useFavorites from '../hooks/useFavorites';
 import SongCard from '../../home/components/SongCard';
 import { Heart, Music, RefreshCw } from 'lucide-react';
@@ -11,6 +11,7 @@ import { usePlayer } from '../../../context/PlayerContext';
 const FavoritesPage = () => {
   const { favorites, loading, error, fetchFavorites, removeFavorite, clearAllFavorites } = useFavorites();
   const { playTrack, currentSong, isPlaying } = usePlayer();
+  const [removingIds, setRemovingIds] = useState([]);
 
   useEffect(() => {
     fetchFavorites();
@@ -25,6 +26,19 @@ const FavoritesPage = () => {
       }
     }
   }, [clearAllFavorites]);
+
+  const handleRemove = useCallback((favId) => {
+    if (removingIds.includes(favId)) return;
+    setRemovingIds((prev) => [...prev, favId]);
+    setTimeout(async () => {
+      try {
+        await removeFavorite(favId);
+      } catch (err) {
+        setRemovingIds((prev) => prev.filter((id) => id !== favId));
+        alert('Failed to remove from favorites. Please try again.');
+      }
+    }, 300);
+  }, [removeFavorite, removingIds]);
 
   const playlistObjs = useMemo(() => {
     return favorites.map((f) => ({
@@ -71,11 +85,11 @@ const FavoritesPage = () => {
       </header>
 
       {/* Main Grid View */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8 min-h-[75vh]">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to fetch favorites</p>
-            <p className="text-xs text-neutral-450">{error}</p>
+            <p className="text-xs text-neutral-455">{error}</p>
           </div>
         )}
 
@@ -98,20 +112,30 @@ const FavoritesPage = () => {
                     (currentSong.name === fav.songName && currentSong.artist === fav.artist));
 
                 const playObj = playlistObjs[index];
+                const isRemoving = removingIds.includes(fav._id);
 
                 return (
-                  <SongCard
+                  <div
                     key={fav._id || index}
-                    title={fav.songName}
-                    artist={fav.artist}
-                    album={fav.album}
-                    imageUrl={fav.image}
-                    spotifyUrl={fav.spotifyUrl}
-                    isPlaying={isCurrentPlaying}
-                    isFavorite={true}
-                    onPlayClick={() => playTrack(playObj, playlistObjs)}
-                    onFavoriteClick={() => removeFavorite(fav._id)}
-                  />
+                    className={`transition-all duration-300 ease-out overflow-hidden ${
+                      isRemoving
+                        ? 'max-h-0 opacity-0 scale-95 pointer-events-none'
+                        : 'max-h-[300px] opacity-100 scale-100'
+                    }`}
+                  >
+                    <SongCard
+                      title={fav.songName}
+                      artist={fav.artist}
+                      album={fav.album}
+                      imageUrl={fav.image}
+                      spotifyUrl={fav.spotifyUrl}
+                      isPlaying={isCurrentPlaying}
+                      isFavorite={!isRemoving}
+                      isRemoving={isRemoving}
+                      onPlayClick={() => playTrack(playObj, playlistObjs)}
+                      onFavoriteClick={() => handleRemove(fav._id)}
+                    />
+                  </div>
                 );
               })}
             </div>
