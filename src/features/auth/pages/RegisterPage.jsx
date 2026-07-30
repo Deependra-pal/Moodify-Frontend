@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Music, Loader2, AlertCircle } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
 
 const RegisterPage = () => {
-  const { register } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect authenticated users
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   // Form states
   const [fullName, setFullName] = useState(''); // UI only at registration (backend register schema doesn't consume this, but it's required in UI specs)
@@ -59,8 +66,8 @@ const RegisterPage = () => {
       // Backend registration endpoint only consumes username, email, password
       await register(username, email, password);
 
-      // On success, redirect to login page with email state so the user can easily log in
-      navigate('/login', { state: { registeredEmail: email } });
+      // On success, redirect to home page directly (since they are automatically logged in now)
+      navigate('/', { replace: true });
     } catch (err) {
       console.error('Registration error:', err);
       if (err.response?.data) {

@@ -4,12 +4,19 @@ import { Eye, EyeOff, Mail, Lock, Music, Loader2, AlertCircle } from 'lucide-rea
 import useAuth from '../hooks/useAuth';
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Redirect path after successful login
   const from = location.state?.from?.pathname || '/';
+
+  // Redirect authenticated users
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
 
   // Form states
   const [email, setEmail] = useState('');

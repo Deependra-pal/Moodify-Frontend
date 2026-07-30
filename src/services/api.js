@@ -9,6 +9,18 @@ const api = axios.create({
   }
 });
 
+// Request interceptor to attach Authorization header from local storage
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('moodify_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Response interceptor to catch unauthorized errors
 api.interceptors.response.use(
   (response) => response,
@@ -17,6 +29,7 @@ api.interceptors.response.use(
       const isMeRequest = error.config && error.config.url && error.config.url.includes('/auth/me');
       const currentPath = window.location.pathname;
       if (!isMeRequest && currentPath !== '/login' && currentPath !== '/register') {
+        localStorage.removeItem('moodify_token');
         window.location.href = '/login';
       }
     }

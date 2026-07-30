@@ -40,11 +40,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.login(email, password);
       if (response && response.success && response.data?.user) {
+        if (response.token) {
+          localStorage.setItem('moodify_token', response.token);
+        }
         setUser(response.data.user);
         return response;
       }
       throw new Error(response.message || 'Login failed');
     } catch (error) {
+      localStorage.removeItem('moodify_token');
       setUser(null);
       throw error;
     } finally {
@@ -57,8 +61,17 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await authService.register(username, email, password);
-      return response;
+      if (response && response.success && response.data?.user) {
+        if (response.token) {
+          localStorage.setItem('moodify_token', response.token);
+        }
+        setUser(response.data.user);
+        return response;
+      }
+      throw new Error(response.message || 'Registration failed');
     } catch (error) {
+      localStorage.removeItem('moodify_token');
+      setUser(null);
       throw error;
     } finally {
       setLoading(false);
@@ -73,6 +86,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error on backend, clearing client session anyway:', error);
     } finally {
+      localStorage.removeItem('moodify_token');
       setUser(null);
       setLoading(false);
     }
