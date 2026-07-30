@@ -5,34 +5,12 @@ import useAuth from '../../auth/hooks/useAuth';
 export const RecommendationContext = createContext(null);
 
 export const RecommendationProvider = ({ children }) => {
-  const [recommendedSongs, setRecommendedSongs] = useState(() => {
-    try {
-      const saved = window.localStorage.getItem('moodify_recommended_songs');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-  const [currentEmotion, setCurrentEmotion] = useState(() => {
-    return window.localStorage.getItem('moodify_current_emotion') || 'None';
-  });
+  const [recommendedSongs, setRecommendedSongs] = useState([]);
+  const [currentEmotion, setCurrentEmotion] = useState('None');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const { isAuthenticated } = useAuth();
-
-  // Sync state modifications to localStorage to persist them across external redirects
-  useEffect(() => {
-    try {
-      window.localStorage.setItem('moodify_recommended_songs', JSON.stringify(recommendedSongs));
-    } catch (e) {
-      console.warn('Failed to save recommended songs to localStorage:', e);
-    }
-  }, [recommendedSongs]);
-
-  useEffect(() => {
-    window.localStorage.setItem('moodify_current_emotion', currentEmotion);
-  }, [currentEmotion]);
 
   const fetchRecommendations = useCallback(async (emotion) => {
     setLoading(true);
@@ -60,8 +38,6 @@ export const RecommendationProvider = ({ children }) => {
     setRecommendedSongs([]);
     setCurrentEmotion('None');
     setError(null);
-    window.localStorage.removeItem('moodify_recommended_songs');
-    window.localStorage.removeItem('moodify_current_emotion');
   }, []);
 
   const searchTracks = useCallback(async (query) => {
