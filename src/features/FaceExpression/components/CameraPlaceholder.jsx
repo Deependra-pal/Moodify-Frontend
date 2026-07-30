@@ -106,7 +106,11 @@ const CameraPlaceholder = ({
       }
     } catch (err) {
       console.error('Error starting camera/models:', err);
-      setStatus(`Failed: ${err.message || 'Camera or Model Error'}`);
+      let errorMsg = err.message || 'Camera or Model Error';
+      if (err.name === 'NotAllowedError' || err.message?.toLowerCase().includes('permission denied')) {
+        errorMsg = 'Permission Denied. Please enable camera access in browser site settings.';
+      }
+      setStatus(`Failed: ${errorMsg}`);
       setCameraEnabled(false);
     }
   };
