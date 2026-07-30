@@ -20,6 +20,7 @@ export const PlayerProvider = ({ children }) => {
   const [volume, setVolume] = useState(0.5);
   const [isPlayerVisible, setIsPlayerVisible] = useState(false);
   const [showConnectModal, setShowConnectModal] = useState(false);
+  const [playbackSource, setPlaybackSource] = useState(null);
 
   const playerRef = useRef(null);
   const { songs: recommendedSongs } = useRecommendations();
@@ -216,8 +217,8 @@ export const PlayerProvider = ({ children }) => {
   }, []);
 
   // Trigger Spotify Playback
-  const playTrack = useCallback(async (track, playlist = []) => {
-    console.log('playTrack invoked with:', { track, playlistSize: playlist.length, deviceId });
+  const playTrack = useCallback(async (track, playlist = [], source = null) => {
+    console.log('playTrack invoked with:', { track, playlistSize: playlist.length, deviceId, source });
 
     const activeToken = await getSpotifyAccessToken();
     if (!activeToken) {
@@ -237,6 +238,9 @@ export const PlayerProvider = ({ children }) => {
     );
 
     if (isSameSong) {
+      if (source) {
+        setPlaybackSource(source);
+      }
       if (isPlaying) {
         console.log('playTrack: Same song is playing, toggling pause');
         await pauseTrack();
@@ -304,6 +308,9 @@ export const PlayerProvider = ({ children }) => {
         setIsPlaying(true);
         setPlaybackPosition(0);
         setIsPlayerVisible(true);
+        if (source) {
+          setPlaybackSource(source);
+        }
       } else {
         console.error('Spotify Play API Failed. HTTP Status:', response.status, 'Response:', response.data);
       }
@@ -312,7 +319,7 @@ export const PlayerProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [deviceId, spotifyToken, recommendedSongs, saveHistory, currentSong, isPlaying, pauseTrack, resumeTrack]);
+  }, [deviceId, spotifyToken, recommendedSongs, saveHistory, currentSong, isPlaying, pauseTrack, resumeTrack, setPlaybackSource]);
 
   // Autoplay pending track when Spotify is connected and the device is ready
   useEffect(() => {
@@ -422,7 +429,9 @@ export const PlayerProvider = ({ children }) => {
     volume,
     changeVolume,
     isPlayerVisible,
-    setIsPlayerVisible
+    setIsPlayerVisible,
+    playbackSource,
+    setPlaybackSource
   }), [
     currentSong,
     currentSongIndex,
@@ -443,7 +452,8 @@ export const PlayerProvider = ({ children }) => {
     disconnectSpotify,
     volume,
     changeVolume,
-    isPlayerVisible
+    isPlayerVisible,
+    playbackSource
   ]);
 
   return (

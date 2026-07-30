@@ -22,7 +22,7 @@ const HomePage = () => {
   const { songs, loading, error, fetchRecommendations, currentEmotion, searchTracks } = useRecommendations();
   const [searchQuery, setSearchQuery] = useState('');
   const { favorites, fetchFavorites, addFavorite, removeFavorite } = useFavorites();
-  const { playTrack, currentSong, isPlaying, setSpotifyToken } = usePlayer();
+  const { playTrack, currentSong, isPlaying, setSpotifyToken, playbackSource } = usePlayer();
 
   const handleSearchSubmit = useCallback(async (e) => {
     e.preventDefault();
@@ -195,6 +195,8 @@ const HomePage = () => {
                           (currentSong.spotifyUrl && currentSong.spotifyUrl === song.spotifyUrl) ||
                           (currentSong.name === song.name && currentSong.artist === song.artist));
 
+                      const isPlayingFromHome = isCurrentPlaying && playbackSource === 'home';
+
                       return (
                         <SongCard
                           key={`${song.uri || index}-${index}`}
@@ -203,9 +205,10 @@ const HomePage = () => {
                           album={song.album}
                           imageUrl={song.image}
                           spotifyUrl={song.spotifyUrl}
-                          isPlaying={isCurrentPlaying}
+                          isPlaying={isPlayingFromHome}
+                          isNowPlaying={isCurrentPlaying}
                           isFavorite={isFav}
-                          onPlayClick={() => playTrack(song, songs)}
+                          onPlayClick={() => playTrack(song, songs, 'home')}
                           onFavoriteClick={() => handleFavoriteToggle(song)}
                         />
                       );

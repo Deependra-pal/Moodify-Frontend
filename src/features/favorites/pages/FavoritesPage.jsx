@@ -10,7 +10,7 @@ import { usePlayer } from '../../../context/PlayerContext';
  */
 const FavoritesPage = () => {
   const { favorites, loading, error, fetchFavorites, removeFavorite, clearAllFavorites } = useFavorites();
-  const { playTrack, currentSong, isPlaying } = usePlayer();
+  const { playTrack, currentSong, isPlaying, playbackSource } = usePlayer();
   const [removingIds, setRemovingIds] = useState([]);
 
   useEffect(() => {
@@ -113,6 +113,7 @@ const FavoritesPage = () => {
 
                 const playObj = playlistObjs[index];
                 const isRemoving = removingIds.includes(fav._id);
+                const isPlayingFromFavorites = isCurrentPlaying && playbackSource === 'favorites';
 
                 return (
                   <div
@@ -129,10 +130,11 @@ const FavoritesPage = () => {
                       album={fav.album}
                       imageUrl={fav.image}
                       spotifyUrl={fav.spotifyUrl}
-                      isPlaying={isCurrentPlaying}
+                      isPlaying={isPlayingFromFavorites}
+                      isNowPlaying={isCurrentPlaying}
                       isFavorite={!isRemoving}
                       isRemoving={isRemoving}
-                      onPlayClick={() => playTrack(playObj, playlistObjs)}
+                      onPlayClick={() => playTrack(playObj, playlistObjs, 'favorites')}
                       onFavoriteClick={() => handleRemove(fav._id)}
                     />
                   </div>

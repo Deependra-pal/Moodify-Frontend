@@ -12,13 +12,16 @@ const SongCard = ({
   album,
   imageUrl,
   spotifyUrl,
-  isPlaying = false,
+  isPlaying = false,    // Active source playing (shows Pause button)
+  isNowPlaying = false, // Globally playing (shows lightweight green title / badge)
   isFavorite = false,
   onPlayClick,
   onFavoriteClick,
   disabled = false,
   isRemoving = false
 }) => {
+  const isGreen = isPlaying || isNowPlaying;
+
   return (
     <>
       {/* Mobile Spotify-style Compact List Row Layout */}
@@ -39,10 +42,17 @@ const SongCard = ({
             />
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className={`font-bold text-sm truncate select-none ${isPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
-              {title}
-            </h4>
-            <p className="text-xs text-neutral-450 truncate select-none">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h4 className={`font-bold text-sm truncate select-none flex-1 ${isGreen ? 'text-[#1db954]' : 'text-neutral-200'}`}>
+                {title}
+              </h4>
+              {isNowPlaying && (
+                <span className="text-[8px] text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/15 px-1.5 py-0.5 rounded font-black tracking-wider uppercase shrink-0">
+                  Playing
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-neutral-455 truncate select-none">
               {artist} {album && <span className="text-neutral-600 font-normal"> • {album}</span>}
             </p>
           </div>
@@ -132,9 +142,16 @@ const SongCard = ({
         </div>
 
         <div className="space-y-1">
-          <h4 className={`font-bold text-sm truncate select-none transition-colors ${isPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
-            {title}
-          </h4>
+          <div className="flex items-center gap-2 justify-between min-w-0">
+            <h4 className={`font-bold text-sm truncate select-none transition-colors flex-1 ${isGreen ? 'text-[#1db954]' : 'text-neutral-200'}`}>
+              {title}
+            </h4>
+            {isNowPlaying && (
+              <span className="text-[8px] text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/15 px-1 py-0.5 rounded font-black tracking-wider uppercase shrink-0">
+                Playing
+              </span>
+            )}
+          </div>
           <p className="text-xs text-neutral-400 truncate select-none">{artist}</p>
           {album && (
             <p className="text-[10px] text-neutral-500 truncate select-none">
@@ -175,4 +192,3 @@ const SongCard = ({
 };
 
 export default React.memo(SongCard);
-

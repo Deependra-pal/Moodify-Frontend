@@ -31,7 +31,7 @@ const formatPlayedAt = (dateString) => {
 const HistoryPage = () => {
   const { history, loading, error, fetchHistory, clearHistory } = useHistory();
   const { favorites, fetchFavorites, addFavorite, removeFavorite } = useFavorites();
-  const { playTrack, pauseTrack, isPlaying, currentSong } = usePlayer();
+  const { playTrack, pauseTrack, isPlaying, currentSong, playbackSource } = usePlayer();
 
   // Local snapshot of history list to maintain page stability while browsing
   // Pre-fill with context cache to prevent layout flashes on back-navigation
@@ -170,14 +170,16 @@ const HistoryPage = () => {
                     (currentSong.spotifyUrl && currentSong.spotifyUrl === track.spotifyUrl) ||
                     (currentSong.name === track.songName && currentSong.artist === track.artist));
 
+                const isPlayingFromHistory = isCurrentPlaying && playbackSource === 'history';
+
                 return (
                   <div
                     key={track._id || index}
                     onClick={() => {
-                      if (isCurrentPlaying) {
+                      if (isPlayingFromHistory) {
                         pauseTrack();
                       } else {
-                        playTrack(trackToPlay, historyPlaylist);
+                        playTrack(trackToPlay, historyPlaylist, 'history');
                       }
                     }}
                     className="grid grid-cols-12 items-center px-3 sm:px-6 py-4 hover:bg-[#282828]/60 cursor-pointer transition-colors duration-150 group"
@@ -187,20 +189,20 @@ const HistoryPage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (isCurrentPlaying) {
+                          if (isPlayingFromHistory) {
                             pauseTrack();
                           } else {
-                            playTrack(trackToPlay, historyPlaylist);
+                            playTrack(trackToPlay, historyPlaylist, 'history');
                           }
                         }}
                         className={`h-9 w-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${
-                          isCurrentPlaying
+                          isPlayingFromHistory
                             ? 'bg-[#1db954] text-black font-bold scale-105 shadow-lg shadow-[#1db954]/25'
                             : 'bg-white hover:bg-neutral-200 text-black'
                         }`}
-                        title={isCurrentPlaying ? 'Pause' : 'Play'}
+                        title={isPlayingFromHistory ? 'Pause' : 'Play'}
                       >
-                        {isCurrentPlaying ? (
+                        {isPlayingFromHistory ? (
                           <Pause className="h-4 w-4 fill-current text-black" />
                         ) : (
                           <Play className="h-4 w-4 fill-current text-black ml-0.5" />
@@ -216,9 +218,16 @@ const HistoryPage = () => {
                         className="h-10 w-10 rounded object-cover border border-neutral-800 shrink-0 select-none"
                       />
                       <div className="min-w-0 flex-1">
-                        <h4 className={`font-bold text-xs sm:text-sm truncate select-none ${isCurrentPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
-                          {track.songName}
-                        </h4>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <h4 className={`font-bold text-xs sm:text-sm truncate select-none flex-1 ${isCurrentPlaying ? 'text-[#1db954]' : 'text-neutral-200'}`}>
+                            {track.songName}
+                          </h4>
+                          {isCurrentPlaying && (
+                            <span className="text-[7.5px] text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/15 px-1.5 py-0.5 rounded font-black tracking-wider uppercase shrink-0 select-none">
+                              Playing
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[10px] sm:text-xs text-neutral-450 truncate select-none">
                           {track.artist}
                         </p>
