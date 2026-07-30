@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { usePlayer } from '../../../context/PlayerContext';
 import useFavorites from '../../favorites/hooks/useFavorites';
 import {
@@ -48,6 +48,62 @@ const MusicPlayer = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
+
+  // Swipe gesture states
+  const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const touchStartY = useRef(0);
+
+  // Listen for back navigation when full screen player is expanded (Android Back Button)
+  useEffect(() => {
+    const handlePopState = (e) => {
+      if (isExpanded) {
+        setIsExpanded(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isExpanded]);
+
+  // Sync browser history state with player expansion
+  useEffect(() => {
+    if (isExpanded) {
+      if (!window.history.state?.playerExpanded) {
+        window.history.pushState({ playerExpanded: true }, '');
+      }
+    } else {
+      if (window.history.state?.playerExpanded) {
+        window.history.back();
+      }
+    }
+  }, [isExpanded]);
+
+  // Swipe touch handlers
+  const handleTouchStart = (e) => {
+    if (e.target.closest('input[type="range"]')) return;
+    touchStartY.current = e.touches[0].clientY;
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - touchStartY.current;
+    if (deltaY > 0) {
+      setDragY(deltaY);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (dragY > 120) {
+      setIsExpanded(false);
+    }
+    setDragY(0);
+  };
 
   // Check if current playing song is favorited
   const isCurrentFavorite = useMemo(() => {
@@ -170,7 +226,7 @@ const MusicPlayer = () => {
             <h4 className={`text-xs sm:text-sm font-bold truncate ${isPlaying ? 'text-[#1db954]' : 'text-neutral-100'}`}>
               {title}
             </h4>
-            <p className="text-[10px] sm:text-xs text-neutral-450 truncate">
+            <p className="text-[10px] sm:text-xs text-neutral-455 truncate">
               {artist}
             </p>
           </div>
@@ -241,7 +297,7 @@ const MusicPlayer = () => {
             </button>
           </div>
 
-          <div className="flex items-center gap-3 w-full text-[10px] text-neutral-450 font-semibold group">
+          <div className="flex items-center gap-3 w-full text-[10px] text-neutral-455 font-semibold group">
             <span>{formatTime(playbackPosition)}</span>
             <input
               type="range"
@@ -329,12 +385,22 @@ const MusicPlayer = () => {
         </div>
       </div>
 
-      {/* ----------------- FULL SCREEN MUSIC PLAYER (Slide-up modal overlay) ----------------- */}
+      {/* ----------------- FULL SCREEN MUSIC PLAYER (Slide-up modal overlay with swipe gestures) ----------------- */}
       <div
-        className={`fixed inset-0 z-50 bg-gradient-to-b from-[#241212] via-[#121212] to-[#121212] flex flex-col justify-between px-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pt-[calc(1.5rem+env(safe-area-inset-top,0px))] transition-all duration-300 ease-out ${
-          isExpanded
-            ? 'translate-y-0 opacity-100 scale-100'
-            : 'translate-y-full opacity-0 scale-95 pointer-events-none'
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          transform: isExpanded
+            ? `translate3d(0, ${dragY}px, 0) scale(${Math.max(0.96, 1 - dragY / 3000)})`
+            : 'translate3d(0, 100%, 0) scale(0.95)',
+          opacity: isExpanded
+            ? Math.max(0.2, 1 - dragY / 400)
+            : 0,
+          transition: isDragging ? 'none' : 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.28s cubic-bezier(0.25, 1, 0.5, 1)'
+        }}
+        className={`fixed inset-0 z-50 bg-gradient-to-b from-[#241212] via-[#121212] to-[#121212] flex flex-col justify-between px-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pt-[calc(1.5rem+env(safe-area-inset-top,0px))] ${
+          isExpanded ? '' : 'pointer-events-none'
         }`}
       >
         {/* TOP BAR: Header and minimize chevron */}
@@ -353,7 +419,7 @@ const MusicPlayer = () => {
 
         {/* COVER ARTWORK CONTAINER */}
         <div className="flex-1 flex items-center justify-center my-6 max-h-[40vh] sm:max-h-[50vh]">
-          <div className="aspect-square w-[75vw] sm:w-[50vw] max-w-[320px] max-h-[320px] rounded-2xl overflow-hidden shadow-2xl border border-neutral-900/60 transition-transform duration-300 transform scale-100 hover:scale-102">
+          <div className="aspect-square w-[75vw] sm:w-[50vw] max-w-[320px] max-h-[320px] rounded-2xl overflow-hidden shadow-2xl border border-neutral-900/60 transition-transform duration-300 transform scale-100 hover:scale-102 select-none pointer-events-none">
             <img
               src={coverImage}
               alt={title}
