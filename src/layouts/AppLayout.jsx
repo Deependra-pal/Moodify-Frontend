@@ -28,7 +28,7 @@ const AppLayout = ({ children }) => {
       {/* Main viewport panels */}
       <div 
         ref={scrollContainerRef}
-        className="flex-1 flex flex-col h-full overflow-y-auto pb-[144px] md:pb-[96px]"
+        className="flex-1 flex flex-col h-full overflow-y-auto pb-[calc(9rem+env(safe-area-inset-bottom,0px))] md:pb-[96px]"
       >
         {children}
       </div>

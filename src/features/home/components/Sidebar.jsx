@@ -84,7 +84,7 @@ const Sidebar = () => {
       </aside>
 
       {/* --- MOBILE BOTTOM TAB BAR --- */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#090909]/95 backdrop-blur-md border-t border-neutral-900 flex items-center justify-around z-50 px-2 py-1">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] bg-[#090909]/95 backdrop-blur-md border-t border-neutral-900 flex items-center justify-around z-50 px-2 py-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (

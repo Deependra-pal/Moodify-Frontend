@@ -58,7 +58,7 @@ const MusicPlayer = () => {
       return (
         <button
           onClick={() => setIsPlayerVisible(true)}
-          className="fixed bottom-20 md:bottom-6 right-6 z-40 bg-[#1db954] hover:bg-[#1ed760] text-black h-12 px-5 rounded-full shadow-2xl active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-2 font-bold text-xs border border-black/10"
+          className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 right-6 z-40 bg-[#1db954] hover:bg-[#1ed760] text-black h-12 px-5 rounded-full shadow-2xl active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-2 font-bold text-xs border border-black/10"
           title="Restore Music Player"
         >
           <span className="relative flex h-2 w-2">
@@ -77,7 +77,7 @@ const MusicPlayer = () => {
   const coverImage = currentSong?.image || defaultAlbum;
 
   return (
-    <div className="fixed bottom-16 md:bottom-0 left-0 right-0 h-20 bg-[#121212]/95 backdrop-blur-md border-t border-neutral-900 px-4 md:px-6 flex items-center justify-between gap-4 z-40 select-none">
+    <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 h-20 bg-[#121212]/95 backdrop-blur-md border-t border-neutral-900 px-4 md:px-6 flex items-center justify-between gap-4 z-40 select-none">
       {/* LEFT PANEL: Track Info */}
       <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
         <img
