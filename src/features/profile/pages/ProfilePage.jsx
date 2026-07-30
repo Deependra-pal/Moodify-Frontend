@@ -143,7 +143,7 @@ const ProfilePage = () => {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-8 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8 space-y-8">
         
         {/* Metrics Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

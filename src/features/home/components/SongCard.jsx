@@ -55,11 +55,11 @@ const SongCard = ({
           <button
             onClick={onFavoriteClick}
             disabled={disabled}
-            className={`p-2 transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
-              isFavorite ? 'text-red-500 fill-current hover:text-red-400' : 'text-neutral-500 hover:text-neutral-350'
+            className={`p-2 transition-colors cursor-pointer active:scale-90 duration-100 ${
+              isFavorite ? 'text-red-500 hover:text-red-400' : 'text-neutral-500 active:text-red-500'
             }`}
           >
-            <Heart className="h-4.5 w-4.5" />
+            <Heart className={`h-4.5 w-4.5 ${isFavorite ? 'fill-red-500 text-red-500' : 'fill-none'}`} />
           </button>
           <button
             onClick={(e) => {
@@ -137,10 +137,10 @@ const SongCard = ({
               onClick={onFavoriteClick}
               disabled={disabled}
               className={`transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
-                isFavorite ? 'text-red-500 fill-current hover:text-red-400' : 'text-neutral-500 hover:text-neutral-350'
+                isFavorite ? 'text-red-500 hover:text-red-400' : 'text-neutral-500 hover:text-red-500'
               }`}
             >
-              <Heart className="h-4 w-4" />
+              <Heart className={`h-4 w-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'fill-none'}`} />
             </button>
           </div>
         </div>

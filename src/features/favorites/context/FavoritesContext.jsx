@@ -51,14 +51,34 @@ export const FavoritesProvider = ({ children }) => {
   // Add track to favorites
   const addFavorite = useCallback(async (songDetails) => {
     setError(null);
+    const tempId = `temp-${Date.now()}`;
+    const optimisticFavorite = {
+      _id: tempId,
+      songName: songDetails.songName,
+      artist: songDetails.artist,
+      album: songDetails.album || 'Unknown Album',
+      image: songDetails.image || '',
+      spotifyUri: songDetails.spotifyUri || '',
+      spotifyUrl: songDetails.spotifyUrl || '',
+      isOptimistic: true
+    };
+
+    // Prepend optimistic item instantly to toggle UI heart icon
+    setFavorites((prev) => [optimisticFavorite, ...prev]);
+
     try {
       const response = await favoriteService.addFavorite(songDetails);
       if (response && response.success && response.data?.favorite) {
-        setFavorites((prev) => [response.data.favorite, ...prev]);
+        // Swap temp optimistic model with actual backend-saved DB object
+        setFavorites((prev) =>
+          prev.map((item) => (item._id === tempId ? response.data.favorite : item))
+        );
         return response.data.favorite;
       }
       throw new Error(response.message || 'Failed to add favorite');
     } catch (err) {
+      // Revert/rollback change on failure
+      setFavorites((prev) => prev.filter((item) => item._id !== tempId));
       console.error('Error adding favorite:', err);
       setError(err.response?.data?.message || err.message || 'Something went wrong');
       throw err;
@@ -68,14 +88,29 @@ export const FavoritesProvider = ({ children }) => {
   // Remove track from favorites by database ID
   const removeFavorite = useCallback(async (favoriteId) => {
     setError(null);
+
+    let rollbackFavorites;
+    setFavorites((prev) => {
+      rollbackFavorites = prev;
+      return prev.filter((item) => item._id !== favoriteId);
+    });
+
     try {
+      // If favoriteId is a temp ID (in-flight optimistic toggle), bypass remote delete call
+      if (typeof favoriteId === 'string' && favoriteId.startsWith('temp-')) {
+        return true;
+      }
+
       const response = await favoriteService.removeFavorite(favoriteId);
       if (response && response.success) {
-        setFavorites((prev) => prev.filter((item) => item._id !== favoriteId));
         return true;
       }
       throw new Error(response.message || 'Failed to remove favorite');
     } catch (err) {
+      // Rollback to previous state on failure
+      if (rollbackFavorites) {
+        setFavorites(rollbackFavorites);
+      }
       console.error('Error removing favorite:', err);
       setError(err.response?.data?.message || err.message || 'Something went wrong');
       throw err;

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from '../features/home/components/Sidebar';
 import MusicPlayer from '../features/home/components/MusicPlayer';
+import { usePlayer } from '../context/PlayerContext';
 
 /**
  * Shared layout component wrapping all authenticated dashboard screens.
@@ -11,6 +12,9 @@ import MusicPlayer from '../features/home/components/MusicPlayer';
 const AppLayout = ({ children }) => {
   const location = useLocation();
   const scrollContainerRef = useRef(null);
+  const { currentSong, isPlayerVisible } = usePlayer();
+
+  const isPlayerActive = currentSong && isPlayerVisible;
 
   // Reset scroll position to top on every page navigation
   useEffect(() => {
@@ -26,11 +30,15 @@ const AppLayout = ({ children }) => {
       <Sidebar />
 
       {/* Main viewport panels */}
-      <div 
+      <div
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto"
       >
-        <div className="flex flex-col min-h-full w-full pb-[calc(9rem+env(safe-area-inset-bottom,0px))] md:pb-[96px]">
+        <div className={`flex flex-col min-h-full w-full ${
+          isPlayerActive
+            ? 'pb-[calc(7rem+env(safe-area-inset-bottom,0px))]'
+            : 'pb-[calc(4rem+env(safe-area-inset-bottom,0px))]'
+        } md:pb-[20px]`}>
           {children}
         </div>
       </div>

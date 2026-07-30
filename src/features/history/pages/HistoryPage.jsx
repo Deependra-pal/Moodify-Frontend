@@ -116,7 +116,7 @@ const HistoryPage = () => {
       </header>
 
       {/* Main viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-6 pb-3 sm:py-8">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to load history</p>
@@ -216,12 +216,10 @@ const HistoryPage = () => {
                       <button
                         onClick={() => handleFavoriteToggle(track)}
                         className={`transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
-                          isFavorited
-                            ? 'text-red-500 fill-current hover:text-red-400'
-                            : 'text-neutral-600 hover:text-neutral-400'
+                          isFavorited ? 'text-red-500 hover:text-red-400' : 'text-neutral-600 hover:text-red-500 active:text-red-500'
                         }`}
                       >
-                        <Heart className="h-4 w-4" />
+                        <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'fill-none'}`} />
                       </button>
                     </div>
                   </div>
