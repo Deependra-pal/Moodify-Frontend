@@ -100,47 +100,47 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[#121212] px-4 py-12 text-white">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-[#181818] p-8 shadow-2xl border border-neutral-900">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[#121212] px-4 py-8 text-white">
+      <div className="w-full max-w-md space-y-5 rounded-2xl bg-[#181818] p-6 shadow-2xl border border-neutral-900">
         
         {/* Header/Logo */}
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#1db954] shadow-md shadow-[#1db954]/20 animate-pulse">
-            <Music className="h-9 w-9 text-black fill-current" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1db954] shadow-md shadow-[#1db954]/20 animate-pulse">
+            <Music className="h-6 w-6 text-black fill-current" />
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-white">
+          <h2 className="mt-4 text-2xl font-black tracking-tight text-white select-none">
             Moodify
           </h2>
-          <p className="mt-2 text-sm text-neutral-400">
+          <p className="mt-0.5 text-xs text-neutral-400">
             Music tailored to your emotions.
           </p>
         </div>
 
         {/* Status Messages */}
         {successMessage && (
-          <div className="flex items-center gap-2 rounded-lg bg-green-500/10 p-3 text-sm text-green-400 border border-green-500/20">
+          <div className="flex items-center gap-2 rounded-lg bg-green-500/10 p-2.5 text-xs text-green-400 border border-green-500/20">
             <p>{successMessage}</p>
           </div>
         )}
 
         {errors.api && (
-          <div className="flex items-start gap-2 rounded-lg bg-red-500/10 p-3 text-sm text-red-400 border border-red-500/20">
-            <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 rounded-lg bg-red-500/10 p-2.5 text-xs text-red-400 border border-red-500/20">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
             <p>{errors.api}</p>
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+        <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-3.5">
             
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
+              <label htmlFor="email" className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
                 Email Address
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Mail className="h-5 w-5 text-neutral-500" />
+                  <Mail className="h-4 w-4 text-neutral-500" />
                 </div>
                 <input
                   id="email"
@@ -151,14 +151,14 @@ const LoginPage = () => {
                   disabled={isSubmitting}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`block w-full rounded-lg bg-[#242424] py-3 pl-10 pr-3 text-sm text-white placeholder-neutral-500 border ${
+                  className={`block w-full rounded-lg bg-[#242424] py-2 pl-9 pr-3 text-xs text-white placeholder-neutral-500 border ${
                     errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-transparent focus:border-[#1db954] focus:ring-[#1db954]/20'
                   } outline-none focus:ring-2 transition-all duration-200`}
                   placeholder="name@example.com"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-xs text-red-400 flex items-center gap-1">
+                <p className="mt-1 text-[10px] text-red-400 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" /> {errors.email}
                 </p>
               )}
@@ -166,12 +166,12 @@ const LoginPage = () => {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
+              <label htmlFor="password" className="block text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">
                 Password
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <Lock className="h-5 w-5 text-neutral-500" />
+                  <Lock className="h-4 w-4 text-neutral-500" />
                 </div>
                 <input
                   id="password"
@@ -182,7 +182,7 @@ const LoginPage = () => {
                   disabled={isSubmitting}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`block w-full rounded-lg bg-[#242424] py-3 pl-10 pr-10 text-sm text-white placeholder-neutral-500 border ${
+                  className={`block w-full rounded-lg bg-[#242424] py-2 pl-9 pr-10 text-xs text-white placeholder-neutral-500 border ${
                     errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-transparent focus:border-[#1db954] focus:ring-[#1db954]/20'
                   } outline-none focus:ring-2 transition-all duration-200`}
                   placeholder="••••••••"
@@ -192,11 +192,11 @@ const LoginPage = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500 hover:text-neutral-300"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-xs text-red-400 flex items-center gap-1">
+                <p className="mt-1 text-[10px] text-red-400 flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" /> {errors.password}
                 </p>
               )}
@@ -204,32 +204,32 @@ const LoginPage = () => {
           </div>
 
           {/* Remember Me & Forgot Password */}
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-xs pt-1">
             <label className="flex items-center cursor-pointer select-none gap-2">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-neutral-700 bg-[#242424] text-[#1db954] focus:ring-0 focus:ring-offset-0 accent-[#1db954]"
+                className="h-3.5 w-3.5 rounded border-neutral-700 bg-[#242424] text-[#1db954] focus:ring-0 focus:ring-offset-0 accent-[#1db954]"
               />
-              <span className="text-xs text-neutral-400 hover:text-neutral-200 transition-colors">Remember me</span>
+              <span className="text-[11px] text-neutral-400 hover:text-neutral-200 transition-colors">Remember me</span>
             </label>
 
             <button
               type="button"
               onClick={handleForgotPassword}
-              className="text-xs font-semibold text-[#1db954] hover:underline"
+              className="text-[11px] font-bold text-[#1db954] hover:underline"
             >
               Forgot password?
             </button>
           </div>
 
           {/* Submit Button */}
-          <div>
+          <div className="pt-1">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex w-full items-center justify-center rounded-full bg-[#1db954] px-4 py-3 text-sm font-bold text-black shadow-lg hover:bg-[#1ed760] active:scale-95 disabled:pointer-events-none disabled:opacity-55 transition-all duration-200 cursor-pointer"
+              className="flex w-full items-center justify-center rounded-full bg-[#1db954] px-4 py-2.5 text-xs font-bold text-black shadow-lg hover:bg-[#1ed760] active:scale-95 disabled:pointer-events-none disabled:opacity-55 transition-all duration-200 cursor-pointer"
             >
               {isSubmitting ? (
                 <>
@@ -244,7 +244,7 @@ const LoginPage = () => {
         </form>
 
         {/* Navigate to Register */}
-        <div className="mt-6 text-center text-sm border-t border-neutral-900 pt-6">
+        <div className="mt-4 text-center text-xs border-t border-neutral-900 pt-4">
           <span className="text-neutral-400">Don't have an account? </span>
           <Link
             to="/register"
