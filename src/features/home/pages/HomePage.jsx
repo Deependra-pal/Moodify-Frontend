@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
-import CameraPlaceholder from '../components/CameraPlaceholder';
+import CameraPlaceholder from '../../FaceExpression/components/CameraPlaceholder';
 import RecommendationEmptyState from '../components/RecommendationEmptyState';
 import SongCard from '../components/SongCard';
 import useRecommendations from '../hooks/useRecommendations';
