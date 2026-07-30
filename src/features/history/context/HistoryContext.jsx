@@ -33,7 +33,7 @@ export const HistoryProvider = ({ children }) => {
     try {
       const response = await historyService.getHistory();
       if (response && response.success) {
-        const data = response.data.history || [];
+        const data = (response.data.history || []).slice(0, 20);
         setHistory(data);
         setIsLoaded(true);
         return data;
@@ -76,7 +76,7 @@ export const HistoryProvider = ({ children }) => {
       }
       
       const filtered = prev.filter((item) => item.spotifyUri !== songDetails.spotifyUri);
-      return [newEntry, ...filtered];
+      return [newEntry, ...filtered].slice(0, 20);
     });
 
     // 2. Perform background synchronization with database
@@ -86,7 +86,7 @@ export const HistoryProvider = ({ children }) => {
         // Hydrate backend values (replace temp entry with server document)
         setHistory((prev) => {
           const filtered = prev.filter((item) => item.spotifyUri !== response.data.history.spotifyUri);
-          return [response.data.history, ...filtered];
+          return [response.data.history, ...filtered].slice(0, 20);
         });
         return response.data.history;
       }
