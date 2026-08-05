@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import * as chatService from '../services/chatService';
 import {
   connectSocket,
@@ -25,12 +25,18 @@ export const ChatProvider = ({ children }) => {
   // Real-Time States
   const [onlineUsers, setOnlineUsers] = useState([]); // List of online User IDs
   const [typingUsers, setTypingUsers] = useState({}); // { [conversationId]: { userId, username } }
+  const [unreadCounts, setUnreadCounts] = useState({}); // { [conversationId]: number }
 
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
   const [isLoadingFriends, setIsLoadingFriends] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [error, setError] = useState(null);
+
+  // Compute total unread messages count across all conversations
+  const totalUnreadCount = useMemo(() => {
+    return Object.values(unreadCounts).reduce((sum, count) => sum + (count || 0), 0);
+  }, [unreadCounts]);
 
   // Helper to check if a user is online
   const isUserOnline = useCallback((userId) => {
@@ -39,15 +45,25 @@ export const ChatProvider = ({ children }) => {
     return onlineUsers.some(id => id.toString() === rawId);
   }, [onlineUsers]);
 
-  // Fetch all user conversations
+  // Fetch all user conversations and populate unread counts
   const loadConversations = useCallback(async () => {
     if (!user) return;
     setIsLoadingConversations(true);
     setError(null);
     try {
       const res = await chatService.getUserConversations();
-      if (res.success) {
-        setConversations(res.data.conversations || []);
+      if (res.success && res.data?.conversations) {
+        const convs = res.data.conversations;
+        setConversations(convs);
+
+        // Populate unreadCounts map
+        const initialUnread = {};
+        convs.forEach(c => {
+          if (c._id) {
+            initialUnread[c._id] = c.unreadCount || 0;
+          }
+        });
+        setUnreadCounts(initialUnread);
       }
     } catch (err) {
       console.error('Failed to fetch conversations:', err);
@@ -86,7 +102,22 @@ export const ChatProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Fetch messages for a specific conversation
+  // Mark conversation as read and clear its unread count
+  const markAsSeen = useCallback(async (conversationId) => {
+    if (!conversationId) return;
+    setUnreadCounts(prev => ({
+      ...prev,
+      [conversationId]: 0
+    }));
+
+    try {
+      await chatService.markAsRead(conversationId);
+    } catch (err) {
+      console.warn('Failed to mark conversation as read:', err.message);
+    }
+  }, []);
+
+  // Fetch messages for a specific conversation and mark as seen
   const loadMessages = useCallback(async (conversationId) => {
     if (!conversationId) return;
     setIsLoadingMessages(true);
@@ -95,6 +126,8 @@ export const ChatProvider = ({ children }) => {
       const res = await chatService.getConversationMessages(conversationId);
       if (res.success) {
         setMessages(res.data.messages || []);
+        // Automatically mark as seen when loading messages
+        await markAsSeen(conversationId);
       }
     } catch (err) {
       console.error('Failed to load messages:', err);
@@ -102,7 +135,7 @@ export const ChatProvider = ({ children }) => {
     } finally {
       setIsLoadingMessages(false);
     }
-  }, []);
+  }, [markAsSeen]);
 
   // Open or create conversation with a friend
   const openChatWithFriend = useCallback(async (friendUser) => {
@@ -123,7 +156,7 @@ export const ChatProvider = ({ children }) => {
           return prev;
         });
 
-        // Load messages for the active conversation
+        // Load messages and mark as seen
         await loadMessages(conv._id);
       }
     } catch (err) {
@@ -246,13 +279,11 @@ export const ChatProvider = ({ children }) => {
 
       // Listen for online users list broadcast
       const handleGetOnlineUsers = (usersList) => {
-        console.log('⚡ Received Online Users Broadcast:', usersList);
         setOnlineUsers(usersList || []);
       };
 
       // Listen for incoming friend request in real-time
       const handleFriendRequestReceived = (reqData) => {
-        console.log('⚡ Real-Time Friend Request Received:', reqData);
         if (reqData && reqData._id) {
           setPendingRequests(prev => {
             const exists = prev.some(r => r._id === reqData._id);
@@ -264,8 +295,7 @@ export const ChatProvider = ({ children }) => {
       };
 
       // Listen for accepted friend request notification in real-time
-      const handleFriendRequestAccepted = (data) => {
-        console.log('⚡ Real-Time Friend Request Accepted:', data);
+      const handleFriendRequestAccepted = () => {
         loadFriends();
         loadConversations();
       };
@@ -292,54 +322,30 @@ export const ChatProvider = ({ children }) => {
       setMessages([]);
       setOnlineUsers([]);
       setTypingUsers({});
+      setUnreadCounts({});
     }
   }, [user, loadConversations, loadFriends, loadPendingRequests]);
 
-  // Manage room joining and Socket Event Listeners for active conversation
+  // Global socket listener for conversation updates & unread increments
   useEffect(() => {
-    if (!activeConversation || !activeConversation._id) return;
-
-    const convId = activeConversation._id;
-    joinRoom(convId);
-
     const socket = getSocket();
     if (!socket) return;
 
-    // Listen for live incoming message
-    const handleNewMessage = (msg) => {
-      if (!msg) return;
+    const handleGlobalConvUpdate = (data) => {
+      if (!data || !data.conversationId) return;
 
-      const msgConvId = (msg.conversation?._id || msg.conversation)?.toString();
-      const activeConvId = (convId?._id || convId)?.toString();
+      const currentUserId = user?.id || user?._id;
+      const activeId = activeConversation?._id?.toString();
 
-      console.log(`⚡ Realtime Socket Message Received: "${msg.text}" (Conv: ${msgConvId}, Active: ${activeConvId})`);
-
-      if (msgConvId && activeConvId && msgConvId === activeConvId) {
-        setMessages(prev => {
-          const exists = prev.some(m => (m._id || m.id)?.toString() === (msg._id || msg.id)?.toString());
-          if (!exists) return [...prev, msg];
-          return prev;
-        });
-
-        // Clear typing indicator for this conversation upon receiving a message
-        setTypingUsers(prev => {
-          const next = { ...prev };
-          delete next[convId];
-          return next;
-        });
-
-        // Update active conversation snippet
-        setActiveConversation(prev => ({
+      // If message came from someone else and conversation is not currently active, increment unread count
+      if (data.senderId?.toString() !== currentUserId?.toString() && data.conversationId !== activeId) {
+        setUnreadCounts(prev => ({
           ...prev,
-          lastMessage: msg.text,
-          lastMessageAt: msg.createdAt || new Date().toISOString()
+          [data.conversationId]: (prev[data.conversationId] || 0) + 1
         }));
       }
-    };
 
-    // Listen for live conversation list updates
-    const handleConversationUpdated = (data) => {
-      if (!data || !data.conversationId) return;
+      // Update conversation in sidebar list
       setConversations(prev => {
         const existing = prev.find(c => c._id === data.conversationId);
         if (!existing) return prev;
@@ -355,11 +361,55 @@ export const ChatProvider = ({ children }) => {
       });
     };
 
+    socket.on('conversationUpdated', handleGlobalConvUpdate);
+    return () => {
+      socket.off('conversationUpdated', handleGlobalConvUpdate);
+    };
+  }, [activeConversation, user]);
+
+  // Manage room joining and Socket Event Listeners for active conversation
+  useEffect(() => {
+    if (!activeConversation || !activeConversation._id) return;
+
+    const convId = activeConversation._id;
+    joinRoom(convId);
+
+    const socket = getSocket();
+    if (!socket) return;
+
+    // Automatically mark active conversation as seen
+    markAsSeen(convId);
+
+    // Listen for live incoming message
+    const handleNewMessage = (msg) => {
+      if (!msg) return;
+
+      const msgConvId = (msg.conversation?._id || msg.conversation)?.toString();
+      const activeConvId = (convId?._id || convId)?.toString();
+
+      if (msgConvId && activeConvId && msgConvId === activeConvId) {
+        setMessages(prev => {
+          const exists = prev.some(m => (m._id || m.id)?.toString() === (msg._id || msg.id)?.toString());
+          if (!exists) return [...prev, msg];
+          return prev;
+        });
+
+        // Clear typing indicator for this conversation upon receiving a message
+        setTypingUsers(prev => {
+          const next = { ...prev };
+          delete next[convId];
+          return next;
+        });
+
+        // Mark incoming message as seen since chat is open
+        markAsSeen(convId);
+      }
+    };
+
     // Listen for live typing events
     const handleTyping = (data) => {
       if (!data || !data.conversationId) return;
       const currentUserId = user?.id || user?._id;
-      // Ignore self-typing events
       if (data.userId?.toString() === currentUserId?.toString()) return;
 
       setTypingUsers(prev => ({
@@ -379,18 +429,16 @@ export const ChatProvider = ({ children }) => {
     };
 
     socket.on('newMessage', handleNewMessage);
-    socket.on('conversationUpdated', handleConversationUpdated);
     socket.on('typing', handleTyping);
     socket.on('stopTyping', handleStopTyping);
 
     return () => {
       leaveRoom(convId);
       socket.off('newMessage', handleNewMessage);
-      socket.off('conversationUpdated', handleConversationUpdated);
       socket.off('typing', handleTyping);
       socket.off('stopTyping', handleStopTyping);
     };
-  }, [activeConversation, user]);
+  }, [activeConversation, user, markAsSeen]);
 
   // Helper typing triggers for input
   const sendTypingNotification = useCallback(() => {
@@ -415,6 +463,8 @@ export const ChatProvider = ({ children }) => {
     messages,
     onlineUsers,
     typingUsers,
+    unreadCounts,
+    totalUnreadCount,
     isUserOnline,
     isLoadingConversations,
     isLoadingFriends,
@@ -433,6 +483,7 @@ export const ChatProvider = ({ children }) => {
     handleRejectRequest,
     sendTypingNotification,
     sendStopTypingNotification,
+    markAsSeen,
     setError
   };
 

@@ -57,3 +57,8 @@ export const getConversationMessages = async (conversationId) => {
   const response = await api.get(`/messages/${conversationId}`);
   return response.data;
 };
+
+export const markAsRead = async (conversationId) => {
+  const response = await api.put(`/messages/read/${conversationId}`);
+  return response.data;
+};

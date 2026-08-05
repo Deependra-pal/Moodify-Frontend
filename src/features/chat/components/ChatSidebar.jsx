@@ -46,6 +46,7 @@ const ChatSidebar = () => {
     friends,
     pendingRequests,
     activeConversation,
+    unreadCounts,
     selectConversation,
     openChatWithFriend,
     handleAcceptRequest,
@@ -200,6 +201,7 @@ const ChatSidebar = () => {
 
                 const friendId = friend._id || friend.id;
                 const online = isUserOnline(friendId);
+                const unread = unreadCounts[conv._id] !== undefined ? unreadCounts[conv._id] : (conv.unreadCount || 0);
 
                 return (
                   <button
@@ -226,11 +228,19 @@ const ChatSidebar = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
                         <p className="text-xs font-bold truncate text-white">{friend.username}</p>
-                        <span className="text-[10px] text-zinc-500 font-semibold shrink-0 ml-1">
-                          {formatTime(conv.lastMessageAt || conv.updatedAt)}
-                        </span>
+                        <div className="flex items-center gap-1 shrink-0 ml-1">
+                          <span className="text-[10px] text-zinc-500 font-semibold">
+                            {formatTime(conv.lastMessageAt || conv.updatedAt)}
+                          </span>
+                          {/* Unread Messages Badge */}
+                          {unread > 0 && (
+                            <span className="bg-[#1db954] text-black font-black text-[10px] px-1.5 py-0.2 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse">
+                              {unread}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-[11px] text-zinc-400 truncate leading-snug">
+                      <p className={`text-[11px] truncate leading-snug ${unread > 0 ? 'text-white font-bold' : 'text-zinc-400'}`}>
                         {conv.lastMessage || <span className="italic text-zinc-600">No messages yet</span>}
                       </p>
                     </div>

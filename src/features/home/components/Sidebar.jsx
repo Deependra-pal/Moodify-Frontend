@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { Music, Heart, History, User, LogOut, Home, MessageSquare } from 'lucide-react';
 import useAuth from '../../auth/hooks/useAuth';
+import useChat from '../../chat/hooks/useChat';
 
 /**
  * Spotify & Linear inspired Sidebar Navigation component.
@@ -9,6 +10,7 @@ import useAuth from '../../auth/hooks/useAuth';
  */
 const Sidebar = () => {
   const { user, logout } = useAuth();
+  const { totalUnreadCount } = useChat();
 
   const getInitials = (name) => {
     if (!name) return 'U';
@@ -17,7 +19,7 @@ const Sidebar = () => {
 
   const navItems = [
     { to: '/', label: 'Home', icon: Home },
-    { to: '/chat', label: 'Messages', icon: MessageSquare },
+    { to: '/chat', label: 'Messages', icon: MessageSquare, badge: totalUnreadCount },
     { to: '/favorites', label: 'Favorites', icon: Heart },
     { to: '/history', label: 'History', icon: History },
     { to: '/profile', label: 'Profile', icon: User }
@@ -49,7 +51,7 @@ const Sidebar = () => {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 ${
+                    `flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 relative ${
                       isActive
                         ? 'bg-[#18181b] text-white border-l-2 border-[#1db954] shadow-md shadow-[#1db954]/5 font-bold'
                         : 'hover:text-white hover:bg-[#18181b]/60'
@@ -57,7 +59,14 @@ const Sidebar = () => {
                   }
                 >
                   <Icon className="h-4.5 w-4.5" />
-                  {item.label}
+                  <span>{item.label}</span>
+
+                  {/* Unread Messages Badge */}
+                  {item.badge > 0 && (
+                    <span className="ml-auto bg-[#1db954] text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse">
+                      {item.badge}
+                    </span>
+                  )}
                 </NavLink>
               );
             })}
@@ -97,12 +106,19 @@ const Sidebar = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center flex-1 gap-1 text-[10px] font-bold tracking-wide transition-all ${
+                `flex flex-col items-center justify-center flex-1 gap-1 text-[10px] font-bold tracking-wide transition-all relative ${
                   isActive ? 'text-[#1db954]' : 'text-zinc-500 hover:text-zinc-300'
                 }`
               }
             >
-              <Icon className="h-5 w-5" />
+              <div className="relative">
+                <Icon className="h-5 w-5" />
+                {item.badge > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-[#1db954] text-black text-[9px] font-black px-1.5 py-0.2 rounded-full shadow-md animate-pulse">
+                    {item.badge}
+                  </span>
+                )}
+              </div>
               <span>{item.label}</span>
             </NavLink>
           );
