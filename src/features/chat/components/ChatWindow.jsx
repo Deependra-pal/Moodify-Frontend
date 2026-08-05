@@ -77,7 +77,7 @@ const ChatWindow = () => {
       activeConversation ? 'flex' : 'hidden md:flex'
     }`}>
       {/* 📌 PINNED TOP HEADER */}
-      <div className="sticky top-0 z-30 p-3.5 px-4 sm:px-6 bg-[#121214]/95 backdrop-blur-xl border-b border-white/5 flex items-center justify-between shrink-0 shadow-md">
+      <div className="sticky top-0 z-30 p-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] px-4 sm:px-6 bg-[#121214]/95 backdrop-blur-xl border-b border-white/5 flex items-center justify-between shrink-0 shadow-md">
         <div className="flex items-center gap-3 min-w-0">
           {/* Mobile Back Button Arrow (<) */}
           <button

@@ -93,7 +93,7 @@ const ChatSidebar = () => {
       activeConversation ? 'hidden md:flex' : 'flex'
     }`}>
       {/* Sidebar Top Header & Controls */}
-      <div className="p-3 border-b border-white/5 space-y-2.5 bg-[#09090b]">
+      <div className="p-3 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] border-b border-white/5 space-y-2.5 bg-[#09090b]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="h-8.5 w-8.5 rounded-xl bg-gradient-to-br from-[#1db954]/20 to-[#1ed760]/10 border border-[#1db954]/20 flex items-center justify-center text-[#1db954] shadow-sm">
