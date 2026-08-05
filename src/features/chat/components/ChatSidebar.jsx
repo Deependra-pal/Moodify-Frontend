@@ -111,33 +111,35 @@ const ChatSidebar = () => {
     <aside className={`w-full md:w-80 h-full bg-[#09090b] border-r border-white/5 flex-col shrink-0 select-none ${
       activeConversation ? 'hidden md:flex' : 'flex'
     }`}>
-      {/* Sidebar Top Header & Controls - Aligned with HomePage Top Padding */}
-      <div className="px-4 sm:px-5 py-4 sm:py-5 border-b border-white/5 space-y-3 bg-[#09090b]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="h-8.5 w-8.5 rounded-xl bg-gradient-to-br from-[#1db954]/20 to-[#1ed760]/10 border border-[#1db954]/20 flex items-center justify-center text-[#1db954] shadow-sm">
-              <MessageSquare className="h-4 w-4" />
+      {/* Sidebar Top Header & Controls - Structured 3-Section Layout */}
+      <div className="px-4 sm:px-5 py-4 sm:py-5 border-b border-white/5 space-y-3.5 bg-[#09090b]">
+        {/* SECTION 1: HEADER & ADD FRIEND */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#1db954]/20 via-[#1db954]/10 to-transparent border border-[#1db954]/25 flex items-center justify-center text-[#1db954] shadow-md shadow-[#1db954]/5 shrink-0">
+              <MessageSquare className="h-4.5 w-4.5" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h2 className="text-lg font-black tracking-tight text-white leading-none">Messages</h2>
-              <span className="text-[10px] font-bold text-zinc-500 mt-0.5 block">{friends.length} Total Friends</span>
+              <span className="text-[10.5px] font-semibold text-zinc-400 mt-1 block">
+                {friends.length} Friends
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-1.5 bg-[#1db954] text-black hover:bg-[#1ed760] px-3.5 py-1.5 rounded-full text-xs font-black transition-all shadow-md shadow-[#1db954]/20 cursor-pointer active:scale-95"
-            >
-              <UserPlus className="h-3.5 w-3.5 stroke-[2.5]" />
-              Add Friend
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsSearchOpen(true)}
+            className="flex items-center gap-1.5 bg-[#1db954] text-black hover:bg-[#1ed760] px-3.5 py-1.5 rounded-full text-xs font-black transition-all shadow-md shadow-[#1db954]/15 cursor-pointer active:scale-95 shrink-0 outline-none focus:outline-none focus:ring-0"
+          >
+            <UserPlus className="h-3.5 w-3.5 stroke-[2.5]" />
+            Add Friend
+          </button>
         </div>
 
-        {/* Dynamic Context-Aware Search Bar */}
+        {/* SECTION 2: CONTEXT-AWARE SEARCH BAR */}
         <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
+          <Search className="absolute left-3.5 top-3 h-4 w-4 text-zinc-500 pointer-events-none" />
           <input
             type="text"
             value={filterText}
@@ -147,53 +149,53 @@ const ChatSidebar = () => {
                 ? 'Search conversations...'
                 : activeTab === 'friends'
                 ? 'Search friends...'
-                : 'Search friend requests...'
+                : 'Search requests...'
             }
-            className="w-full bg-[#121214] text-white text-[11px] placeholder-zinc-500 rounded-full pl-8.5 pr-3 py-1.5 border border-white/5 focus:outline-none focus:border-[#1db954]/60 focus:ring-1 focus:ring-[#1db954]/30 transition-all h-8"
+            className="w-full bg-[#121214] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-xl pl-9 pr-3 py-2 border border-white/5 focus:outline-none focus:border-[#1db954]/60 focus:ring-1 focus:ring-[#1db954]/30 transition-all h-10"
           />
         </div>
 
-        {/* 3 Tab Navigation Buttons - Clean Outline-Free Switching */}
-        <div className="flex bg-[#121214] p-1 rounded-xl border border-white/5 text-[11px]">
+        {/* SECTION 3: 3 NAVIGATION MODE TABS */}
+        <div className="flex bg-[#121214] p-1 rounded-xl border border-white/5 text-xs gap-1">
           <button
             type="button"
             onClick={() => handleTabChange('chats')}
-            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:outline-none select-none ${
+            className={`flex-1 py-2 font-black rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
               activeTab === 'chats'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
-            <MessageSquare className="h-3 w-3 text-[#1db954]" />
+            <MessageSquare className="h-4 w-4 text-[#1db954]" />
             Chats
           </button>
 
           <button
             type="button"
             onClick={() => handleTabChange('friends')}
-            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:outline-none select-none ${
+            className={`flex-1 py-2 font-black rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
               activeTab === 'friends'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
-            <Users className="h-3 w-3 text-sky-400" />
+            <Users className="h-4 w-4 text-sky-400" />
             Friends
           </button>
 
           <button
             type="button"
             onClick={() => handleTabChange('requests')}
-            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 relative cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:outline-none select-none ${
+            className={`flex-1 py-2 font-black rounded-lg transition-all flex items-center justify-center gap-1.5 relative cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
               activeTab === 'requests'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
-            <Inbox className="h-3 w-3 text-amber-400" />
+            <Inbox className="h-4 w-4 text-amber-400" />
             Requests
             {pendingRequests.length > 0 && (
-              <span className="bg-[#1db954] text-black font-black text-[9px] px-1.5 py-0.2 rounded-full shadow-md animate-pulse shrink-0">
+              <span className="bg-[#1db954] text-black font-black text-[10px] px-1.5 py-0.2 rounded-full shadow-md animate-pulse shrink-0 ml-0.5">
                 {pendingRequests.length}
               </span>
             )}
@@ -226,7 +228,7 @@ const ChatSidebar = () => {
                   <button
                     key={conv._id}
                     onClick={() => selectConversation(conv)}
-                    className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between gap-3 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
+                    className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between gap-3 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
                       isActive
                         ? 'bg-[#18181b] text-white border border-[#1db954]/60 shadow-md shadow-[#1db954]/10'
                         : 'bg-[#121214] hover:bg-[#18181b] text-zinc-300 border border-white/5 hover:border-white/10'
@@ -234,13 +236,13 @@ const ChatSidebar = () => {
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="relative shrink-0">
-                        <div className={`h-9 w-9 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
+                        <div className={`h-10 w-10 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
                           online ? 'border-[#1db954]/50' : 'border-white/10'
                         }`}>
                           {friend.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
                         </div>
                         <span
-                          className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-[#09090b] ${
+                          className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-[#09090b] ${
                             online ? 'bg-[#1db954]' : 'bg-zinc-600'
                           }`}
                           title={online ? 'Online' : 'Offline'}
@@ -249,17 +251,17 @@ const ChatSidebar = () => {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between mb-0.5">
-                          <p className="text-xs font-bold truncate text-white">{friend.username}</p>
-                          <span className="text-[10px] text-zinc-500 font-semibold shrink-0 ml-1">
+                          <p className="text-xs sm:text-sm font-bold truncate text-white">{friend.username}</p>
+                          <span className="text-[11px] text-zinc-400 font-semibold shrink-0 ml-1">
                             {formatTime(conv.lastMessageAt || conv.updatedAt)}
                           </span>
                         </div>
                         <div className="flex items-center justify-between gap-1">
-                          <p className={`text-[11px] truncate leading-snug ${unread > 0 ? 'text-white font-extrabold' : 'text-zinc-400'}`}>
-                            {conv.lastMessage || <span className="italic text-zinc-600">No messages yet</span>}
+                          <p className={`text-xs truncate leading-snug ${unread > 0 ? 'text-white font-black' : 'text-zinc-400'}`}>
+                            {conv.lastMessage || <span className="italic text-zinc-500">No messages yet</span>}
                           </p>
                           {unread > 0 && (
-                            <span className="bg-[#1db954] text-black font-black text-[9px] px-1.5 py-0.2 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse shrink-0">
+                            <span className="bg-[#1db954] text-black font-black text-[10px] px-1.5 py-0.2 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse shrink-0">
                               {unread}
                             </span>
                           )}

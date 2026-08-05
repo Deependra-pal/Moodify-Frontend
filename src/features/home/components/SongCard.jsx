@@ -43,17 +43,17 @@ const SongCard = ({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 min-w-0">
-              <h4 className={`font-bold text-sm truncate select-none flex-1 ${isGreen ? 'text-[#1db954]' : 'text-neutral-200'}`}>
+              <h4 className={`font-bold text-sm sm:text-base truncate select-none flex-1 ${isGreen ? 'text-[#1db954]' : 'text-neutral-200'}`}>
                 {title}
               </h4>
               {isNowPlaying && (
-                <span className="text-[8px] text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/15 px-1.5 py-0.5 rounded font-black tracking-wider uppercase shrink-0">
+                <span className="text-[9px] sm:text-[10px] text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/15 px-1.5 py-0.5 rounded font-black tracking-wider uppercase shrink-0">
                   Playing
                 </span>
               )}
             </div>
-            <p className="text-xs text-neutral-455 truncate select-none">
-              {artist} {album && <span className="text-neutral-600 font-normal"> • {album}</span>}
+            <p className="text-xs sm:text-sm text-neutral-400 font-medium truncate select-none">
+              {artist} {album && <span className="text-neutral-500 font-normal"> • {album}</span>}
             </p>
           </div>
         </div>
@@ -65,7 +65,7 @@ const SongCard = ({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="p-2 text-neutral-450 hover:text-[#1db954] cursor-pointer transition-colors"
+              className="p-2 text-neutral-400 hover:text-[#1db954] cursor-pointer transition-colors"
               title="Open in Spotify"
             >
               <ExternalLink className="h-4 w-4" />
@@ -81,7 +81,7 @@ const SongCard = ({
               isFavorite ? 'text-red-500 hover:text-red-400' : 'text-neutral-500 active:text-red-500'
             }`}
           >
-            <Heart className={`h-4.5 w-4.5 ${isFavorite ? 'fill-red-500 text-red-500' : 'fill-none'}`} />
+            <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'fill-none'}`} />
           </button>
           <button
             onClick={(e) => {
@@ -143,18 +143,18 @@ const SongCard = ({
 
         <div className="space-y-1">
           <div className="flex items-center gap-2 justify-between min-w-0">
-            <h4 className={`font-bold text-sm truncate select-none transition-colors flex-1 ${isGreen ? 'text-[#1db954]' : 'text-neutral-200'}`}>
+            <h4 className={`font-bold text-base truncate select-none transition-colors flex-1 ${isGreen ? 'text-[#1db954]' : 'text-neutral-200'}`}>
               {title}
             </h4>
             {isNowPlaying && (
-              <span className="text-[8px] text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/15 px-1 py-0.5 rounded font-black tracking-wider uppercase shrink-0">
+              <span className="text-[9px] text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/15 px-1.5 py-0.5 rounded font-black tracking-wider uppercase shrink-0">
                 Playing
               </span>
             )}
           </div>
-          <p className="text-xs text-neutral-400 truncate select-none">{artist}</p>
+          <p className="text-xs sm:text-sm text-neutral-400 font-medium truncate select-none">{artist}</p>
           {album && (
-            <p className="text-[10px] text-neutral-500 truncate select-none">
+            <p className="text-xs text-neutral-500 truncate select-none">
               {album}
             </p>
           )}

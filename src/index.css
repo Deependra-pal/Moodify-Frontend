@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+/* --- GLOBAL SPACING & TYPOGRAPHY DESIGN SYSTEM TOKENS --- */
+:root {
+  --app-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --app-safe-area-top: env(safe-area-inset-top, 0px);
+  
+  /* Mobile Tab Bar (4rem / 64px) + Safe Area */
+  --nav-bar-height: calc(4rem + var(--app-safe-area-bottom));
+  
+  /* Mini Music Player Deck (5rem / 80px) */
+  --player-deck-height: 5rem;
+  
+  /* Universal Breathing Space above fixed bottom elements */
+  --app-bottom-breathing-space: 1.5rem; /* 24px comfortable breathing room */
+}
+
+html {
+  font-size: 15px; /* Upgraded application-wide base font scale for high legibility */
+}
+
 html,
 body,
 #root {
@@ -16,6 +35,9 @@ body,
   touch-action: manipulation;
   -webkit-user-select: none;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Enable text selection inside input fields & message paragraphs */
@@ -67,4 +89,25 @@ textarea,
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #1db954;
+}
+
+/* Centralized Page Container Design Token */
+.app-page-view {
+  width: 100%;
+  max-width: 64rem; /* max-w-5xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .app-page-view {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+  }
 }

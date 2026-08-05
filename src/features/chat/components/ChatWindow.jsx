@@ -106,8 +106,8 @@ const ChatWindow = () => {
 
           {/* Recipient Details & Live Status */}
           <div className="min-w-0 space-y-0.5">
-            <h3 className="text-sm sm:text-base font-bold text-white truncate leading-tight">{friend?.username || 'Chat'}</h3>
-            <p className="text-[11px] font-semibold flex items-center gap-1.5 truncate">
+            <h3 className="text-base sm:text-lg font-black text-white truncate leading-tight">{friend?.username || 'Chat'}</h3>
+            <p className="text-xs font-semibold flex items-center gap-1.5 truncate">
               <span className={`inline-block h-1.5 w-1.5 rounded-full ${isOnline ? 'bg-[#1db954] animate-pulse' : 'bg-zinc-600'}`} />
               <span className={isOnline ? 'text-[#1db954]' : 'text-zinc-500'}>
                 {isOnline ? 'Online' : 'Offline'}
@@ -128,7 +128,7 @@ const ChatWindow = () => {
         </div>
       )}
 
-      {/* 📜 MESSAGES SCROLL VIEWPORT - Top Padding Added */}
+      {/* 📜 MESSAGES SCROLL VIEWPORT - Top Padding & Readable Mobile Fonts */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-4 space-y-4 custom-scrollbar min-h-0">
         {isLoadingMessages ? (
           <MessageSkeleton />
@@ -144,7 +144,7 @@ const ChatWindow = () => {
                 className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} animate-in fade-in duration-200`}
               >
                 <div
-                  className={`max-w-[85%] sm:max-w-[70%] md:max-w-[60%] px-4 py-2.5 sm:py-3 rounded-2xl text-sm leading-relaxed break-words shadow-md ${
+                  className={`max-w-[85%] sm:max-w-[70%] md:max-w-[60%] px-4 py-2.5 sm:py-3 rounded-2xl text-sm sm:text-base leading-relaxed break-words shadow-md ${
                     isMe
                       ? 'bg-gradient-to-r from-[#1db954] to-[#1ed760] text-black font-semibold rounded-br-xs shadow-md shadow-[#1db954]/10'
                       : 'bg-[#1e1e22]/90 text-zinc-100 border border-white/5 rounded-bl-xs'
@@ -152,7 +152,7 @@ const ChatWindow = () => {
                 >
                   <p className="select-text">{msg.text}</p>
                 </div>
-                <span className="text-[10px] text-zinc-500 mt-1 px-1 font-medium select-none">
+                <span className="text-[11px] text-zinc-400 mt-1 px-1 font-semibold select-none">
                   {formatMessageTime(msg.createdAt)}
                 </span>
               </div>

@@ -46,19 +46,19 @@ const Sidebar = () => {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 relative ${
+                    `flex items-center gap-3.5 px-4 py-3 rounded-xl text-base font-bold tracking-wide transition-all duration-200 relative ${
                       isActive
-                        ? 'bg-[#18181b] text-white border-l-2 border-[#1db954] shadow-md shadow-[#1db954]/5 font-bold'
+                        ? 'bg-[#18181b] text-white border-l-2 border-[#1db954] shadow-md shadow-[#1db954]/5'
                         : 'hover:text-white hover:bg-[#18181b]/60'
                     }`
                   }
                 >
-                  <Icon className="h-4.5 w-4.5" />
+                  <Icon className="h-5 w-5" />
                   <span>{item.label}</span>
 
                   {/* Unread Messages Badge */}
                   {item.badge > 0 && (
-                    <span className="ml-auto bg-[#1db954] text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse">
+                    <span className="ml-auto bg-[#1db954] text-black text-xs font-black px-2 py-0.5 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse">
                       {item.badge}
                     </span>
                   )}
@@ -76,15 +76,15 @@ const Sidebar = () => {
               {user ? getInitials(user.username) : 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider select-none">Logged In</p>
-              <p className="text-xs font-bold text-zinc-200 truncate select-none">{user?.username}</p>
+              <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider select-none">Logged In</p>
+              <p className="text-xs sm:text-sm font-bold text-zinc-200 truncate select-none">{user?.username}</p>
             </div>
           </div>
 
           {/* Logout Button */}
           <button
             onClick={logout}
-            className="flex w-full items-center justify-center gap-2 bg-[#18181b] border border-white/5 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 active:scale-95 px-4 py-2.5 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 bg-[#18181b] border border-white/5 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 active:scale-95 px-4 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer"
           >
             <LogOut className="h-4 w-4" />
             Log Out
@@ -101,15 +101,15 @@ const Sidebar = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center flex-1 gap-1 text-[10px] font-bold tracking-wide transition-all relative ${
-                  isActive ? 'text-[#1db954]' : 'text-zinc-500 hover:text-zinc-300'
+                `flex flex-col items-center justify-center flex-1 gap-1 text-xs font-bold tracking-wide transition-all relative ${
+                  isActive ? 'text-[#1db954]' : 'text-zinc-400 hover:text-zinc-200'
                 }`
               }
             >
               <div className="relative">
                 <Icon className="h-5 w-5" />
                 {item.badge > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-[#1db954] text-black text-[9px] font-black px-1.5 py-0.2 rounded-full shadow-md animate-pulse">
+                  <span className="absolute -top-1 -right-2 bg-[#1db954] text-black text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-md animate-pulse">
                     {item.badge}
                   </span>
                 )}
