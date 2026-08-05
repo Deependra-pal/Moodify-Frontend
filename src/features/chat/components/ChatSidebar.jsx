@@ -153,14 +153,15 @@ const ChatSidebar = () => {
           />
         </div>
 
-        {/* 3 Tab Navigation Buttons */}
+        {/* 3 Tab Navigation Buttons - Clean Outline-Free Switching */}
         <div className="flex bg-[#121214] p-1 rounded-xl border border-white/5 text-[11px]">
           <button
+            type="button"
             onClick={() => handleTabChange('chats')}
-            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:outline-none select-none ${
               activeTab === 'chats'
-                ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
+                : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
             <MessageSquare className="h-3 w-3 text-[#1db954]" />
@@ -168,11 +169,12 @@ const ChatSidebar = () => {
           </button>
 
           <button
+            type="button"
             onClick={() => handleTabChange('friends')}
-            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:outline-none select-none ${
               activeTab === 'friends'
-                ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
+                : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
             <Users className="h-3 w-3 text-sky-400" />
@@ -180,11 +182,12 @@ const ChatSidebar = () => {
           </button>
 
           <button
+            type="button"
             onClick={() => handleTabChange('requests')}
-            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 relative cursor-pointer ${
+            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 relative cursor-pointer outline-none focus:outline-none focus:ring-0 focus-visible:outline-none select-none ${
               activeTab === 'requests'
-                ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
+                : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
             <Inbox className="h-3 w-3 text-amber-400" />
