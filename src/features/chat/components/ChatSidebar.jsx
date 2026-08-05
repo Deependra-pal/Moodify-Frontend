@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Users, UserPlus, Check, X, Search, Clock, RefreshCw } from 'lucide-react';
+import { MessageSquare, Users, UserPlus, Check, X, Search, Clock, RefreshCw, UserCheck } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
 import UserSearchModal from './UserSearchModal';
@@ -156,7 +156,9 @@ const ChatSidebar = () => {
             <Users className="h-3.5 w-3.5 text-sky-400" />
             Friends ({friends.length})
             {pendingRequests.length > 0 && (
-              <span className="h-2 w-2 rounded-full bg-[#1db954] absolute top-1 right-2 animate-pulse" />
+              <span className="bg-[#1db954] text-black font-extrabold text-[10px] px-1.5 py-0.5 rounded-full shadow-md animate-pulse shrink-0">
+                +{pendingRequests.length}
+              </span>
             )}
           </button>
         </div>
@@ -238,30 +240,53 @@ const ChatSidebar = () => {
         {/* --- FRIENDS TAB --- */}
         {activeTab === 'friends' && (
           <div className="space-y-3 p-1">
-            {/* Pending Requests Section */}
+            {/* Real-Time Pending Requests Section */}
             {pendingRequests.length > 0 && (
-              <div className="bg-[#121214] border border-amber-500/20 p-3 rounded-xl space-y-2">
-                <p className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" />
-                  Pending Requests ({pendingRequests.length})
-                </p>
+              <div className="bg-[#121214] border border-amber-500/30 p-3 rounded-2xl space-y-2.5 shadow-xl animate-in fade-in duration-300">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 animate-pulse" />
+                    Incoming Friend Requests
+                  </p>
+                  <span className="bg-amber-500/20 text-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-amber-500/30">
+                    {pendingRequests.length} Pending
+                  </span>
+                </div>
+
                 {pendingRequests.map((req) => (
-                  <div key={req._id} className="flex items-center justify-between gap-2 bg-[#18181b] p-2 rounded-lg border border-white/5">
-                    <span className="text-xs font-bold text-white truncate">{req.sender?.username}</span>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        onClick={() => handleAcceptRequest(req._id)}
-                        className="p-1 rounded-md bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors"
-                        title="Accept"
-                      >
-                        <Check className="h-3.5 w-3.5" />
-                      </button>
+                  <div
+                    key={req._id}
+                    className="flex flex-col gap-2 bg-[#18181b] p-3 rounded-xl border border-white/5 hover:border-white/10 transition-all"
+                  >
+                    <div className="flex items-center justify-between gap-2 min-w-0">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="h-8 w-8 rounded-full bg-zinc-800 border border-white/10 text-white font-bold flex items-center justify-center text-xs shrink-0">
+                          {req.sender?.username ? req.sender.username.substring(0, 2).toUpperCase() : 'U'}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-white truncate">{req.sender?.username}</p>
+                          <p className="text-[10px] text-zinc-400 truncate">{req.sender?.fullName || 'Sent a friend request'}</p>
+                        </div>
+                      </div>
+                      <span className="text-[9px] text-zinc-500 font-semibold shrink-0">
+                        {formatTime(req.createdAt)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 pt-1 border-t border-white/5">
                       <button
                         onClick={() => handleRejectRequest(req._id)}
-                        className="p-1 rounded-md bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
-                        title="Reject"
+                        className="px-3 py-1 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-red-500/20"
                       >
-                        <X className="h-3.5 w-3.5" />
+                        <X className="h-3 w-3" />
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => handleAcceptRequest(req._id)}
+                        className="px-3.5 py-1 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black text-xs font-extrabold transition-all flex items-center gap-1 cursor-pointer shadow-md shadow-[#1db954]/20 active:scale-95"
+                      >
+                        <Check className="h-3 w-3 stroke-[3]" />
+                        Accept
                       </button>
                     </div>
                   </div>

@@ -242,7 +242,29 @@ export const ChatProvider = ({ children }) => {
         setOnlineUsers(usersList || []);
       };
 
+      // Listen for incoming friend request in real-time
+      const handleFriendRequestReceived = (reqData) => {
+        console.log('⚡ Real-Time Friend Request Received:', reqData);
+        if (reqData && reqData._id) {
+          setPendingRequests(prev => {
+            const exists = prev.some(r => r._id === reqData._id);
+            if (!exists) return [reqData, ...prev];
+            return prev;
+          });
+        }
+        loadPendingRequests();
+      };
+
+      // Listen for accepted friend request notification in real-time
+      const handleFriendRequestAccepted = (data) => {
+        console.log('⚡ Real-Time Friend Request Accepted:', data);
+        loadFriends();
+        loadConversations();
+      };
+
       socket.on('getOnlineUsers', handleGetOnlineUsers);
+      socket.on('friendRequestReceived', handleFriendRequestReceived);
+      socket.on('friendRequestAccepted', handleFriendRequestAccepted);
 
       loadConversations();
       loadFriends();
@@ -250,6 +272,8 @@ export const ChatProvider = ({ children }) => {
 
       return () => {
         socket.off('getOnlineUsers', handleGetOnlineUsers);
+        socket.off('friendRequestReceived', handleFriendRequestReceived);
+        socket.off('friendRequestAccepted', handleFriendRequestAccepted);
       };
     } else {
       disconnectSocket();
