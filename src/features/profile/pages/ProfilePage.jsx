@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import useProfile from '../hooks/useProfile';
 import useAuth from '../../auth/hooks/useAuth';
-import { User, Mail, Save, Calendar, Play, RefreshCw, BarChart2, CheckCircle2, AlertTriangle } from 'lucide-react';
-import defaultAlbum from '../../../assets/default_album.png';
+import useChat from '../../chat/hooks/useChat';
+import { useNavigate } from 'react-router-dom';
+import { User, Mail, Save, Calendar, Play, RefreshCw, BarChart2, CheckCircle2, AlertTriangle, Users, UserCheck, Heart, Edit3, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react';
 
 /**
- * User Profile dashboard component.
- * Displays metrics (play count, favorite count, member status),
- * profile info form editor, and the 5 most recently played tracks.
+ * Spotify-Authentic User Profile page with Tabbed Navigation.
+ * Includes Overview, Friends & Following, and Edit Settings tabs.
+ * Removed Recently Played tracks section.
  */
 const ProfilePage = () => {
   const {
@@ -21,8 +22,11 @@ const ProfilePage = () => {
     setSuccess,
     setError
   } = useProfile();
-  const { logout } = useAuth();
+  const { user } = useAuth();
+  const { friends, openChatWithFriend } = useChat();
+  const navigate = useNavigate();
 
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'friends' | 'settings'
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -56,7 +60,6 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if there are actual changes from the current profile details
     const hasChanges =
       formData.fullName !== (profile?.fullName || '') ||
       formData.username !== (profile?.username || '') ||
@@ -81,128 +84,282 @@ const ProfilePage = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
-  const formatJoinedDate = (dateString) => {
-    if (!dateString) return 'Member';
+  const formatJoinedYear = (dateString) => {
+    if (!dateString) return '2026';
     const date = new Date(dateString);
-    const formatted = date.toLocaleDateString('en-US', {
-      month: 'long',
-      year: 'numeric'
-    });
-    return `Member since ${formatted}`;
-  };
-
-  // Helper relative time format for recently played songs
-  const formatPlayedAt = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    return date.getFullYear();
   };
 
   if (loading) {
     return (
-      <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col items-center justify-center space-y-4">
-        <RefreshCw className="h-10 w-10 text-[#1db954] animate-spin" />
-        <p className="text-sm font-semibold tracking-wider text-neutral-400">
-          Loading profile dashboard...
+      <div className="flex-1 min-h-screen bg-[#09090b] text-white flex flex-col items-center justify-center space-y-4">
+        <RefreshCw className="h-9 w-9 text-[#1db954] animate-spin" />
+        <p className="text-xs font-semibold tracking-wider text-zinc-400">
+          Loading Spotify Profile...
         </p>
       </div>
     );
   }
 
+  const followersCount = friends?.length || 0;
+  const followingCount = friends?.length || 0;
+  const displayName = profile?.fullName || profile?.username || 'User Profile';
+
   return (
-    <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
-      {/* Header Profile Info Banner */}
-      <header className="bg-gradient-to-b from-[#1b2b1b] to-[#121212] px-4 sm:px-6 py-6 sm:py-8 md:py-12 border-b border-neutral-900/60">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-          {/* Avatar Banner */}
-          <div className="h-20 w-20 sm:h-28 sm:w-28 md:h-36 md:w-36 bg-gradient-to-br from-[#282828] to-[#181818] rounded-full flex items-center justify-center shadow-2xl shrink-0 border border-neutral-700/30 text-white font-black text-2xl sm:text-3xl md:text-4xl">
-            {profile ? getInitials(profile.fullName || profile.username) : 'U'}
+    <div className="flex-1 min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans select-none">
+      
+      {/* --- SPOTIFY HERO HEADER BANNER --- */}
+      <header className="bg-gradient-to-b from-[#1a3d24] via-[#102417] to-[#09090b] px-6 sm:px-10 pt-10 pb-8 border-b border-white/5 relative overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#1db954]/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center sm:items-end gap-6 sm:gap-8 relative z-10">
+          {/* Massive Circular Spotify Avatar */}
+          <div className="h-36 w-36 sm:h-44 sm:w-44 md:h-48 md:w-48 rounded-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-black flex items-center justify-center text-white font-black text-5xl sm:text-6xl md:text-7xl shadow-2xl border-4 border-[#09090b] shrink-0 shadow-black/80">
+            {getInitials(displayName)}
           </div>
 
-          <div className="space-y-1.5 sm:space-y-2 text-center sm:text-left min-w-0">
-            <span className="text-[10px] sm:text-xs uppercase font-black tracking-widest text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20 px-2.5 py-1 rounded-full">
-              User Account
+          {/* Profile Header Details */}
+          <div className="space-y-2 text-center sm:text-left min-w-0">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20 px-3 py-1 rounded-full inline-block">
+              Public Profile
             </span>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-white truncate leading-none mt-1 sm:mt-2">
-              {profile?.fullName || profile?.username}
+            <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white truncate leading-none py-1">
+              {displayName}
             </h1>
-            <p className="text-xs sm:text-sm font-semibold text-neutral-400 flex items-center justify-center sm:justify-start gap-1.5 mt-0.5 sm:mt-1">
-              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#1db954]" />
-              {formatJoinedDate(profile?.joinedDate)}
-            </p>
+
+            {/* Spotify Meta Stats Line */}
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs font-semibold text-zinc-300 pt-1">
+              <span className="text-white font-bold">{profile?.username}</span>
+              <span className="text-zinc-500">•</span>
+              <span className="text-white font-bold">{followersCount}</span>
+              <span className="text-zinc-400">Followers</span>
+              <span className="text-zinc-500">•</span>
+              <span className="text-white font-bold">{followingCount}</span>
+              <span className="text-zinc-400">Following</span>
+              <span className="text-zinc-500">•</span>
+              <span className="text-white font-bold">{profile?.totalPlayedSongs || 0}</span>
+              <span className="text-zinc-400">Played</span>
+              <span className="text-zinc-500">•</span>
+              <span className="text-white font-bold">{profile?.totalFavoriteSongs || 0}</span>
+              <span className="text-zinc-400">Favorites</span>
+            </div>
+
+            {profile?.bio && (
+              <p className="text-xs text-zinc-400 max-w-xl line-clamp-2 pt-1 font-normal italic">
+                "{profile.bio}"
+              </p>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:py-8 space-y-8 min-h-[75vh]">
-        
-        {/* Metrics Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="bg-[#181818] border border-neutral-900 rounded-xl p-5 shadow-md flex items-center gap-4">
-            <div className="h-12 w-12 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-[#1db954]">
-              <Play className="h-6 w-6 fill-current" />
-            </div>
-            <div>
-              <p className="text-xs uppercase font-bold text-neutral-500 tracking-wider">Total Played</p>
-              <h3 className="text-xl sm:text-2xl font-black text-white">{profile?.totalPlayedSongs || 0}</h3>
-            </div>
+      {/* --- SPOTIFY TAB NAVIGATION BAR --- */}
+      <section className="bg-[#09090b] px-6 sm:px-10 py-3 border-b border-white/5 sticky top-0 z-20 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Tabs Group */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
+                activeTab === 'overview'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('friends')}
+              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'friends'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+              }`}
+            >
+              <Users className="h-3.5 w-3.5" />
+              Friends ({friends.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'settings'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+              }`}
+            >
+              <Edit3 className="h-3.5 w-3.5" />
+              Edit Profile
+            </button>
           </div>
 
-          <div className="bg-[#181818] border border-neutral-900 rounded-xl p-5 shadow-md flex items-center gap-4">
-            <div className="h-12 w-12 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-red-500">
-              <BarChart2 className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-xs uppercase font-bold text-neutral-500 tracking-wider">Total Favorites</p>
-              <h3 className="text-xl sm:text-2xl font-black text-white">{profile?.totalFavoriteSongs || 0}</h3>
-            </div>
-          </div>
-
-          <div className="bg-[#181818] border border-neutral-900 rounded-xl p-5 shadow-md flex items-center gap-4">
-            <div className="h-12 w-12 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-blue-400">
-              <Mail className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs uppercase font-bold text-neutral-500 tracking-wider">Email Address</p>
-              <h3 className="text-sm font-bold text-neutral-300 truncate">{profile?.email}</h3>
-            </div>
-          </div>
+          <span className="text-xs font-bold text-zinc-500 hidden sm:inline">
+            Member since {formatJoinedYear(profile?.joinedDate)}
+          </span>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Block: Edit Profile Details */}
-          <div className="lg:col-span-7 bg-[#181818] border border-neutral-900 rounded-2xl p-4 sm:p-6 shadow-xl space-y-6">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-200 border-b border-neutral-900 pb-3">
+      {/* --- TAB CONTENT AREA --- */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-10 py-8 space-y-8">
+        
+        {/* --- OVERVIEW TAB --- */}
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            {/* Spotify Stats Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="bg-[#121214] border border-white/5 rounded-2xl p-5 shadow-lg flex items-center gap-4 hover:border-zinc-800 transition-all">
+                <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center text-[#1db954] shrink-0">
+                  <Play className="h-5 w-5 fill-current" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] uppercase font-bold text-zinc-400 tracking-wider">Total Played</p>
+                  <h3 className="text-2xl font-black text-white">{profile?.totalPlayedSongs || 0}</h3>
+                </div>
+              </div>
+
+              <div className="bg-[#121214] border border-white/5 rounded-2xl p-5 shadow-lg flex items-center gap-4 hover:border-zinc-800 transition-all">
+                <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center text-rose-500 shrink-0">
+                  <Heart className="h-5 w-5 fill-current" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] uppercase font-bold text-zinc-400 tracking-wider">Favorites</p>
+                  <h3 className="text-2xl font-black text-white">{profile?.totalFavoriteSongs || 0}</h3>
+                </div>
+              </div>
+
+              <div className="bg-[#121214] border border-white/5 rounded-2xl p-5 shadow-lg flex items-center gap-4 hover:border-zinc-800 transition-all">
+                <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center text-indigo-400 shrink-0">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] uppercase font-bold text-zinc-400 tracking-wider">Followers</p>
+                  <h3 className="text-2xl font-black text-white">{followersCount}</h3>
+                </div>
+              </div>
+
+              <div className="bg-[#121214] border border-white/5 rounded-2xl p-5 shadow-lg flex items-center gap-4 hover:border-zinc-800 transition-all">
+                <div className="h-12 w-12 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center text-sky-400 shrink-0">
+                  <UserCheck className="h-5 w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] uppercase font-bold text-zinc-400 tracking-wider">Following</p>
+                  <h3 className="text-2xl font-black text-white">{followingCount}</h3>
+                </div>
+              </div>
+            </div>
+
+            {/* Account Information Summary Card */}
+            <div className="bg-[#121214] border border-white/5 rounded-2xl p-6 sm:p-8 space-y-4 shadow-xl">
+              <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2 border-b border-white/5 pb-3">
+                <ShieldCheck className="h-5 w-5 text-[#1db954]" />
+                Account & Profile Summary
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+                <div className="space-y-1">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Username</p>
+                  <p className="text-sm font-bold text-white">{profile?.username}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Email Address</p>
+                  <p className="text-sm font-bold text-white truncate">{profile?.email}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Account Status</p>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                    <Sparkles className="h-3.5 w-3.5" /> Premium Active
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- FRIENDS & COMMUNITY TAB --- */}
+        {activeTab === 'friends' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+              <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                <Users className="h-5 w-5 text-[#1db954]" />
+                Your Friends & Network ({friends.length})
+              </h2>
+            </div>
+
+            {friends.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {friends.map((f) => {
+                  const friendUser = f.user;
+                  if (!friendUser) return null;
+
+                  return (
+                    <div
+                      key={f.friendshipId || friendUser._id}
+                      className="bg-[#121214] border border-white/5 p-4 rounded-2xl flex items-center justify-between gap-3 hover:border-white/10 transition-all"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-11 w-11 rounded-full bg-zinc-800 border border-white/10 text-white font-bold flex items-center justify-center text-sm shrink-0">
+                          {friendUser.username ? friendUser.username.substring(0, 2).toUpperCase() : 'U'}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-white truncate">{friendUser.username}</p>
+                          <p className="text-xs text-zinc-400 truncate">{friendUser.fullName || friendUser.email}</p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          openChatWithFriend(friendUser);
+                          navigate('/chat');
+                        }}
+                        className="bg-[#1db954] text-black hover:bg-[#1ed760] text-xs font-extrabold px-4 py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5 fill-current" />
+                        Chat
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-16 space-y-3 text-zinc-500 border border-white/5 rounded-2xl bg-[#121214]">
+                <Users className="h-10 w-10 mx-auto text-zinc-600" />
+                <p className="text-sm font-bold text-zinc-400">No friends added yet</p>
+                <button
+                  onClick={() => navigate('/chat')}
+                  className="text-xs font-extrabold text-[#1db954] hover:underline"
+                >
+                  Go to Messages & Find Friends
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* --- EDIT PROFILE SETTINGS TAB --- */}
+        {activeTab === 'settings' && (
+          <div className="bg-[#121214] border border-white/5 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6 max-w-3xl mx-auto">
+            <h2 className="text-lg font-bold tracking-tight text-white border-b border-white/5 pb-3 flex items-center gap-2">
+              <Edit3 className="h-5 w-5 text-[#1db954]" />
               Profile Metadata Settings
             </h2>
 
             {error && (
-              <div className="flex items-start gap-2.5 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
-                <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
-                <p className="text-xs font-semibold">{error}</p>
+              <div className="flex items-start gap-2.5 rounded-xl bg-red-500/10 p-4 text-xs text-red-400 border border-red-500/20">
+                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                <p className="font-semibold">{error}</p>
               </div>
             )}
 
             {success && (
-              <div className="flex items-start gap-2.5 rounded-lg bg-green-500/10 p-4 text-sm text-green-400 border border-green-500/20">
-                <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
-                <p className="text-xs font-semibold">{success}</p>
+              <div className="flex items-start gap-2.5 rounded-xl bg-emerald-500/10 p-4 text-xs text-emerald-400 border border-emerald-500/20">
+                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
+                <p className="font-semibold">{success}</p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="fullName" className="text-xs font-bold text-neutral-400 uppercase tracking-wide">
+                <div className="space-y-2">
+                  <label htmlFor="fullName" className="text-xs font-bold text-zinc-400 uppercase tracking-wide">
                     Full Name
                   </label>
                   <input
@@ -211,13 +368,13 @@ const ProfilePage = () => {
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
-                    className="w-full bg-[#242424] border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#1db954] transition-colors"
-                    placeholder="Enter your name"
+                    className="w-full bg-[#18181b] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#1db954] focus:ring-1 focus:ring-[#1db954] transition-all"
+                    placeholder="Enter full name"
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="username" className="text-xs font-bold text-neutral-400 uppercase tracking-wide">
+                <div className="space-y-2">
+                  <label htmlFor="username" className="text-xs font-bold text-zinc-400 uppercase tracking-wide">
                     Username
                   </label>
                   <input
@@ -226,16 +383,16 @@ const ProfilePage = () => {
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    className="w-full bg-[#242424] border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#1db954] transition-colors"
+                    className="w-full bg-[#18181b] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#1db954] focus:ring-1 focus:ring-[#1db954] transition-all"
                     placeholder="Enter username"
                     required
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label htmlFor="email" className="text-xs font-bold text-neutral-400 uppercase tracking-wide">
-                  Email Account (Disabled)
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-xs font-bold text-zinc-400 uppercase tracking-wide">
+                  Email Address
                 </label>
                 <div className="relative">
                   <input
@@ -243,15 +400,15 @@ const ProfilePage = () => {
                     id="email"
                     value={profile?.email || ''}
                     disabled
-                    className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-11 pr-4 py-3 text-sm text-neutral-500 cursor-not-allowed select-none"
+                    className="w-full bg-[#18181b]/50 border border-white/5 rounded-xl pl-11 pr-4 py-3 text-sm text-zinc-500 cursor-not-allowed select-none"
                   />
-                  <Mail className="absolute left-4 top-3.5 h-4 w-4 text-neutral-600" />
+                  <Mail className="absolute left-4 top-3.5 h-4 w-4 text-zinc-600" />
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label htmlFor="bio" className="text-xs font-bold text-neutral-400 uppercase tracking-wide">
-                  Biography Profile Summary
+              <div className="space-y-2">
+                <label htmlFor="bio" className="text-xs font-bold text-zinc-400 uppercase tracking-wide">
+                  Biography & Summary
                 </label>
                 <textarea
                   id="bio"
@@ -259,7 +416,7 @@ const ProfilePage = () => {
                   value={formData.bio}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full bg-[#242424] border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#1db954] transition-colors resize-none"
+                  className="w-full bg-[#18181b] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#1db954] focus:ring-1 focus:ring-[#1db954] transition-all resize-none"
                   placeholder="Tell us about yourself..."
                 />
               </div>
@@ -267,12 +424,12 @@ const ProfilePage = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#1db954] hover:bg-[#1ed760] text-black font-bold text-sm px-6 py-3 rounded-full active:scale-95 transition-all cursor-pointer disabled:pointer-events-none disabled:opacity-55"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#1db954] hover:bg-[#1ed760] text-black font-extrabold text-sm px-8 py-3 rounded-full active:scale-95 transition-all cursor-pointer disabled:pointer-events-none disabled:opacity-55 shadow-md shadow-[#1db954]/20"
               >
                 {updating ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin text-black" />
-                    Updating Details...
+                    Saving Changes...
                   </>
                 ) : (
                   <>
@@ -283,56 +440,7 @@ const ProfilePage = () => {
               </button>
             </form>
           </div>
-
-          {/* Right Block: Recently Played */}
-          <div className="lg:col-span-5 bg-[#181818] border border-neutral-900 rounded-2xl p-6 shadow-xl space-y-4">
-            <h2 className="text-lg font-bold tracking-tight text-neutral-200 border-b border-neutral-900 pb-3">
-              5 Most Recently Played
-            </h2>
-
-            {profile?.recentlyPlayed && profile.recentlyPlayed.length > 0 ? (
-              <div className="space-y-3">
-                {profile.recentlyPlayed.map((track, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-2 rounded-lg bg-neutral-900/40 border border-neutral-900 hover:bg-neutral-900 hover:border-neutral-850 transition-all group"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <img
-                          src={track.image || defaultAlbum}
-                          alt={track.songName}
-                          className="h-10 w-10 rounded object-cover border border-neutral-850 shrink-0 select-none"
-                        />
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-bold truncate text-neutral-200">
-                            {track.songName}
-                          </h4>
-                          <p className="text-[10px] text-neutral-455 truncate">{track.artist}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          disabled
-                          className="h-7 w-7 rounded-full flex items-center justify-center bg-neutral-850 text-neutral-500 cursor-not-allowed opacity-60"
-                          title="Playback is disabled"
-                        >
-                          <Play className="h-3 w-3 fill-current ml-0.5" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-12 space-y-2 text-neutral-555 border border-neutral-900 rounded-xl bg-neutral-950/20">
-                <BarChart2 className="h-7 w-7 mx-auto text-neutral-600" />
-                <p className="text-xs font-bold">No tracks played recently</p>
-              </div>
-            )}
-          </div>
-        </div>
+        )}
 
       </main>
     </div>
