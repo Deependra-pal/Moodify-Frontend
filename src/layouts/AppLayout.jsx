@@ -15,6 +15,7 @@ const AppLayout = ({ children }) => {
   const { currentSong, isPlayerVisible } = usePlayer();
 
   const isPlayerActive = currentSong && isPlayerVisible;
+  const isChatPage = location.pathname === '/chat';
 
   // Reset scroll position to top on every page navigation
   useEffect(() => {
@@ -25,21 +26,23 @@ const AppLayout = ({ children }) => {
   }, [location.pathname]);
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-[#121212] text-white flex flex-col">
+    <div className="h-screen w-screen overflow-hidden bg-[#09090b] text-white flex flex-col">
       {/* Top container: Sidebar + Main Scroll Viewport */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden">
         {/* Navigation Sidebar */}
         <Sidebar />
 
-        {/* Scrollable Viewport */}
+        {/* Viewport Container */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto"
+          className={`flex-1 flex flex-col min-h-0 ${isChatPage ? 'overflow-hidden' : 'overflow-y-auto'}`}
         >
-          <div className={`flex flex-col min-h-full w-full ${
-            isPlayerActive
-              ? 'pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] md:pb-8'
-              : 'pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-8'
+          <div className={`flex flex-col w-full flex-1 min-h-0 ${
+            isChatPage
+              ? 'h-full pb-16 md:pb-0'
+              : isPlayerActive
+              ? 'min-h-full pb-[calc(8.5rem+env(safe-area-inset-bottom,0px))] md:pb-8'
+              : 'min-h-full pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-8'
           }`}>
             {children}
           </div>
@@ -53,4 +56,3 @@ const AppLayout = ({ children }) => {
 };
 
 export default AppLayout;
-

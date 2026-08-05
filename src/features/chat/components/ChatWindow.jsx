@@ -73,11 +73,13 @@ const ChatWindow = () => {
   }
 
   return (
-    <div className={`relative flex-1 h-full max-h-full bg-[#09090b] flex-col min-w-0 overflow-hidden ${
-      activeConversation ? 'flex' : 'hidden md:flex'
+    <div className={`flex-1 h-full bg-[#09090b] flex-col min-w-0 overflow-hidden ${
+      activeConversation
+        ? 'flex fixed inset-0 z-50 md:relative md:inset-auto md:z-auto'
+        : 'hidden md:flex'
     }`}>
       {/* 📌 PINNED TOP HEADER */}
-      <div className="sticky top-0 z-30 p-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] px-4 sm:px-6 bg-[#121214]/95 backdrop-blur-xl border-b border-white/5 flex items-center justify-between shrink-0 shadow-md">
+      <div className="sticky top-0 z-30 p-3 sm:p-3.5 px-4 sm:px-6 bg-[#121214] border-b border-white/5 flex items-center justify-between shrink-0 shadow-md">
         <div className="flex items-center gap-3 min-w-0">
           {/* Mobile Back Button Arrow (<) */}
           <button
@@ -90,7 +92,7 @@ const ChatWindow = () => {
 
           {/* Avatar with Status Ring */}
           <div className="relative shrink-0">
-            <div className={`h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
+            <div className={`h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
               isOnline ? 'border-[#1db954]/60 shadow-md shadow-[#1db954]/15' : 'border-white/10'
             }`}>
               {friend?.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
@@ -127,7 +129,7 @@ const ChatWindow = () => {
       )}
 
       {/* 📜 MESSAGES SCROLL VIEWPORT */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3.5 custom-scrollbar min-h-0">
+      <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 space-y-3.5 custom-scrollbar min-h-0">
         {isLoadingMessages ? (
           <MessageSkeleton />
         ) : messages.length > 0 ? (
