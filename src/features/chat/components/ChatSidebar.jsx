@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Users, UserPlus, Check, X, Search, Clock, UserCheck, Inbox } from 'lucide-react';
+import { MessageSquare, Users, UserPlus, Check, X, Search, Clock, Inbox, Sparkles } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
 import UserSearchModal from './UserSearchModal';
@@ -51,9 +51,6 @@ const ChatSidebar = () => {
     openChatWithFriend,
     handleAcceptRequest,
     handleRejectRequest,
-    loadConversations,
-    loadFriends,
-    loadPendingRequests,
     isLoadingConversations,
     isLoadingFriends,
     isUserOnline
@@ -96,24 +93,24 @@ const ChatSidebar = () => {
       activeConversation ? 'hidden md:flex' : 'flex'
     }`}>
       {/* Sidebar Top Header & Controls */}
-      <div className="p-4 border-b border-white/5 space-y-3.5">
+      <div className="p-3 border-b border-white/5 space-y-2.5 bg-[#09090b]">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-[#1db954]/10 border border-[#1db954]/20 flex items-center justify-center text-[#1db954]">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8.5 w-8.5 rounded-xl bg-gradient-to-br from-[#1db954]/20 to-[#1ed760]/10 border border-[#1db954]/20 flex items-center justify-center text-[#1db954] shadow-sm">
               <MessageSquare className="h-4 w-4" />
             </div>
             <div>
               <h2 className="text-lg font-black tracking-tight text-white leading-none">Messages</h2>
-              <span className="text-[10px] font-bold text-zinc-500">{friends.length} Total Friends</span>
+              <span className="text-[10px] font-bold text-zinc-500 mt-0.5 block">{friends.length} Total Friends</span>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="flex items-center gap-1 bg-[#1db954] text-black hover:bg-[#1ed760] px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-md shadow-[#1db954]/15 cursor-pointer active:scale-95"
+              className="flex items-center gap-1.5 bg-[#1db954] text-black hover:bg-[#1ed760] px-3.5 py-1.5 rounded-full text-xs font-black transition-all shadow-md shadow-[#1db954]/20 cursor-pointer active:scale-95"
             >
-              <UserPlus className="h-3.5 w-3.5" />
+              <UserPlus className="h-3.5 w-3.5 stroke-[2.5]" />
               Add Friend
             </button>
           </div>
@@ -121,7 +118,7 @@ const ChatSidebar = () => {
 
         {/* Instant Fast Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3.5 top-2.5 h-3.5 w-3.5 text-zinc-500" />
+          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
           <input
             type="text"
             value={filterText}
@@ -133,7 +130,7 @@ const ChatSidebar = () => {
                 ? 'Filter friends...'
                 : 'Search requests...'
             }
-            className="w-full bg-[#121214] text-white text-xs placeholder-zinc-500 rounded-full pl-9 pr-4 py-2 border border-white/5 focus:outline-none focus:border-[#1db954]/60 transition-all"
+            className="w-full bg-[#121214] text-white text-[11px] placeholder-zinc-500 rounded-full pl-8.5 pr-3 py-1.5 border border-white/5 focus:outline-none focus:border-[#1db954]/60 focus:ring-1 focus:ring-[#1db954]/30 transition-all h-8"
           />
         </div>
 
@@ -141,9 +138,9 @@ const ChatSidebar = () => {
         <div className="flex bg-[#121214] p-1 rounded-xl border border-white/5 text-[11px]">
           <button
             onClick={() => setActiveTab('chats')}
-            className={`flex-1 py-1.5 font-bold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'chats'
-                ? 'bg-[#18181b] text-white shadow-sm'
+                ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -153,9 +150,9 @@ const ChatSidebar = () => {
 
           <button
             onClick={() => setActiveTab('friends')}
-            className={`flex-1 py-1.5 font-bold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'friends'
-                ? 'bg-[#18181b] text-white shadow-sm'
+                ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -165,9 +162,9 @@ const ChatSidebar = () => {
 
           <button
             onClick={() => setActiveTab('requests')}
-            className={`flex-1 py-1.5 font-bold rounded-lg transition-all flex items-center justify-center gap-1 relative cursor-pointer ${
+            className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 relative cursor-pointer ${
               activeTab === 'requests'
-                ? 'bg-[#18181b] text-white shadow-sm'
+                ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
@@ -214,7 +211,9 @@ const ChatSidebar = () => {
                     }`}
                   >
                     <div className="relative shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-zinc-800 border border-white/10 text-white font-bold flex items-center justify-center text-xs">
+                      <div className={`h-10 w-10 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
+                        online ? 'border-[#1db954]/50' : 'border-white/10'
+                      }`}>
                         {friend.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
                       </div>
                       <span
@@ -240,7 +239,7 @@ const ChatSidebar = () => {
                           )}
                         </div>
                       </div>
-                      <p className={`text-[11px] truncate leading-snug ${unread > 0 ? 'text-white font-bold' : 'text-zinc-400'}`}>
+                      <p className={`text-[11px] truncate leading-snug ${unread > 0 ? 'text-white font-extrabold' : 'text-zinc-400'}`}>
                         {conv.lastMessage || <span className="italic text-zinc-600">No messages yet</span>}
                       </p>
                     </div>
@@ -255,7 +254,7 @@ const ChatSidebar = () => {
                 <p className="text-xs text-zinc-500 font-medium">No chats found.</p>
                 <button
                   onClick={() => setActiveTab('friends')}
-                  className="text-xs font-bold text-[#1db954] hover:underline"
+                  className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer"
                 >
                   Message a friend to start chatting
                 </button>
@@ -287,7 +286,9 @@ const ChatSidebar = () => {
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="relative shrink-0">
-                        <div className="h-9 w-9 rounded-full bg-zinc-800 border border-white/10 text-white font-bold flex items-center justify-center text-xs">
+                        <div className={`h-9 w-9 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
+                          online ? 'border-[#1db954]/50' : 'border-white/10'
+                        }`}>
                           {friendUser.username ? friendUser.username.substring(0, 2).toUpperCase() : 'U'}
                         </div>
                         <span
@@ -309,9 +310,9 @@ const ChatSidebar = () => {
                         openChatWithFriend(friendUser);
                         setActiveTab('chats');
                       }}
-                      className="bg-[#1db954] text-black hover:bg-[#1ed760] text-[11px] font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-sm shadow-[#1db954]/10 active:scale-95"
+                      className="bg-[#1db954] text-black hover:bg-[#1ed760] text-[11px] font-extrabold px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-sm shadow-[#1db954]/10 active:scale-95"
                     >
-                      <MessageSquare className="h-3 w-3" />
+                      <MessageSquare className="h-3 w-3 fill-current" />
                       Message
                     </button>
                   </div>
@@ -322,7 +323,7 @@ const ChatSidebar = () => {
                 <p className="text-xs text-zinc-500">No friends found matching "{filterText}"</p>
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="text-xs font-bold text-[#1db954] hover:underline"
+                  className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer"
                 >
                   Find users & add friends
                 </button>
@@ -382,7 +383,7 @@ const ChatSidebar = () => {
                 <p className="text-xs text-zinc-500">Incoming friend requests will appear here in real-time.</p>
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="text-xs font-bold text-[#1db954] hover:underline"
+                  className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer"
                 >
                   Send friend requests to users
                 </button>

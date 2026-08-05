@@ -67,8 +67,8 @@ const MessageInput = () => {
   if (!activeConversation) return null;
 
   return (
-    <form onSubmit={onSubmit} className="p-3.5 bg-[#121214] border-t border-white/5 flex items-center gap-3">
-      <div className="flex-1 bg-[#18181b] rounded-full border border-white/10 focus-within:border-[#1db954]/60 focus-within:ring-1 focus-within:ring-[#1db954]/30 transition-all flex items-center px-4 py-1">
+    <form onSubmit={onSubmit} className="sticky bottom-0 z-30 p-2.5 sm:p-3 bg-[#121214] border-t border-white/5 flex items-center gap-2 sm:gap-2.5 shrink-0 pb-[calc(0.6rem+env(safe-area-inset-bottom,0px))]">
+      <div className="flex-1 bg-[#18181b] rounded-full border border-white/10 focus-within:border-[#1db954]/60 focus-within:ring-1 focus-within:ring-[#1db954]/30 transition-all flex items-center px-4 h-10">
         <input
           type="text"
           value={text}
@@ -76,19 +76,19 @@ const MessageInput = () => {
           onKeyDown={handleKeyDown}
           placeholder="Write a message..."
           disabled={isSendingMessage}
-          className="w-full bg-transparent text-white placeholder-zinc-500 text-sm py-2.5 focus:outline-none"
+          className="w-full bg-transparent text-white placeholder-zinc-500 text-xs sm:text-sm py-1.5 focus:outline-none"
         />
       </div>
       <button
         type="submit"
         disabled={!text.trim() || isSendingMessage}
-        className="h-10 w-10 flex items-center justify-center rounded-full bg-gradient-to-r from-[#1db954] to-[#1ed760] text-black hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#1db954]/20 shrink-0 cursor-pointer"
+        className="h-10 w-10 flex items-center justify-center rounded-full bg-gradient-to-r from-[#1db954] to-[#1ed760] text-black hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shadow-[#1db954]/20 shrink-0 cursor-pointer"
         title="Send Message"
       >
         {isSendingMessage ? (
-          <Loader2 className="h-4.5 w-4.5 animate-spin text-black" />
+          <Loader2 className="h-4 w-4 animate-spin text-black" />
         ) : (
-          <Send className="h-4.5 w-4.5 fill-current ml-0.5" />
+          <Send className="h-4 w-4 fill-current ml-0.5 text-black" />
         )}
       </button>
     </form>
