@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { MessageSquare, AlertCircle } from 'lucide-react';
+import { MessageSquare, AlertCircle, ArrowLeft } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
 import MessageInput from './MessageInput';
@@ -37,6 +37,7 @@ const ChatWindow = () => {
     error,
     typingUsers,
     isUserOnline,
+    selectConversation,
     setError
   } = useChat();
 
@@ -56,10 +57,10 @@ const ChatWindow = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, activeConversation, activeTyping]);
 
-  // Empty state when no conversation selected
+  // Empty state when no conversation selected (Desktop view)
   if (!activeConversation) {
     return (
-      <div className="flex-1 h-full bg-[#09090b] flex flex-col items-center justify-center p-8 text-center select-none">
+      <div className="hidden md:flex flex-1 h-full bg-[#09090b] flex-col items-center justify-center p-8 text-center select-none">
         <div className="h-20 w-20 rounded-full bg-[#121214] border border-white/5 flex items-center justify-center text-[#1db954] mb-4 shadow-2xl shadow-[#1db954]/5">
           <MessageSquare className="h-9 w-9" />
         </div>
@@ -72,10 +73,22 @@ const ChatWindow = () => {
   }
 
   return (
-    <div className="flex-1 h-full bg-[#09090b] flex flex-col min-w-0">
-      {/* Active Conversation Glass Header */}
-      <div className="p-3.5 px-5 bg-[#121214]/90 backdrop-blur-md border-b border-white/5 flex items-center justify-between shrink-0">
+    <div className={`flex-1 h-full bg-[#09090b] flex-col min-w-0 ${
+      activeConversation ? 'flex' : 'hidden md:flex'
+    }`}>
+      {/* Active Conversation Glass Header with Mobile Back Button */}
+      <div className="p-3.5 px-4 sm:px-6 bg-[#121214]/90 backdrop-blur-md border-b border-white/5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0">
+          {/* Mobile Back Button Arrow (<) */}
+          <button
+            onClick={() => selectConversation(null)}
+            className="md:hidden p-2 -ml-2 text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-full transition-colors cursor-pointer shrink-0"
+            title="Back to conversations"
+          >
+            <ArrowLeft className="h-5 w-5 text-white" />
+          </button>
+
+          {/* Avatar with Status Ring */}
           <div className="relative shrink-0">
             <div className={`h-10 w-10 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
               isOnline ? 'border-[#1db954]/60 shadow-md shadow-[#1db954]/10' : 'border-white/10'
@@ -88,6 +101,8 @@ const ChatWindow = () => {
               }`}
             />
           </div>
+
+          {/* Recipient Details & Live Status */}
           <div className="min-w-0 space-y-0.5">
             <h3 className="text-sm font-bold text-white truncate">{friend?.username || 'Chat'}</h3>
             <p className="text-[11px] font-semibold flex items-center gap-1.5 truncate">

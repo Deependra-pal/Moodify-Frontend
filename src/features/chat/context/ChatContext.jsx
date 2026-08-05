@@ -158,7 +158,7 @@ export const ChatProvider = ({ children }) => {
 
         // Immediately append to local messages list if not already added by socket
         setMessages(prev => {
-          const exists = prev.some(m => m._id === newMsg._id);
+          const exists = prev.some(m => (m._id || m.id)?.toString() === (newMsg._id || newMsg.id)?.toString());
           if (!exists) return [...prev, newMsg];
           return prev;
         });
@@ -307,9 +307,16 @@ export const ChatProvider = ({ children }) => {
 
     // Listen for live incoming message
     const handleNewMessage = (msg) => {
-      if (msg && msg.conversation === convId) {
+      if (!msg) return;
+
+      const msgConvId = (msg.conversation?._id || msg.conversation)?.toString();
+      const activeConvId = (convId?._id || convId)?.toString();
+
+      console.log(`⚡ Realtime Socket Message Received: "${msg.text}" (Conv: ${msgConvId}, Active: ${activeConvId})`);
+
+      if (msgConvId && activeConvId && msgConvId === activeConvId) {
         setMessages(prev => {
-          const exists = prev.some(m => m._id === msg._id);
+          const exists = prev.some(m => (m._id || m.id)?.toString() === (msg._id || msg.id)?.toString());
           if (!exists) return [...prev, msg];
           return prev;
         });

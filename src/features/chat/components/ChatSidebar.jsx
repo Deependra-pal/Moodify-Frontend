@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Users, UserPlus, Check, X, Search, Clock, RefreshCw, UserCheck } from 'lucide-react';
+import { MessageSquare, Users, UserPlus, Check, X, Search, Clock, UserCheck, Inbox } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
 import UserSearchModal from './UserSearchModal';
@@ -36,7 +36,7 @@ const SkeletonItem = () => (
 );
 
 const ChatSidebar = () => {
-  const [activeTab, setActiveTab] = useState('chats'); // 'chats' | 'friends'
+  const [activeTab, setActiveTab] = useState('chats'); // 'chats' | 'friends' | 'requests'
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filterText, setFilterText] = useState('');
 
@@ -46,7 +46,6 @@ const ChatSidebar = () => {
     friends,
     pendingRequests,
     activeConversation,
-    onlineUsers,
     selectConversation,
     openChatWithFriend,
     handleAcceptRequest,
@@ -55,7 +54,8 @@ const ChatSidebar = () => {
     loadFriends,
     loadPendingRequests,
     isLoadingConversations,
-    isLoadingFriends
+    isLoadingFriends,
+    isUserOnline
   } = useChat();
 
   const getOtherParticipant = (conv) => {
@@ -64,27 +64,36 @@ const ChatSidebar = () => {
     return conv.participants.find(p => (p._id || p.id).toString() !== currentUserId.toString()) || conv.participants[0];
   };
 
-  const isUserOnline = (userId) => {
-    if (!userId || !onlineUsers) return false;
-    return onlineUsers.includes(userId.toString());
-  };
-
+  // Instant fast search filtering across chats
   const filteredConversations = conversations.filter(c => {
     const friend = getOtherParticipant(c);
     if (!friend) return true;
-    return friend.username?.toLowerCase().includes(filterText.toLowerCase()) ||
-           friend.fullName?.toLowerCase().includes(filterText.toLowerCase());
+    const searchLower = filterText.toLowerCase().trim();
+    if (!searchLower) return true;
+    return (
+      friend.username?.toLowerCase().includes(searchLower) ||
+      friend.fullName?.toLowerCase().includes(searchLower) ||
+      c.lastMessage?.toLowerCase().includes(searchLower)
+    );
   });
 
+  // Instant fast search filtering across friends
   const filteredFriends = friends.filter(f => {
     const friendUser = f.user;
     if (!friendUser) return false;
-    return friendUser.username?.toLowerCase().includes(filterText.toLowerCase()) ||
-           friendUser.fullName?.toLowerCase().includes(filterText.toLowerCase());
+    const searchLower = filterText.toLowerCase().trim();
+    if (!searchLower) return true;
+    return (
+      friendUser.username?.toLowerCase().includes(searchLower) ||
+      friendUser.fullName?.toLowerCase().includes(searchLower) ||
+      friendUser.email?.toLowerCase().includes(searchLower)
+    );
   });
 
   return (
-    <aside className="w-full md:w-80 h-full bg-[#09090b] border-r border-white/5 flex flex-col shrink-0 select-none">
+    <aside className={`w-full md:w-80 h-full bg-[#09090b] border-r border-white/5 flex-col shrink-0 select-none ${
+      activeConversation ? 'hidden md:flex' : 'flex'
+    }`}>
       {/* Sidebar Top Header & Controls */}
       <div className="p-4 border-b border-white/5 space-y-3.5">
         <div className="flex items-center justify-between">
@@ -94,22 +103,11 @@ const ChatSidebar = () => {
             </div>
             <div>
               <h2 className="text-lg font-black tracking-tight text-white leading-none">Messages</h2>
-              <span className="text-[10px] font-bold text-zinc-500">{friends.length} Friends Active</span>
+              <span className="text-[10px] font-bold text-zinc-500">{friends.length} Total Friends</span>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => {
-                loadConversations();
-                loadFriends();
-                loadPendingRequests();
-              }}
-              title="Refresh"
-              className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-full transition-colors cursor-pointer"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-            </button>
             <button
               onClick={() => setIsSearchOpen(true)}
               className="flex items-center gap-1 bg-[#1db954] text-black hover:bg-[#1ed760] px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-md shadow-[#1db954]/15 cursor-pointer active:scale-95"
@@ -120,51 +118,70 @@ const ChatSidebar = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Instant Fast Search Bar */}
         <div className="relative">
           <Search className="absolute left-3.5 top-2.5 h-3.5 w-3.5 text-zinc-500" />
           <input
             type="text"
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            placeholder={activeTab === 'chats' ? 'Filter chats...' : 'Filter friends...'}
+            placeholder={
+              activeTab === 'chats'
+                ? 'Filter chats...'
+                : activeTab === 'friends'
+                ? 'Filter friends...'
+                : 'Search requests...'
+            }
             className="w-full bg-[#121214] text-white text-xs placeholder-zinc-500 rounded-full pl-9 pr-4 py-2 border border-white/5 focus:outline-none focus:border-[#1db954]/60 transition-all"
           />
         </div>
 
-        {/* Tab Buttons */}
-        <div className="flex bg-[#121214] p-1 rounded-xl border border-white/5">
+        {/* 3 Tab Navigation Buttons */}
+        <div className="flex bg-[#121214] p-1 rounded-xl border border-white/5 text-[11px]">
           <button
             onClick={() => setActiveTab('chats')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-1.5 font-bold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'chats'
                 ? 'bg-[#18181b] text-white shadow-sm'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
-            <MessageSquare className="h-3.5 w-3.5 text-[#1db954]" />
-            Chats ({conversations.length})
+            <MessageSquare className="h-3 w-3 text-[#1db954]" />
+            Chats
           </button>
+
           <button
             onClick={() => setActiveTab('friends')}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 relative cursor-pointer ${
+            className={`flex-1 py-1.5 font-bold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'friends'
                 ? 'bg-[#18181b] text-white shadow-sm'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
-            <Users className="h-3.5 w-3.5 text-sky-400" />
-            Friends ({friends.length})
+            <Users className="h-3 w-3 text-sky-400" />
+            Friends
+          </button>
+
+          <button
+            onClick={() => setActiveTab('requests')}
+            className={`flex-1 py-1.5 font-bold rounded-lg transition-all flex items-center justify-center gap-1 relative cursor-pointer ${
+              activeTab === 'requests'
+                ? 'bg-[#18181b] text-white shadow-sm'
+                : 'text-zinc-400 hover:text-white'
+            }`}
+          >
+            <Inbox className="h-3 w-3 text-amber-400" />
+            Requests
             {pendingRequests.length > 0 && (
-              <span className="bg-[#1db954] text-black font-extrabold text-[10px] px-1.5 py-0.5 rounded-full shadow-md animate-pulse shrink-0">
-                +{pendingRequests.length}
+              <span className="bg-[#1db954] text-black font-black text-[9px] px-1.5 py-0.2 rounded-full shadow-md animate-pulse shrink-0">
+                {pendingRequests.length}
               </span>
             )}
           </button>
         </div>
       </div>
 
-      {/* Main Tab Content */}
+      {/* Main Tab Content Viewport */}
       <div className="flex-1 overflow-y-auto p-2 space-y-1.5 custom-scrollbar">
         {/* --- CHATS TAB --- */}
         {activeTab === 'chats' && (
@@ -225,7 +242,7 @@ const ChatSidebar = () => {
                 <div className="h-12 w-12 rounded-full bg-[#121214] border border-white/5 flex items-center justify-center mx-auto text-zinc-600">
                   <MessageSquare className="h-6 w-6" />
                 </div>
-                <p className="text-xs text-zinc-500 font-medium">No active conversations found.</p>
+                <p className="text-xs text-zinc-500 font-medium">No chats found.</p>
                 <button
                   onClick={() => setActiveTab('friends')}
                   className="text-xs font-bold text-[#1db954] hover:underline"
@@ -239,62 +256,7 @@ const ChatSidebar = () => {
 
         {/* --- FRIENDS TAB --- */}
         {activeTab === 'friends' && (
-          <div className="space-y-3 p-1">
-            {/* Real-Time Pending Requests Section */}
-            {pendingRequests.length > 0 && (
-              <div className="bg-[#121214] border border-amber-500/30 p-3 rounded-2xl space-y-2.5 shadow-xl animate-in fade-in duration-300">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5 animate-pulse" />
-                    Incoming Friend Requests
-                  </p>
-                  <span className="bg-amber-500/20 text-amber-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-amber-500/30">
-                    {pendingRequests.length} Pending
-                  </span>
-                </div>
-
-                {pendingRequests.map((req) => (
-                  <div
-                    key={req._id}
-                    className="flex flex-col gap-2 bg-[#18181b] p-3 rounded-xl border border-white/5 hover:border-white/10 transition-all"
-                  >
-                    <div className="flex items-center justify-between gap-2 min-w-0">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="h-8 w-8 rounded-full bg-zinc-800 border border-white/10 text-white font-bold flex items-center justify-center text-xs shrink-0">
-                          {req.sender?.username ? req.sender.username.substring(0, 2).toUpperCase() : 'U'}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-bold text-white truncate">{req.sender?.username}</p>
-                          <p className="text-[10px] text-zinc-400 truncate">{req.sender?.fullName || 'Sent a friend request'}</p>
-                        </div>
-                      </div>
-                      <span className="text-[9px] text-zinc-500 font-semibold shrink-0">
-                        {formatTime(req.createdAt)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-end gap-2 pt-1 border-t border-white/5">
-                      <button
-                        onClick={() => handleRejectRequest(req._id)}
-                        className="px-3 py-1 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-red-500/20"
-                      >
-                        <X className="h-3 w-3" />
-                        Reject
-                      </button>
-                      <button
-                        onClick={() => handleAcceptRequest(req._id)}
-                        className="px-3.5 py-1 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black text-xs font-extrabold transition-all flex items-center gap-1 cursor-pointer shadow-md shadow-[#1db954]/20 active:scale-95"
-                      >
-                        <Check className="h-3 w-3 stroke-[3]" />
-                        Accept
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Friends List */}
+          <div className="space-y-2 p-1">
             {isLoadingFriends ? (
               <div className="space-y-2">
                 <SkeletonItem />
@@ -347,12 +309,72 @@ const ChatSidebar = () => {
               })
             ) : (
               <div className="p-8 text-center space-y-2">
-                <p className="text-xs text-zinc-500">No friends added yet.</p>
+                <p className="text-xs text-zinc-500">No friends found matching "{filterText}"</p>
                 <button
                   onClick={() => setIsSearchOpen(true)}
                   className="text-xs font-bold text-[#1db954] hover:underline"
                 >
                   Find users & add friends
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* --- DEDICATED INCOMING REQUESTS TAB --- */}
+        {activeTab === 'requests' && (
+          <div className="space-y-3 p-1">
+            {pendingRequests.length > 0 ? (
+              pendingRequests.map((req) => (
+                <div
+                  key={req._id}
+                  className="flex flex-col gap-3 bg-[#121214] border border-amber-500/30 p-3.5 rounded-2xl shadow-xl hover:border-amber-500/50 transition-all animate-in fade-in duration-200"
+                >
+                  <div className="flex items-center justify-between gap-3 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-10 w-10 rounded-full bg-zinc-800 border border-white/10 text-white font-black flex items-center justify-center text-xs shrink-0 shadow-md">
+                        {req.sender?.username ? req.sender.username.substring(0, 2).toUpperCase() : 'U'}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-white truncate">{req.sender?.username}</p>
+                        <p className="text-[11px] text-zinc-400 truncate">{req.sender?.fullName || req.sender?.email}</p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-amber-400/80 font-bold shrink-0 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                      {formatTime(req.createdAt)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
+                    <button
+                      onClick={() => handleRejectRequest(req._id)}
+                      className="px-3.5 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-red-500/20"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      Reject
+                    </button>
+                    <button
+                      onClick={() => handleAcceptRequest(req._id)}
+                      className="px-4 py-1.5 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black text-xs font-extrabold transition-all flex items-center gap-1 cursor-pointer shadow-md shadow-[#1db954]/25 active:scale-95"
+                    >
+                      <Check className="h-3.5 w-3.5 stroke-[3]" />
+                      Accept Friend
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-8 text-center space-y-3">
+                <div className="h-12 w-12 rounded-full bg-[#121214] border border-white/5 flex items-center justify-center mx-auto text-amber-400">
+                  <Inbox className="h-6 w-6" />
+                </div>
+                <h4 className="text-sm font-bold text-white">No Pending Requests</h4>
+                <p className="text-xs text-zinc-500">Incoming friend requests will appear here in real-time.</p>
+                <button
+                  onClick={() => setIsSearchOpen(true)}
+                  className="text-xs font-bold text-[#1db954] hover:underline"
+                >
+                  Send friend requests to users
                 </button>
               </div>
             )}
