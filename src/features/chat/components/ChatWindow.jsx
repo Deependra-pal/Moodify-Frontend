@@ -78,8 +78,8 @@ const ChatWindow = () => {
         ? 'flex fixed inset-0 z-50 md:relative md:inset-auto md:z-auto'
         : 'hidden md:flex'
     }`}>
-      {/* 📌 PINNED TOP HEADER */}
-      <div className="sticky top-0 z-30 p-3 sm:p-3.5 px-4 sm:px-6 bg-[#121214] border-b border-white/5 flex items-center justify-between shrink-0 shadow-md">
+      {/* 📌 PINNED TOP HEADER - Aligned with HomePage Top Padding */}
+      <div className="sticky top-0 z-30 px-4 sm:px-6 py-4 sm:py-5 bg-[#121214] border-b border-white/5 flex items-center justify-between shrink-0 shadow-md">
         <div className="flex items-center gap-3 min-w-0">
           {/* Mobile Back Button Arrow (<) */}
           <button
