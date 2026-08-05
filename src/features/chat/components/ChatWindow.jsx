@@ -128,8 +128,8 @@ const ChatWindow = () => {
         </div>
       )}
 
-      {/* 📜 MESSAGES SCROLL VIEWPORT */}
-      <div className="flex-1 overflow-y-auto p-3.5 sm:p-6 space-y-3.5 custom-scrollbar min-h-0">
+      {/* 📜 MESSAGES SCROLL VIEWPORT - Top Padding Added */}
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-4 space-y-4 custom-scrollbar min-h-0">
         {isLoadingMessages ? (
           <MessageSkeleton />
         ) : messages.length > 0 ? (

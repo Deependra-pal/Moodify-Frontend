@@ -205,9 +205,9 @@ const ChatSidebar = () => {
       <div className="flex-1 overflow-y-auto p-2 space-y-1.5 custom-scrollbar">
         {/* --- CHATS TAB --- */}
         {activeTab === 'chats' && (
-          <>
+          <div className="space-y-2 p-1">
             {isLoadingConversations ? (
-              <div className="space-y-2 p-1">
+              <div className="space-y-2">
                 <SkeletonItem />
                 <SkeletonItem />
                 <SkeletonItem />
@@ -226,44 +226,45 @@ const ChatSidebar = () => {
                   <button
                     key={conv._id}
                     onClick={() => selectConversation(conv)}
-                    className={`w-full text-left p-3 rounded-xl transition-all flex items-center gap-3 cursor-pointer ${
+                    className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between gap-3 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
                       isActive
-                        ? 'bg-[#18181b] text-white border-l-2 border-[#1db954] shadow-md shadow-[#1db954]/5'
-                        : 'hover:bg-[#121214] text-zinc-300 border border-transparent'
+                        ? 'bg-[#18181b] text-white border border-[#1db954]/60 shadow-md shadow-[#1db954]/10'
+                        : 'bg-[#121214] hover:bg-[#18181b] text-zinc-300 border border-white/5 hover:border-white/10'
                     }`}
                   >
-                    <div className="relative shrink-0">
-                      <div className={`h-10 w-10 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
-                        online ? 'border-[#1db954]/50' : 'border-white/10'
-                      }`}>
-                        {friend.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="relative shrink-0">
+                        <div className={`h-9 w-9 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
+                          online ? 'border-[#1db954]/50' : 'border-white/10'
+                        }`}>
+                          {friend.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
+                        </div>
+                        <span
+                          className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-[#09090b] ${
+                            online ? 'bg-[#1db954]' : 'bg-zinc-600'
+                          }`}
+                          title={online ? 'Online' : 'Offline'}
+                        />
                       </div>
-                      <span
-                        className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#09090b] ${
-                          online ? 'bg-[#1db954] shadow-sm shadow-[#1db954]' : 'bg-zinc-600'
-                        }`}
-                        title={online ? 'Online' : 'Offline'}
-                      />
-                    </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-0.5">
-                        <p className="text-xs font-bold truncate text-white">{friend.username}</p>
-                        <div className="flex items-center gap-1 shrink-0 ml-1">
-                          <span className="text-[10px] text-zinc-500 font-semibold">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <p className="text-xs font-bold truncate text-white">{friend.username}</p>
+                          <span className="text-[10px] text-zinc-500 font-semibold shrink-0 ml-1">
                             {formatTime(conv.lastMessageAt || conv.updatedAt)}
                           </span>
-                          {/* Unread Messages Badge */}
+                        </div>
+                        <div className="flex items-center justify-between gap-1">
+                          <p className={`text-[11px] truncate leading-snug ${unread > 0 ? 'text-white font-extrabold' : 'text-zinc-400'}`}>
+                            {conv.lastMessage || <span className="italic text-zinc-600">No messages yet</span>}
+                          </p>
                           {unread > 0 && (
-                            <span className="bg-[#1db954] text-black font-black text-[10px] px-1.5 py-0.2 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse">
+                            <span className="bg-[#1db954] text-black font-black text-[9px] px-1.5 py-0.2 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse shrink-0">
                               {unread}
                             </span>
                           )}
                         </div>
                       </div>
-                      <p className={`text-[11px] truncate leading-snug ${unread > 0 ? 'text-white font-extrabold' : 'text-zinc-400'}`}>
-                        {conv.lastMessage || <span className="italic text-zinc-600">No messages yet</span>}
-                      </p>
                     </div>
                   </button>
                 );
@@ -282,7 +283,7 @@ const ChatSidebar = () => {
                 </button>
               </div>
             )}
-          </>
+          </div>
         )}
 
         {/* --- FRIENDS TAB --- */}
