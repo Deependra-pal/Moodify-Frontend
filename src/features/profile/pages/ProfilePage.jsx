@@ -92,7 +92,7 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex-1 min-h-screen bg-[#09090b] text-white flex flex-col items-center justify-center space-y-4">
+      <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col items-center justify-center space-y-4">
         <RefreshCw className="h-9 w-9 text-[#1db954] animate-spin" />
         <p className="text-xs font-semibold tracking-wider text-zinc-400">
           Loading Spotify Profile...
@@ -106,8 +106,8 @@ const ProfilePage = () => {
   const displayName = profile?.fullName || profile?.username || 'User Profile';
 
   return (
-    <div className="flex-1 min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans select-none">
-      
+    <div className="flex-1 w-full bg-[#09090b] text-zinc-100 flex flex-col font-sans select-none">
+
       {/* --- SPOTIFY HERO HEADER BANNER --- */}
       <header className="bg-gradient-to-b from-[#1a3d24] via-[#102417] to-[#09090b] px-6 sm:px-10 pt-10 pb-8 border-b border-white/5 relative overflow-hidden">
         {/* Subtle background glow */}
@@ -161,32 +161,29 @@ const ProfilePage = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer ${
-                activeTab === 'overview'
-                  ? 'bg-white text-black shadow-md'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
-              }`}
+              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer ${activeTab === 'overview'
+                ? 'bg-white text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+                }`}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab('friends')}
-              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'friends'
-                  ? 'bg-white text-black shadow-md'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
-              }`}
+              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'friends'
+                ? 'bg-white text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+                }`}
             >
               <Users className="h-3.5 w-3.5" />
               Friends ({friends.length})
             </button>
             <button
               onClick={() => setActiveTab('settings')}
-              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'settings'
-                  ? 'bg-white text-black shadow-md'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
-              }`}
+              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'settings'
+                ? 'bg-white text-black shadow-md'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
+                }`}
             >
               <Edit3 className="h-3.5 w-3.5" />
               Edit Profile
@@ -200,8 +197,8 @@ const ProfilePage = () => {
       </section>
 
       {/* --- TAB CONTENT AREA --- */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-10 py-8 space-y-8">
-        
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 sm:px-10 py-6 sm:py-8 space-y-8">
+
         {/* --- OVERVIEW TAB --- */}
         {activeTab === 'overview' && (
           <div className="space-y-8">

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, Music, Loader2, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Loader2, AlertCircle } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
+import Logo from '../../../components/Logo';
 
 const RegisterPage = () => {
   const { register, isAuthenticated } = useAuth();
@@ -15,7 +16,7 @@ const RegisterPage = () => {
   }, [isAuthenticated, navigate]);
 
   // Form states
-  const [fullName, setFullName] = useState(''); // UI only at registration (backend register schema doesn't consume this, but it's required in UI specs)
+  const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,6 +30,7 @@ const RegisterPage = () => {
   // Client side validation
   const validateForm = () => {
     const tempErrors = {};
+    if (!fullName.trim()) tempErrors.fullName = 'Full name is required';
     if (!username.trim()) {
       tempErrors.username = 'Username is required';
     } else if (username.trim().length < 3) {
@@ -63,11 +65,10 @@ const RegisterPage = () => {
 
     setIsSubmitting(true);
     try {
-      // Backend registration endpoint only consumes username, email, password
-      await register(username, email, password);
-
-      // On success, redirect to home page directly (since they are automatically logged in now)
-      navigate('/', { replace: true });
+      await register({ fullName, username, email, password });
+      navigate('/login', {
+        state: { registeredEmail: email }
+      });
     } catch (err) {
       console.error('Registration error:', err);
       if (err.response?.data) {
@@ -95,10 +96,8 @@ const RegisterPage = () => {
 
         {/* Header/Logo */}
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1db954] shadow-md shadow-[#1db954]/20">
-            <Music className="h-6 w-6 text-black fill-current" />
-          </div>
-          <h2 className="mt-4 text-2xl font-black tracking-tight text-white select-none">
+          <Logo size="lg" />
+          <h2 className="mt-4 text-xl font-black tracking-tight text-white select-none">
             Create Account
           </h2>
           <p className="mt-0.5 text-xs text-neutral-400">

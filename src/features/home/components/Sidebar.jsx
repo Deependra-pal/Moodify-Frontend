@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { Music, Heart, History, User, LogOut, Home, MessageSquare } from 'lucide-react';
 import useAuth from '../../auth/hooks/useAuth';
 import useChat from '../../chat/hooks/useChat';
+import Logo from '../../../components/Logo';
 
 /**
  * Spotify & Linear inspired Sidebar Navigation component.
@@ -32,14 +33,8 @@ const Sidebar = () => {
         
         <div className="space-y-8">
           {/* Brand Logo */}
-          <div className="flex items-center gap-3 px-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#1db954] to-[#1ed760] shadow-lg shadow-[#1db954]/20">
-              <Music className="h-5 w-5 text-black fill-current" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-black tracking-tight text-white leading-none">Moodify</span>
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5">SaaS Music</span>
-            </div>
+          <div className="px-2">
+            <Logo size="md" showSubtitle />
           </div>
 
           {/* Navigation Links */}

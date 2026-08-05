@@ -52,9 +52,9 @@ const FavoritesPage = () => {
   }, [favorites]);
 
   return (
-    <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
+    <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col font-sans">
       {/* Header Banner */}
-      <header className="bg-gradient-to-b from-red-900/40 to-[#121212] px-4 sm:px-6 py-6 sm:py-8 md:py-12 border-b border-neutral-900/60">
+      <header className="bg-gradient-to-b from-red-900/40 to-[#09090b] px-4 sm:px-6 py-6 sm:py-8 md:py-12 border-b border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6">
           <div className="h-24 w-24 sm:h-32 sm:w-32 md:h-40 md:w-40 bg-gradient-to-br from-red-600 to-red-950 rounded-2xl flex items-center justify-center shadow-2xl shrink-0">
             <Heart className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 text-white fill-current animate-pulse" />
@@ -85,7 +85,7 @@ const FavoritesPage = () => {
       </header>
 
       {/* Main Grid View */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:py-8 min-h-[75vh]">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-6">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to fetch favorites</p>
@@ -118,11 +118,10 @@ const FavoritesPage = () => {
                 return (
                   <div
                     key={fav._id || index}
-                    className={`transition-all duration-300 ease-out overflow-hidden ${
-                      isRemoving
-                        ? 'max-h-0 opacity-0 scale-95 pointer-events-none'
-                        : 'max-h-[300px] opacity-100 scale-100'
-                    }`}
+                    className={`transition-all duration-300 ease-out overflow-hidden ${isRemoving
+                      ? 'max-h-0 opacity-0 scale-95 pointer-events-none'
+                      : 'max-h-[300px] opacity-100 scale-100'
+                      }`}
                   >
                     <SongCard
                       title={fav.songName}

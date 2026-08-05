@@ -8,6 +8,23 @@ body,
   background-color: #09090b;
   color: #f4f4f5;
   overflow: hidden;
+  position: fixed;
+  inset: 0;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Enable text selection inside input fields & message paragraphs */
+input,
+textarea,
+[contenteditable="true"],
+.select-text {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* Global & custom scrollbar styling - ultra sleek 4px scrollbars */
@@ -32,6 +49,7 @@ body,
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

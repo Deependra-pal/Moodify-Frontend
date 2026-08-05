@@ -4,6 +4,7 @@ import { Music, LogOut, User } from 'lucide-react';
 import useAuth from '../../auth/hooks/useAuth';
 import { usePlayer } from '../../../context/PlayerContext';
 import { loginWithSpotify } from '../../../utils/spotifyAuth';
+import Logo from '../../../components/Logo';
 
 /**
  * Spotify-inspired Top Navbar component.
@@ -23,12 +24,9 @@ const Navbar = () => {
   return (
     <nav className="bg-[#0b0b0b] border-b border-neutral-900 px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-50 select-none">
       {/* Brand Logo */}
-      <div className="flex items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1db954] shadow-md shadow-[#1db954]/10">
-          <Music className="h-5 w-5 text-black fill-current" />
-        </div>
-        <span className="text-xl font-black tracking-tight text-white">Moodify</span>
-      </div>
+      <Link to="/" className="hover:opacity-90 transition-opacity">
+        <Logo size="sm" />
+      </Link>
 
       {/* User Actions Panel */}
       <div className="flex items-center gap-3 sm:gap-4 relative">

@@ -103,10 +103,10 @@ const HomePage = () => {
   }, [getFavoriteItem, addFavorite, removeFavorite]);
 
   return (
-    <div className="min-h-screen w-full bg-[#121212] text-white flex flex-col font-sans select-none animate-in fade-in duration-300">
+    <div className="w-full bg-[#09090b] text-white flex flex-col font-sans select-none animate-in fade-in duration-300">
       <Navbar />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-12">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8 sm:space-y-12">
         {/* STEP 1: Welcome Tagline & Header */}
         <HeroSection />
 
@@ -119,8 +119,8 @@ const HomePage = () => {
           />
         </div>
 
-        {/* STEP 5: Search & Recommendations Section (Always Visible) */}
-        <div className="bg-[#181818] border border-neutral-900 rounded-2xl p-5 sm:p-7 shadow-xl space-y-6 w-full animate-in slide-in-from-bottom-6 duration-300">
+        {/* STEP 5: Search & Recommendations Section (Always Visible) - Bottom Margin ON THE OUTSIDE OF THE CARD */}
+        <div className="bg-[#181818] border border-neutral-900 rounded-2xl p-5 sm:p-7 shadow-xl space-y-6 w-full mb-16 sm:mb-20 animate-in slide-in-from-bottom-6 duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <h2 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
@@ -128,8 +128,8 @@ const HomePage = () => {
                 {songs.length > 0 ? 'Recommended for your mood' : 'Search Tracks'}
               </h2>
               <p className="text-xs text-neutral-455 font-semibold leading-normal">
-                {songs.length > 0 
-                  ? 'A curated collection of tracks matching your facial expression and emotional vibe.' 
+                {songs.length > 0
+                  ? 'A curated collection of tracks matching your facial expression and emotional vibe.'
                   : 'Search for your favorite songs, artists, or singers manually without a face scan.'
                 }
               </p>
@@ -188,39 +188,41 @@ const HomePage = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 space-y-4">
               <RefreshCw className="h-10 w-10 text-[#1db954] animate-spin" />
-              <p className="text-sm font-semibold tracking-wider text-neutral-450">
+              <p className="text-sm font-semibold tracking-wider text-neutral-400">
                 Retrieving tracks...
               </p>
             </div>
           ) : songs.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-2">
-              {songs.map((song, index) => {
-                const isFav = !!getFavoriteItem(song);
-                const isCurrentPlaying =
-                  isPlaying &&
-                  currentSong &&
-                  ((currentSong.uri && currentSong.uri === (song.uri || song.spotifyUri)) ||
-                    (currentSong.spotifyUrl && currentSong.spotifyUrl === song.spotifyUrl) ||
-                    (currentSong.name === song.name && currentSong.artist === song.artist));
+            <div className="max-h-[440px] sm:max-h-[520px] overflow-y-auto overscroll-y-auto custom-scrollbar pr-1 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {songs.map((song, index) => {
+                  const isFav = !!getFavoriteItem(song);
+                  const isCurrentPlaying =
+                    isPlaying &&
+                    currentSong &&
+                    ((currentSong.uri && currentSong.uri === (song.uri || song.spotifyUri)) ||
+                      (currentSong.spotifyUrl && currentSong.spotifyUrl === song.spotifyUrl) ||
+                      (currentSong.name === song.name && currentSong.artist === song.artist));
 
-                const isPlayingFromHome = isCurrentPlaying && playbackSource === 'home';
+                  const isPlayingFromHome = isCurrentPlaying && playbackSource === 'home';
 
-                return (
-                  <SongCard
-                    key={`${song.uri || index}-${index}`}
-                    title={song.name}
-                    artist={song.artist}
-                    album={song.album}
-                    imageUrl={song.image}
-                    spotifyUrl={song.spotifyUrl}
-                    isPlaying={isPlayingFromHome}
-                    isNowPlaying={isCurrentPlaying}
-                    isFavorite={isFav}
-                    onPlayClick={() => playTrack(song, songs, 'home')}
-                    onFavoriteClick={() => handleFavoriteToggle(song)}
-                  />
-                );
-              })}
+                  return (
+                    <SongCard
+                      key={`${song.uri || index}-${index}`}
+                      title={song.name}
+                      artist={song.artist}
+                      album={song.album}
+                      imageUrl={song.image}
+                      spotifyUrl={song.spotifyUrl}
+                      isPlaying={isPlayingFromHome}
+                      isNowPlaying={isCurrentPlaying}
+                      isFavorite={isFav}
+                      onPlayClick={() => playTrack(song, songs, 'home')}
+                      onFavoriteClick={() => handleFavoriteToggle(song)}
+                    />
+                  );
+                })}
+              </div>
             </div>
           ) : (
             <div className="text-center py-8 text-neutral-500 text-xs font-semibold select-none border-t border-neutral-900/60 pt-6">

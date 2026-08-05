@@ -97,9 +97,9 @@ const HistoryPage = () => {
   }, [getFavoriteItem, addFavorite, removeFavorite]);
 
   return (
-    <div className="flex-1 min-h-screen bg-[#121212] text-white flex flex-col font-sans">
+    <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col font-sans">
       {/* Header Banner */}
-      <header className="bg-gradient-to-b from-[#1b1b3a] to-[#121212] px-4 sm:px-6 py-6 sm:py-8 md:py-12 border-b border-neutral-900/60">
+      <header className="bg-gradient-to-b from-[#1b1b3a] to-[#09090b] px-4 sm:px-6 py-6 sm:py-8 md:py-12 border-b border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left w-full sm:w-auto">
             <div className="h-20 w-20 sm:h-28 sm:w-28 md:h-36 md:w-36 bg-gradient-to-br from-[#535353] to-[#191919] rounded-2xl flex items-center justify-center shadow-2xl shrink-0 border border-neutral-800">
@@ -132,7 +132,7 @@ const HistoryPage = () => {
       </header>
 
       {/* Main viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-3 sm:py-8 min-h-[75vh]">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 pb-6">
         {error && (
           <div className="mb-6 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20">
             <p className="font-semibold">Failed to load history</p>
@@ -195,11 +195,10 @@ const HistoryPage = () => {
                             playTrack(trackToPlay, historyPlaylist, 'history');
                           }
                         }}
-                        className={`h-9 w-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${
-                          isPlayingFromHistory
-                            ? 'bg-[#1db954] text-black font-bold scale-105 shadow-lg shadow-[#1db954]/25'
-                            : 'bg-white hover:bg-neutral-200 text-black'
-                        }`}
+                        className={`h-9 w-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${isPlayingFromHistory
+                          ? 'bg-[#1db954] text-black font-bold scale-105 shadow-lg shadow-[#1db954]/25'
+                          : 'bg-white hover:bg-neutral-200 text-black'
+                          }`}
                         title={isPlayingFromHistory ? 'Pause' : 'Play'}
                       >
                         {isPlayingFromHistory ? (
@@ -251,9 +250,8 @@ const HistoryPage = () => {
                           e.stopPropagation();
                           handleFavoriteToggle(track);
                         }}
-                        className={`transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${
-                          isFavorited ? 'text-red-500 hover:text-red-400' : 'text-neutral-600 hover:text-red-500 active:text-red-500'
-                        }`}
+                        className={`transition-colors cursor-pointer hover:scale-110 active:scale-90 duration-100 ${isFavorited ? 'text-red-500 hover:text-red-400' : 'text-neutral-600 hover:text-red-500 active:text-red-500'
+                          }`}
                       >
                         <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : 'fill-none'}`} />
                       </button>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, Music, Loader2, AlertCircle } from 'lucide-react';
 import useAuth from '../hooks/useAuth';
+import Logo from '../../../components/Logo';
 
 const LoginPage = () => {
   const { login, isAuthenticated } = useAuth();
@@ -112,13 +113,8 @@ const LoginPage = () => {
 
         {/* Header/Logo */}
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1db954] shadow-md shadow-[#1db954]/20 animate-pulse">
-            <Music className="h-6 w-6 text-black fill-current" />
-          </div>
-          <h2 className="mt-4 text-2xl font-black tracking-tight text-white select-none">
-            Moodify
-          </h2>
-          <p className="mt-0.5 text-xs text-neutral-400">
+          <Logo size="lg" />
+          <p className="mt-2 text-xs text-neutral-400">
             Music tailored to your emotions.
           </p>
         </div>
