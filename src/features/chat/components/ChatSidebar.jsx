@@ -56,26 +56,32 @@ const ChatSidebar = () => {
     isUserOnline
   } = useChat();
 
+  const handleTabChange = (newTab) => {
+    setActiveTab(newTab);
+    setFilterText('');
+  };
+
   const getOtherParticipant = (conv) => {
     if (!conv || !conv.participants || !user) return null;
     const currentUserId = user.id || user._id;
     return conv.participants.find(p => (p._id || p.id).toString() !== currentUserId.toString()) || conv.participants[0];
   };
 
-  // Instant fast search filtering across chats
+  // Instant client-side search filtering across existing conversations ONLY
   const filteredConversations = conversations.filter(c => {
     const friend = getOtherParticipant(c);
-    if (!friend) return true;
+    if (!friend) return false;
     const searchLower = filterText.toLowerCase().trim();
     if (!searchLower) return true;
     return (
       friend.username?.toLowerCase().includes(searchLower) ||
       friend.fullName?.toLowerCase().includes(searchLower) ||
+      friend.email?.toLowerCase().includes(searchLower) ||
       c.lastMessage?.toLowerCase().includes(searchLower)
     );
   });
 
-  // Instant fast search filtering across friends
+  // Instant client-side search filtering across friends list ONLY
   const filteredFriends = friends.filter(f => {
     const friendUser = f.user;
     if (!friendUser) return false;
@@ -85,6 +91,19 @@ const ChatSidebar = () => {
       friendUser.username?.toLowerCase().includes(searchLower) ||
       friendUser.fullName?.toLowerCase().includes(searchLower) ||
       friendUser.email?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  // Instant client-side search filtering across pending friend requests ONLY
+  const filteredRequests = pendingRequests.filter(req => {
+    const sender = req.sender;
+    if (!sender) return false;
+    const searchLower = filterText.toLowerCase().trim();
+    if (!searchLower) return true;
+    return (
+      sender.username?.toLowerCase().includes(searchLower) ||
+      sender.fullName?.toLowerCase().includes(searchLower) ||
+      sender.email?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -116,7 +135,7 @@ const ChatSidebar = () => {
           </div>
         </div>
 
-        {/* Instant Fast Search Bar */}
+        {/* Dynamic Context-Aware Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
           <input
@@ -125,10 +144,10 @@ const ChatSidebar = () => {
             onChange={(e) => setFilterText(e.target.value)}
             placeholder={
               activeTab === 'chats'
-                ? 'Filter chats...'
+                ? 'Search conversations...'
                 : activeTab === 'friends'
-                ? 'Filter friends...'
-                : 'Search requests...'
+                ? 'Search friends...'
+                : 'Search friend requests...'
             }
             className="w-full bg-[#121214] text-white text-[11px] placeholder-zinc-500 rounded-full pl-8.5 pr-3 py-1.5 border border-white/5 focus:outline-none focus:border-[#1db954]/60 focus:ring-1 focus:ring-[#1db954]/30 transition-all h-8"
           />
@@ -137,7 +156,7 @@ const ChatSidebar = () => {
         {/* 3 Tab Navigation Buttons */}
         <div className="flex bg-[#121214] p-1 rounded-xl border border-white/5 text-[11px]">
           <button
-            onClick={() => setActiveTab('chats')}
+            onClick={() => handleTabChange('chats')}
             className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'chats'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
@@ -149,7 +168,7 @@ const ChatSidebar = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('friends')}
+            onClick={() => handleTabChange('friends')}
             className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'friends'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
@@ -161,7 +180,7 @@ const ChatSidebar = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('requests')}
+            onClick={() => handleTabChange('requests')}
             className={`flex-1 py-1.5 font-extrabold rounded-lg transition-all flex items-center justify-center gap-1 relative cursor-pointer ${
               activeTab === 'requests'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/5'
@@ -251,9 +270,9 @@ const ChatSidebar = () => {
                 <div className="h-12 w-12 rounded-full bg-[#121214] border border-white/5 flex items-center justify-center mx-auto text-zinc-600">
                   <MessageSquare className="h-6 w-6" />
                 </div>
-                <p className="text-xs text-zinc-500 font-medium">No chats found.</p>
+                <p className="text-xs text-zinc-400 font-bold">No conversations found.</p>
                 <button
-                  onClick={() => setActiveTab('friends')}
+                  onClick={() => handleTabChange('friends')}
                   className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer"
                 >
                   Message a friend to start chatting
@@ -308,7 +327,7 @@ const ChatSidebar = () => {
                     <button
                       onClick={() => {
                         openChatWithFriend(friendUser);
-                        setActiveTab('chats');
+                        handleTabChange('chats');
                       }}
                       className="bg-[#1db954] text-black hover:bg-[#1ed760] text-[11px] font-extrabold px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-sm shadow-[#1db954]/10 active:scale-95"
                     >
@@ -320,7 +339,7 @@ const ChatSidebar = () => {
               })
             ) : (
               <div className="p-8 text-center space-y-2">
-                <p className="text-xs text-zinc-500">No friends found matching "{filterText}"</p>
+                <p className="text-xs text-zinc-400 font-bold">No friends found.</p>
                 <button
                   onClick={() => setIsSearchOpen(true)}
                   className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer"
@@ -335,8 +354,8 @@ const ChatSidebar = () => {
         {/* --- DEDICATED INCOMING REQUESTS TAB --- */}
         {activeTab === 'requests' && (
           <div className="space-y-3 p-1">
-            {pendingRequests.length > 0 ? (
-              pendingRequests.map((req) => (
+            {filteredRequests.length > 0 ? (
+              filteredRequests.map((req) => (
                 <div
                   key={req._id}
                   className="flex flex-col gap-3 bg-[#121214] border border-amber-500/30 p-3.5 rounded-2xl shadow-xl hover:border-amber-500/50 transition-all animate-in fade-in duration-200"
@@ -379,7 +398,7 @@ const ChatSidebar = () => {
                 <div className="h-12 w-12 rounded-full bg-[#121214] border border-white/5 flex items-center justify-center mx-auto text-amber-400">
                   <Inbox className="h-6 w-6" />
                 </div>
-                <h4 className="text-sm font-bold text-white">No Pending Requests</h4>
+                <h4 className="text-sm font-bold text-white">No matching requests found.</h4>
                 <p className="text-xs text-zinc-500">Incoming friend requests will appear here in real-time.</p>
                 <button
                   onClick={() => setIsSearchOpen(true)}
