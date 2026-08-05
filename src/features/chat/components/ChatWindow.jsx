@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { MessageSquare, RefreshCw, Loader2, AlertCircle } from 'lucide-react';
+import { MessageSquare, AlertCircle } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
 import MessageInput from './MessageInput';
@@ -35,9 +35,8 @@ const ChatWindow = () => {
     messages,
     isLoadingMessages,
     error,
-    onlineUsers,
     typingUsers,
-    loadMessages,
+    isUserOnline,
     setError
   } = useChat();
 
@@ -49,7 +48,7 @@ const ChatWindow = () => {
   ) || activeConversation?.participants?.[0];
 
   const friendId = friend?._id || friend?.id;
-  const isOnline = friendId && onlineUsers ? onlineUsers.includes(friendId.toString()) : false;
+  const isOnline = isUserOnline(friendId);
   const activeTyping = activeConversation && typingUsers ? typingUsers[activeConversation._id] : null;
 
   // Auto-scroll to bottom when messages update, active conversation changes, or typing status changes
@@ -75,10 +74,12 @@ const ChatWindow = () => {
   return (
     <div className="flex-1 h-full bg-[#09090b] flex flex-col min-w-0">
       {/* Active Conversation Glass Header */}
-      <div className="p-4 bg-[#121214]/90 backdrop-blur-md border-b border-white/5 flex items-center justify-between shrink-0">
+      <div className="p-3.5 px-5 bg-[#121214]/90 backdrop-blur-md border-b border-white/5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <div className="relative shrink-0">
-            <div className="h-10 w-10 rounded-full bg-zinc-800 border border-white/10 text-white font-bold flex items-center justify-center text-xs">
+            <div className={`h-10 w-10 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
+              isOnline ? 'border-[#1db954]/60 shadow-md shadow-[#1db954]/10' : 'border-white/10'
+            }`}>
               {friend?.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
             </div>
             <span
@@ -87,24 +88,16 @@ const ChatWindow = () => {
               }`}
             />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 space-y-0.5">
             <h3 className="text-sm font-bold text-white truncate">{friend?.username || 'Chat'}</h3>
-            <p className="text-[11px] font-medium text-zinc-400 flex items-center gap-1.5 truncate">
-              <span className={`inline-block h-1.5 w-1.5 rounded-full ${isOnline ? 'bg-[#1db954]' : 'bg-zinc-600'}`} />
-              {isOnline ? 'Online' : 'Offline'}
+            <p className="text-[11px] font-semibold flex items-center gap-1.5 truncate">
+              <span className={`inline-block h-1.5 w-1.5 rounded-full ${isOnline ? 'bg-[#1db954] animate-pulse' : 'bg-zinc-600'}`} />
+              <span className={isOnline ? 'text-[#1db954]' : 'text-zinc-500'}>
+                {isOnline ? 'Online' : 'Offline'}
+              </span>
             </p>
           </div>
         </div>
-
-        {/* Manual Refresh Messages Button */}
-        <button
-          onClick={() => loadMessages(activeConversation._id)}
-          disabled={isLoadingMessages}
-          title="Refresh Messages"
-          className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-full transition-colors cursor-pointer disabled:opacity-50"
-        >
-          <RefreshCw className={`h-4 w-4 ${isLoadingMessages ? 'animate-spin' : ''}`} />
-        </button>
       </div>
 
       {/* Error Alert Banner */}

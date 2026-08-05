@@ -32,6 +32,13 @@ export const ChatProvider = ({ children }) => {
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [error, setError] = useState(null);
 
+  // Helper to check if a user is online
+  const isUserOnline = useCallback((userId) => {
+    if (!userId || !onlineUsers || !Array.isArray(onlineUsers)) return false;
+    const rawId = (userId._id || userId.id || userId).toString();
+    return onlineUsers.some(id => id.toString() === rawId);
+  }, [onlineUsers]);
+
   // Fetch all user conversations
   const loadConversations = useCallback(async () => {
     if (!user) return;
@@ -239,6 +246,7 @@ export const ChatProvider = ({ children }) => {
 
       // Listen for online users list broadcast
       const handleGetOnlineUsers = (usersList) => {
+        console.log('⚡ Received Online Users Broadcast:', usersList);
         setOnlineUsers(usersList || []);
       };
 
@@ -400,6 +408,7 @@ export const ChatProvider = ({ children }) => {
     messages,
     onlineUsers,
     typingUsers,
+    isUserOnline,
     isLoadingConversations,
     isLoadingFriends,
     isLoadingMessages,
