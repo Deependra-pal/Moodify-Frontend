@@ -39,8 +39,6 @@ const RegisterPage = () => {
 
     if (!email.trim()) {
       tempErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      tempErrors.email = 'Please provide a valid email address';
     }
 
     if (!password) {
@@ -65,7 +63,7 @@ const RegisterPage = () => {
 
     setIsSubmitting(true);
     try {
-      await register({ fullName, username, email, password });
+      await register(username, email, password);
       navigate('/login', {
         state: { registeredEmail: email }
       });
