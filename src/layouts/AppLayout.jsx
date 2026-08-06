@@ -46,7 +46,7 @@ const AppLayout = ({ children }) => {
           <div
             className={`flex flex-col w-full flex-1 min-h-0 max-w-full overflow-x-hidden ${
               isChatPage
-                ? 'h-full pb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:pb-0'
+                ? 'h-full pb-0 md:pb-0'
                 : isPlayerActive
                   ? 'min-h-full pb-[calc(9.25rem+env(safe-area-inset-bottom,0px))] md:pb-24'
                   : 'min-h-full pb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:pb-4'

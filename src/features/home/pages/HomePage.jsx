@@ -14,13 +14,13 @@ import { GridSkeleton } from '../../../components/common/Skeletons';
 
 /**
  * HomePage container component.
- * Guides the user step-by-step through a centered vertical flow: Welcome -> Scan -> Recommendation.
+ * Mobile-first responsive flow: Welcome -> Face Scan -> Music Curations.
  */
 const HomePage = () => {
   const navigate = useNavigate();
   const { songs, loading, error, fetchRecommendations, currentEmotion, searchTracks } = useRecommendations();
   const [searchQuery, setSearchQuery] = useState('');
-  const { favorites, fetchFavorites, addFavorite, removeFavorite } = useFavorites();
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
   const { playTrack, currentSong, isPlaying, setSpotifyToken, playbackSource } = usePlayer();
 
   const handleSearchSubmit = useCallback(async (e) => {
@@ -61,8 +61,6 @@ const HomePage = () => {
     }
   }, [setSpotifyToken, navigate]);
 
-
-
   const handleRecommend = useCallback(async (emotion) => {
     try {
       await fetchRecommendations(emotion);
@@ -101,10 +99,10 @@ const HomePage = () => {
   }, [getFavoriteItem, addFavorite, removeFavorite]);
 
   return (
-    <div className="w-full bg-[#09090b] text-white flex flex-col font-sans select-none animate-in fade-in duration-300">
+    <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col font-sans h-full overflow-hidden select-none animate-in fade-in duration-300">
       <Navbar />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8 sm:space-y-12">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 overflow-y-auto custom-scrollbar pb-4 md:pb-6 space-y-6 sm:space-y-8">
         {/* STEP 1: Welcome Tagline & Header */}
         <HeroSection />
 
@@ -117,15 +115,15 @@ const HomePage = () => {
           />
         </div>
 
-        {/* STEP 5: Search & Recommendations Section (Always Visible) - Bottom Margin ON THE OUTSIDE OF THE CARD */}
-        <div className="bg-[#181818] border border-neutral-900 rounded-2xl p-5 sm:p-7 shadow-xl space-y-6 w-full mb-16 sm:mb-20 animate-in slide-in-from-bottom-6 duration-300">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* STEP 5: Search & Recommendations Section */}
+        <div className="bg-[#121214] border border-white/10 rounded-2xl p-4 sm:p-7 shadow-xl space-y-5 sm:space-y-6 w-full animate-in slide-in-from-bottom-6 duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div className="space-y-1">
-              <h2 className="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
-                <Music className="h-5.5 w-5.5 text-[#1db954]" />
+              <h2 className="text-base sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
+                <Music className="h-5 w-5 sm:h-6 sm:w-6 text-[#1db954]" />
                 {songs.length > 0 ? 'Recommended for your mood' : 'Search Tracks'}
               </h2>
-              <p className="text-xs text-neutral-455 font-semibold leading-normal">
+              <p className="text-xs text-neutral-400 font-semibold leading-normal">
                 {songs.length > 0
                   ? 'A curated collection of tracks matching your facial expression and emotional vibe.'
                   : 'Search for your favorite songs, artists, or singers manually without a face scan.'
@@ -136,23 +134,24 @@ const HomePage = () => {
               <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
                 {currentEmotion && (
                   <button
+                    type="button"
                     onClick={() => handleRecommend(currentEmotion)}
                     disabled={loading}
-                    className="flex items-center gap-1.5 bg-[#242424] hover:bg-neutral-800 hover:border-neutral-700 border border-neutral-800 active:scale-95 px-3 py-1.5 rounded-full text-[10px] font-bold text-[#1db954] transition-all cursor-pointer disabled:opacity-50"
+                    className="flex items-center gap-1.5 bg-[#1f1f24] hover:bg-neutral-800 border border-white/10 active:scale-95 px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-bold text-[#1db954] transition-all cursor-pointer disabled:opacity-50 min-h-[36px] touch-target"
                     title={`Get fresh songs for ${currentEmotion}`}
                   >
                     <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
                     Refresh Vibes
                   </button>
                 )}
-                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-full">
+                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider bg-black/40 border border-white/5 px-3 py-1.5 rounded-full">
                   {songs.length} tracks
                 </span>
               </div>
             )}
           </div>
 
-          {/* Custom Search bar next to curations */}
+          {/* Custom Search bar */}
           <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-lg">
             <div className="relative w-full flex-1">
               <input
@@ -160,9 +159,9 @@ const HomePage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by artist or track name..."
-                className="w-full bg-[#242424] border border-neutral-800 rounded-full pl-11 pr-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#1db954] transition-colors h-11 sm:h-12"
+                className="w-full bg-[#18181c] border border-white/10 rounded-full pl-11 pr-4 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#1db954] transition-colors h-11 sm:h-12"
               />
-              <Search className="absolute left-4 top-3.5 sm:top-4 h-4 w-4 text-neutral-500" />
+              <Search className="absolute left-4 top-3.5 sm:top-4 h-4 w-4 text-neutral-500 pointer-events-none" />
             </div>
             <button
               type="submit"
@@ -174,11 +173,11 @@ const HomePage = () => {
           </form>
 
           {error && (
-            <div className="flex items-start gap-2 rounded-lg bg-red-500/10 p-4 text-sm text-red-400 border border-red-500/20 w-full">
-              <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 animate-pulse" />
-              <div className="space-y-1">
+            <div className="flex items-start gap-2 rounded-xl bg-red-500/10 p-3.5 text-xs text-red-400 border border-red-500/20 w-full">
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 animate-pulse" />
+              <div className="space-y-0.5">
                 <p className="font-semibold">Failed to retrieve Spotify recommendations</p>
-                <p className="text-xs text-neutral-455">{error}</p>
+                <p className="text-[11px] text-neutral-400">{error}</p>
               </div>
             </div>
           )}
@@ -188,8 +187,8 @@ const HomePage = () => {
               <GridSkeleton count={6} />
             </div>
           ) : songs.length > 0 ? (
-            <div className="max-h-[calc(100vh-22rem)] sm:max-h-[calc(100vh-20rem)] overflow-y-auto custom-scrollbar pr-1 pt-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
                 {songs.map((song, index) => {
                   const isFav = !!getFavoriteItem(song);
                   const isCurrentPlaying =
@@ -220,7 +219,7 @@ const HomePage = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-neutral-500 text-xs font-semibold select-none border-t border-neutral-900/60 pt-6">
+            <div className="text-center py-6 text-neutral-500 text-xs font-semibold select-none border-t border-white/5 pt-6">
               💡 Tip: Start the face scanner above to detect your current mood automatically, or type keywords in the search bar to find songs manually!
             </div>
           )}

@@ -89,49 +89,38 @@ const ChatSidebar = () => {
       }`}
     >
       {/* 📌 SIDEBAR HEADER & NAVIGATION MODE SELECTOR */}
-      <div className="px-4 sm:px-5 py-4 border-b border-white/5 space-y-3.5 bg-[#09090b]">
-        {/* LOGO & ADD FRIEND ACTION */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#1db954]/20 via-[#1db954]/10 to-transparent border border-[#1db954]/30 flex items-center justify-center text-[#1db954] shadow-md shadow-[#1db954]/10 shrink-0">
-              <MessageSquare className="h-5 w-5" />
-            </div>
-            <div>
-              <h2 className="text-xl font-black tracking-tight text-white leading-none">Chat Hub</h2>
-              <p className="text-[11px] font-semibold text-zinc-400 mt-1">
-                {conversations.length} conversations
-              </p>
-            </div>
+      <div className="px-5 sm:px-6 py-5 border-b border-white/5 space-y-4.5 bg-[#0c0c0e]">
+        {/* LOGO TITLE */}
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#1db954]/20 via-[#1db954]/10 to-transparent border border-[#1db954]/30 flex items-center justify-center text-[#1db954] shadow-lg shadow-[#1db954]/10 shrink-0">
+            <MessageSquare className="h-5.5 w-5.5" />
           </div>
-
-          <button
-            type="button"
-            onClick={() => setIsSearchOpen(true)}
-            className="flex items-center gap-1.5 bg-[#1db954] text-black hover:bg-[#1ed760] px-3.5 py-2 rounded-full text-xs font-black transition-all shadow-md shadow-[#1db954]/20 cursor-pointer active:scale-95 shrink-0 touch-target"
-          >
-            <UserPlus className="h-4 w-4 stroke-[2.5]" />
-            <span>Add Friend</span>
-          </button>
+          <div className="space-y-0.5">
+            <h2 className="text-2xl font-black tracking-tight text-white leading-none">Chat Hub</h2>
+            <p className="text-xs font-semibold text-zinc-400">
+              {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
+            </p>
+          </div>
         </div>
 
         {/* 3-TAB NAVIGATION MODE BAR */}
-        <div className="flex bg-[#121214] p-1 rounded-2xl border border-white/5 text-xs font-bold gap-1">
+        <div className="flex bg-[#141416] p-1.5 rounded-2xl border border-white/10 text-xs font-bold gap-1.5 shadow-inner">
           <button
             type="button"
             onClick={() => {
               setActiveTab('chats');
               setFilterText('');
             }}
-            className={`flex-1 py-2.5 sm:py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none min-h-[44px] text-xs sm:text-sm font-extrabold ${
+            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer touch-target select-none min-h-[44px] text-xs font-extrabold ${
               activeTab === 'chats'
-                ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
+                ? 'bg-[#222226] text-white shadow-md border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
             <MessageSquare className="h-4 w-4 text-[#1db954]" />
-            Chats
+            <span>Chats</span>
             {totalUnreadCount > 0 && (
-              <span className="bg-[#1db954] text-black font-black text-[10px] px-1.5 py-0.2 rounded-full">
+              <span className="bg-[#1db954] text-black font-black text-[10px] px-2 py-0.5 rounded-full shadow-sm">
                 {totalUnreadCount}
               </span>
             )}
@@ -143,14 +132,14 @@ const ChatSidebar = () => {
               setActiveTab('friends');
               setFilterText('');
             }}
-            className={`flex-1 py-2.5 sm:py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none min-h-[44px] text-xs sm:text-sm font-extrabold ${
+            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer touch-target select-none min-h-[44px] text-xs font-extrabold ${
               activeTab === 'friends'
-                ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
+                ? 'bg-[#222226] text-white shadow-md border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
             <Users className="h-4 w-4 text-sky-400" />
-            Friends
+            <span>Friends</span>
           </button>
 
           <button
@@ -159,16 +148,16 @@ const ChatSidebar = () => {
               setActiveTab('requests');
               setFilterText('');
             }}
-            className={`flex-1 py-2.5 sm:py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none min-h-[44px] text-xs sm:text-sm font-extrabold ${
+            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer touch-target select-none min-h-[44px] text-xs font-extrabold ${
               activeTab === 'requests'
-                ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
+                ? 'bg-[#222226] text-white shadow-md border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
             <Inbox className="h-4 w-4 text-amber-400" />
-            Requests
+            <span>Requests</span>
             {pendingRequests.length > 0 && (
-              <span className="bg-amber-400 text-black font-black text-[10px] px-1.5 py-0.2 rounded-full animate-pulse">
+              <span className="bg-amber-400 text-black font-black text-[10px] px-2 py-0.5 rounded-full animate-pulse shadow-sm">
                 {pendingRequests.length}
               </span>
             )}
@@ -178,25 +167,25 @@ const ChatSidebar = () => {
         {/* SEARCH BAR (Only visible on Chats tab) */}
         {activeTab === 'chats' && (
           <div className="relative">
-            <Search className="absolute left-3.5 top-3 h-4 w-4 text-zinc-500 pointer-events-none" />
+            <Search className="absolute left-4 top-3.5 h-4 w-4 text-zinc-500 pointer-events-none" />
             <input
               type="text"
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
               placeholder="Search chats by name or message..."
-              className="w-full bg-[#121214] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-xl pl-9 pr-3 py-2 border border-white/5 focus:outline-none focus:border-[#1db954]/60 transition-all h-10"
+              className="w-full bg-[#141416] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-2xl pl-10 pr-4 py-2.5 border border-white/10 focus:outline-none focus:border-[#1db954]/60 transition-all h-11"
             />
           </div>
         )}
       </div>
 
       {/* 📜 MAIN TAB VIEWPORT CONTENT */}
-      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar pb-24 md:pb-4">
         {/* --- CHATS TAB VIEW --- */}
         {activeTab === 'chats' && (
-          <div className="p-3 space-y-2">
+          <div className="p-4 space-y-3">
             {isLoadingConversations ? (
-              <div className="space-y-2 p-1">
+              <div className="space-y-3 p-1">
                 <ConversationItemSkeleton />
                 <ConversationItemSkeleton />
                 <ConversationItemSkeleton />
@@ -221,10 +210,10 @@ const ChatSidebar = () => {
                     key={conv._id}
                     type="button"
                     onClick={() => selectConversation(conv)}
-                    className={`w-full text-left p-3.5 sm:p-4 rounded-2xl transition-all flex items-center justify-between gap-3.5 cursor-pointer select-none touch-target ${
+                    className={`w-full text-left p-4 rounded-2xl transition-all flex items-center justify-between gap-4 cursor-pointer select-none touch-target shadow-md ${
                       isActive
-                        ? 'bg-[#18181b] text-white border border-[#1db954]/60 shadow-lg shadow-[#1db954]/10'
-                        : 'bg-[#121214]/80 hover:bg-[#18181b] text-zinc-300 border border-white/5 hover:border-white/10'
+                        ? 'bg-[#122216] text-white border border-[#1db954]/60 shadow-lg shadow-[#1db954]/15'
+                        : 'bg-[#141416] hover:bg-[#18181c] text-zinc-300 border border-white/10 hover:border-white/20'
                     }`}
                   >
                     <div className="flex items-center gap-3.5 min-w-0 flex-1">
@@ -238,16 +227,16 @@ const ChatSidebar = () => {
                           {friend.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
                         </div>
                         <span
-                          className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#121214] ${
+                          className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[#141416] ${
                             online ? 'bg-[#1db954]' : 'bg-zinc-600'
                           }`}
                         />
                       </div>
 
                       {/* Content details */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-black truncate text-white leading-tight">
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm sm:text-base font-black truncate text-white leading-tight">
                             {friend.username}
                           </h4>
                           <span className="text-[11px] text-zinc-400 font-semibold shrink-0 ml-2">

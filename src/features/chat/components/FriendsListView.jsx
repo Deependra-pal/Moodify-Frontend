@@ -133,7 +133,7 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                             type="button"
                             onClick={async () => {
                               if (window.confirm(`Unfriend ${friendUser.username}?`)) {
-                                await handleRemoveFriend(f.friendshipId || friendUser._id);
+                                await handleRemoveFriend(friendUser._id || f.friendshipId);
                               }
                             }}
                             className="p-3 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20"
@@ -204,7 +204,7 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                             type="button"
                             onClick={async () => {
                               if (window.confirm(`Unfriend ${friendUser.username}?`)) {
-                                await handleRemoveFriend(f.friendshipId || friendUser._id);
+                                await handleRemoveFriend(friendUser._id || f.friendshipId);
                               }
                             }}
                             className="p-3 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20"
