@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Sidebar from '../features/home/components/Sidebar';
 import MusicPlayer from '../features/home/components/MusicPlayer';
 import usePlayer from '../features/home/hooks/usePlayer';
+import useSocketListeners from '../features/chat/hooks/useSocketListeners';
 
 /**
  * Shared layout component wrapping all authenticated dashboard screens.
@@ -13,6 +14,9 @@ const AppLayout = ({ children }) => {
   const location = useLocation();
   const scrollContainerRef = useRef(null);
   const { currentSong, isPlayerVisible } = usePlayer();
+
+  // Mount central socket listeners for real-time messaging, typing, and notifications
+  useSocketListeners();
 
   const isPlayerActive = currentSong && isPlayerVisible;
   const isChatPage = location.pathname === '/chat';

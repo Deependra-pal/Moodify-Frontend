@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   setActiveConversation,
@@ -54,6 +54,13 @@ const useChat = () => {
     skip: !activeConvId
   });
 
+  // Sync fetched DB messages into Redux store when conversation changes or refetches
+  useEffect(() => {
+    if (msgData?.data?.messages) {
+      dispatch(setMessages(msgData.data.messages));
+    }
+  }, [msgData, dispatch]);
+
   const conversations = useMemo(() => convsData?.data?.conversations || [], [convsData]);
   const friends = useMemo(() => friendsData?.data?.friends || [], [friendsData]);
   const pendingRequests = useMemo(() => pendingData?.data?.requests || [], [pendingData]);
@@ -61,13 +68,20 @@ const useChat = () => {
 
   const messages = useMemo(() => {
     const fetchedMsgs = msgData?.data?.messages || [];
-    if (chatState.messages.length > 0) {
-      const optimisticMsgs = chatState.messages.filter(
-        (m) => m.status === 'uploading' || m.status === 'failed'
-      );
-      return [...fetchedMsgs, ...optimisticMsgs];
-    }
-    return fetchedMsgs;
+    // Merge optimistic messages (uploading or failed) that haven't saved to DB yet
+    const pendingOptimistic = chatState.messages.filter(
+      (m) => m.status === 'uploading' || m.status === 'failed' || m.status === 'sending'
+    );
+
+    const mergedMap = new Map();
+    fetchedMsgs.forEach((m) => mergedMap.set(m._id, m));
+    chatState.messages.forEach((m) => {
+      if (!mergedMap.has(m._id)) {
+        mergedMap.set(m._id, m);
+      }
+    });
+
+    return Array.from(mergedMap.values()).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   }, [msgData, chatState.messages]);
 
   const isUserOnline = useCallback(
@@ -114,28 +128,47 @@ const useChat = () => {
   const handleSendMessage = useCallback(
     async (text) => {
       if (!chatState.activeConversation || !text?.trim()) return;
+
+      const tempId = `temp_txt_${Date.now()}`;
+      const currentUserId = authUser?._id || authUser?.id;
+      const optimisticMsg = {
+        _id: tempId,
+        conversation: chatState.activeConversation._id,
+        sender: currentUserId,
+        text: text.trim(),
+        status: 'sending',
+        createdAt: new Date().toISOString()
+      };
+
+      dispatch(addMessage(optimisticMsg));
+
       try {
         const res = await sendMessageMutation({
           conversationId: chatState.activeConversation._id,
           text: text.trim()
         }).unwrap();
+
         if (res.success && res.data?.message) {
-          dispatch(addMessage(res.data.message));
+          dispatch(updateOptimisticMessage({ tempId, updatedMsg: res.data.message }));
         }
       } catch (err) {
         console.error('Failed to send message:', err);
+        dispatch(updateOptimisticMessage({ tempId, updatedMsg: { ...optimisticMsg, status: 'failed' } }));
       }
     },
-    [chatState.activeConversation, sendMessageMutation, dispatch]
+    [chatState.activeConversation, authUser, sendMessageMutation, dispatch]
   );
 
   const handleSendImageMessage = useCallback(
     async (imageDataUrl, text = '') => {
       if (!chatState.activeConversation || !imageDataUrl) return;
+
       const tempId = `temp_img_${Date.now()}`;
+      const currentUserId = authUser?._id || authUser?.id;
       const optimisticMsg = {
         _id: tempId,
         conversation: chatState.activeConversation._id,
+        sender: currentUserId,
         text: text || '',
         image: imageDataUrl,
         status: 'uploading',
@@ -149,14 +182,40 @@ const useChat = () => {
           text,
           image: imageDataUrl
         }).unwrap();
+
         if (res.success && res.data?.message) {
           dispatch(updateOptimisticMessage({ tempId, updatedMsg: { ...res.data.message, status: 'sent' } }));
         }
       } catch (err) {
+        console.error('Failed to send image message:', err);
         dispatch(updateOptimisticMessage({ tempId, updatedMsg: { ...optimisticMsg, status: 'failed' } }));
       }
     },
-    [chatState.activeConversation, sendMessageMutation, dispatch]
+    [chatState.activeConversation, authUser, sendMessageMutation, dispatch]
+  );
+
+  const retryImageUpload = useCallback(
+    async (tempId) => {
+      const failedMsg = chatState.messages.find((m) => m._id === tempId);
+      if (!failedMsg || !chatState.activeConversation) return;
+
+      dispatch(updateOptimisticMessage({ tempId, updatedMsg: { ...failedMsg, status: 'uploading' } }));
+
+      try {
+        const res = await sendMessageMutation({
+          conversationId: chatState.activeConversation._id,
+          text: failedMsg.text || '',
+          image: failedMsg.image
+        }).unwrap();
+
+        if (res.success && res.data?.message) {
+          dispatch(updateOptimisticMessage({ tempId, updatedMsg: { ...res.data.message, status: 'sent' } }));
+        }
+      } catch (err) {
+        dispatch(updateOptimisticMessage({ tempId, updatedMsg: { ...failedMsg, status: 'failed' } }));
+      }
+    },
+    [chatState.messages, chatState.activeConversation, sendMessageMutation, dispatch]
   );
 
   const sendTypingNotification = useCallback(() => {
@@ -230,6 +289,14 @@ const useChat = () => {
     [removeFriendMutation]
   );
 
+  const totalUnreadCount = useMemo(() => {
+    let count = 0;
+    conversations.forEach((c) => {
+      count += chatState.unreadCounts[c._id] || c.unreadCount || 0;
+    });
+    return count;
+  }, [conversations, chatState.unreadCounts]);
+
   return {
     ...chatState,
     conversations,
@@ -242,17 +309,21 @@ const useChat = () => {
     isLoadingMessages,
     isSendingMessage,
     error: messagesError?.data?.message || null,
+    totalUnreadCount,
     isUserOnline,
     selectConversation,
     openChatWithFriend,
     sendMessage: handleSendMessage,
     handleSendMessage,
     handleSendImageMessage,
+    retryImageUpload,
     sendTypingNotification,
     sendStopTypingNotification,
     handleSendFriendRequest,
     handleAcceptFriendRequest,
+    handleAcceptRequest: handleAcceptFriendRequest,
     handleRejectFriendRequest,
+    handleRejectRequest: handleRejectFriendRequest,
     handleCancelSentRequest,
     handleRemoveFriend,
     setActiveTab: (tab) => dispatch(setActiveTab(tab)),

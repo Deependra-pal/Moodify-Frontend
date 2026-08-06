@@ -39,7 +39,6 @@ const SkeletonItem = () => (
 );
 
 const ChatSidebar = () => {
-  const [activeTab, setActiveTab] = useState('chats'); // 'chats' | 'friends' | 'requests'
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filterText, setFilterText] = useState('');
 
@@ -53,7 +52,9 @@ const ChatSidebar = () => {
     selectConversation,
     isLoadingConversations,
     typingUsers,
-    isUserOnline
+    isUserOnline,
+    activeTab,
+    setActiveTab
   } = useChat();
 
   const getOtherParticipant = (conv) => {

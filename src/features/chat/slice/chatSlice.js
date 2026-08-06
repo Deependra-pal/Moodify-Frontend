@@ -21,7 +21,10 @@ const chatSlice = createSlice({
       state.messages = action.payload;
     },
     addMessage: (state, action) => {
-      state.messages.push(action.payload);
+      const exists = state.messages.some((m) => m._id === action.payload._id);
+      if (!exists) {
+        state.messages.push(action.payload);
+      }
     },
     updateOptimisticMessage: (state, action) => {
       const { tempId, updatedMsg } = action.payload;

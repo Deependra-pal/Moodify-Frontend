@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Search, UserPlus, X, Loader2, Check, AlertCircle, Sparkles } from 'lucide-react';
-import { searchUsers } from '../services/chatService';
+import { useLazySearchUsersQuery } from '../api/chatApi';
 import useChat from '../hooks/useChat';
 import { mockSearchUsers } from '../data/mockChatData';
 
 const UserSearchModal = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(mockSearchUsers);
-  const [isSearching, setIsSearching] = useState(false);
+  const [triggerSearch, { isLoading: isSearching }] = useLazySearchUsersQuery();
   const [sendingId, setSendingId] = useState(null);
   const [statusMessage, setStatusMessage] = useState({});
   const { handleSendFriendRequest } = useChat();
@@ -21,9 +21,8 @@ const UserSearchModal = ({ isOpen, onClose }) => {
       return;
     }
 
-    setIsSearching(true);
     try {
-      const res = await searchUsers(query.trim());
+      const res = await triggerSearch(query.trim()).unwrap();
       if (res.success && res.data?.users && res.data.users.length > 0) {
         setResults(res.data.users);
       } else {
@@ -43,8 +42,6 @@ const UserSearchModal = ({ isOpen, onClose }) => {
         u.email.toLowerCase().includes(q)
       );
       setResults(filtered);
-    } finally {
-      setIsSearching(false);
     }
   };
 
