@@ -160,6 +160,7 @@ const NotificationDropdown = () => {
             )}
           </div>
         </div>
+        </>
       )}
     </div>
   );
