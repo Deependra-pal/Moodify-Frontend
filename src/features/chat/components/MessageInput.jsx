@@ -97,7 +97,7 @@ const MessageInput = () => {
   if (!activeConversation) return null;
 
   return (
-    <div className="relative sticky bottom-0 z-30 bg-[#121214] border-t border-white/5 px-3 py-3 sm:px-5 sm:py-3.5 flex flex-col shrink-0 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] md:pb-3.5 glass-panel">
+    <div className="relative sticky bottom-0 z-30 bg-[#121214] border-t border-white/5 px-3 py-2.5 sm:px-5 sm:py-3.5 flex flex-col shrink-0 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-3.5 glass-panel">
       {/* Emoji Picker Popover */}
       {showEmojiPicker && (
         <EmojiPicker

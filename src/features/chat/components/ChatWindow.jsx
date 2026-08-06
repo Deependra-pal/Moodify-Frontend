@@ -300,7 +300,7 @@ const ChatWindow = () => {
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-3.5 sm:px-6 pt-4 sm:pt-6 pb-28 md:pb-6 space-y-4 custom-scrollbar min-h-0 relative max-w-full overflow-x-hidden"
+        className="flex-1 overflow-y-auto px-3.5 sm:px-6 pt-4 sm:pt-6 pb-16 md:pb-6 space-y-4 custom-scrollbar min-h-0 relative max-w-full overflow-x-hidden"
       >
         {isLoadingMessages ? (
           <MessageSkeleton />

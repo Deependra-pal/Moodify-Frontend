@@ -6,8 +6,8 @@ import { usePlayer } from '../context/PlayerContext';
 
 /**
  * Shared layout component wrapping all authenticated dashboard screens.
- * Enforces zero horizontal scroll overflow, 44px+ touch target clearance,
- * and maintains bottom clearance for mobile navigation tabs & music player deck.
+ * Enforces zero horizontal scroll overflow, consistent compact padding across screens,
+ * and eliminates dead black gaps above mobile navigation tabs & music player deck.
  */
 const AppLayout = ({ children }) => {
   const location = useLocation();
@@ -42,10 +42,10 @@ const AppLayout = ({ children }) => {
           <div
             className={`flex flex-col w-full flex-1 min-h-0 max-w-full overflow-x-hidden ${
               isChatPage
-                ? 'h-full pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-0'
+                ? 'h-full pb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:pb-0'
                 : isPlayerActive
-                  ? 'min-h-full pb-[calc(12rem+env(safe-area-inset-bottom,0px))] md:pb-36'
-                  : 'min-h-full pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-20'
+                  ? 'min-h-full pb-[calc(9.25rem+env(safe-area-inset-bottom,0px))] md:pb-24'
+                  : 'min-h-full pb-[calc(4.25rem+env(safe-area-inset-bottom,0px))] md:pb-4'
             }`}
           >
             {children}

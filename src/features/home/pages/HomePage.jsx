@@ -191,7 +191,7 @@ const HomePage = () => {
               <GridSkeleton count={6} />
             </div>
           ) : songs.length > 0 ? (
-            <div className="max-h-[440px] sm:max-h-[520px] overflow-y-auto overscroll-y-auto custom-scrollbar pr-1 pt-2">
+            <div className="max-h-[calc(100vh-22rem)] sm:max-h-[calc(100vh-20rem)] overflow-y-auto custom-scrollbar pr-1 pt-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {songs.map((song, index) => {
                   const isFav = !!getFavoriteItem(song);

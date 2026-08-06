@@ -161,7 +161,7 @@ const HistoryPage = () => {
             </div>
 
             {/* List Rows */}
-            <div className="divide-y divide-neutral-900/60 w-full">
+            <div className="divide-y divide-neutral-900/60 w-full max-h-[calc(100vh-20rem)] overflow-y-auto custom-scrollbar">
               {displayHistory.map((track, index) => {
                 const isFavorited = !!getFavoriteItem(track);
                 const trackToPlay = historyPlaylist[index];

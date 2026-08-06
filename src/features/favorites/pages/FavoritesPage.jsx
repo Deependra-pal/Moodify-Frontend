@@ -99,7 +99,7 @@ const FavoritesPage = () => {
             <GridSkeleton count={5} />
           </div>
         ) : favorites.length > 0 ? (
-          <div className="w-full">
+          <div className="w-full max-h-[calc(100vh-18rem)] sm:max-h-[calc(100vh-20rem)] overflow-y-auto custom-scrollbar p-1">
             <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {favorites.map((fav, index) => {
                 const isCurrentPlaying =
