@@ -56,12 +56,15 @@ const ChatSidebar = () => {
   } = useChat();
 
   const getOtherParticipant = (conv) => {
-    if (!conv || !conv.participants || !user) return null;
-    const currentUserId = user.id || user._id;
-    return (
-      conv.participants.find((p) => (p._id || p.id).toString() !== currentUserId.toString()) ||
-      conv.participants[0]
-    );
+    if (!conv || !conv.participants || !Array.isArray(conv.participants)) return null;
+    const currentUserId = user ? (user._id || user.id || '').toString() : '';
+    const found = conv.participants.find((p) => {
+      if (!p) return false;
+      const pId = typeof p === 'object' ? (p._id || p.id || '').toString() : p.toString();
+      return pId && pId !== currentUserId;
+    });
+    const result = found || conv.participants[0] || null;
+    return typeof result === 'object' ? result : { _id: result, username: 'User', email: '' };
   };
 
   const filteredConversations = conversations.filter((c) => {

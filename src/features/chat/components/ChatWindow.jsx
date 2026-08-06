@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import {
   MessageSquare,
   AlertCircle,
@@ -83,13 +83,25 @@ const ChatWindow = () => {
 
   const scrollContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const isInitialLoadRef = useRef(true);
   const [showScrollDownBtn, setShowScrollDownBtn] = useState(false);
 
-  const friend =
-    activeConversation?.participants?.find(
-      (p) => (p._id || p.id).toString() !== (user?.id || user?._id)?.toString()
-    ) || activeConversation?.participants?.[0];
+  // 100% Robust, Null-Safe Participant Extractor
+  const friend = useMemo(() => {
+    if (!activeConversation || !activeConversation.participants || !Array.isArray(activeConversation.participants)) {
+      return { username: 'Chat User', email: '' };
+    }
+
+    const currentUserId = user ? (user._id || user.id || '').toString() : '';
+
+    const found = activeConversation.participants.find((p) => {
+      if (!p) return false;
+      const pId = typeof p === 'object' ? (p._id || p.id || '').toString() : p.toString();
+      return pId && pId !== currentUserId;
+    });
+
+    const result = found || activeConversation.participants[0] || { username: 'Chat User', email: '' };
+    return typeof result === 'object' ? result : { _id: result, username: 'Chat User', email: '' };
+  }, [activeConversation, user]);
 
   const friendId = friend?._id || friend?.id;
   const isOnline = isUserOnline(friendId);
@@ -108,11 +120,18 @@ const ChatWindow = () => {
     const container = scrollContainerRef.current;
     if (instant) {
       container.scrollTop = container.scrollHeight;
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+      }
     } else {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: 'smooth'
-      });
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      } else {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
     }
   }, []);
 
@@ -128,7 +147,11 @@ const ChatWindow = () => {
     if (!activeConversation) return;
     scrollToBottom(true);
     const frame = requestAnimationFrame(() => scrollToBottom(true));
-    return () => cancelAnimationFrame(frame);
+    const timer = setTimeout(() => scrollToBottom(true), 60);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
   }, [activeConversation?._id, isLoadingMessages, scrollToBottom]);
 
   // Smooth scroll on incoming/outgoing messages if user is near bottom
@@ -173,8 +196,9 @@ const ChatWindow = () => {
 
   return (
     <div
-      className={`flex-1 h-full bg-[#09090b] flex-col min-w-0 overflow-hidden relative ${activeConversation ? 'flex fixed inset-0 z-50 md:relative md:inset-auto md:z-auto' : 'hidden md:flex'
-        }`}
+      className={`flex-1 h-full bg-[#09090b] flex-col min-w-0 overflow-hidden relative ${
+        activeConversation ? 'flex fixed inset-0 z-50 md:relative md:inset-auto md:z-auto' : 'hidden md:flex'
+      }`}
     >
       {/* 📌 STICKY WHATSAPP-STYLE HEADER */}
       <div className="sticky top-0 z-30 px-4 sm:px-6 py-3.5 sm:py-4 bg-[#121214] border-b border-white/5 flex items-center justify-between shrink-0 shadow-lg glass-panel">
@@ -192,14 +216,16 @@ const ChatWindow = () => {
           {/* Avatar with Status Ring */}
           <div className="relative shrink-0">
             <div
-              className={`h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-zinc-800 border text-white font-black flex items-center justify-center text-sm shadow-md ${isOnline ? 'border-[#1db954]/60 shadow-md shadow-[#1db954]/20' : 'border-white/10'
-                }`}
+              className={`h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-zinc-800 border text-white font-black flex items-center justify-center text-sm shadow-md ${
+                isOnline ? 'border-[#1db954]/60 shadow-md shadow-[#1db954]/20' : 'border-white/10'
+              }`}
             >
               {friend?.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
             </div>
             <span
-              className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-full border-2 border-[#121214] ${isOnline ? 'bg-[#1db954]' : 'bg-zinc-600'
-                }`}
+              className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-full border-2 border-[#121214] ${
+                isOnline ? 'bg-[#1db954]' : 'bg-zinc-600'
+              }`}
             />
           </div>
 
@@ -210,8 +236,9 @@ const ChatWindow = () => {
             </h3>
             <p className="text-xs font-semibold flex items-center gap-1.5 truncate">
               <span
-                className={`inline-block h-2 w-2 rounded-full ${isOnline ? 'bg-[#1db954] animate-pulse' : 'bg-zinc-600'
-                  }`}
+                className={`inline-block h-2 w-2 rounded-full ${
+                  isOnline ? 'bg-[#1db954] animate-pulse' : 'bg-zinc-600'
+                }`}
               />
               <span className={isOnline ? 'text-[#1db954] font-bold' : 'text-zinc-400 font-medium'}>
                 {isOnline ? 'Online' : 'Offline'}
@@ -296,17 +323,19 @@ const ChatWindow = () => {
                 className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} animate-in fade-in duration-200`}
               >
                 <div
-                  className={`max-w-[85%] sm:max-w-[70%] md:max-w-[60%] px-4 py-3 text-sm sm:text-base leading-relaxed break-words shadow-lg ${isMe
+                  className={`max-w-[85%] sm:max-w-[70%] md:max-w-[60%] px-4 py-3 text-sm sm:text-base leading-relaxed break-words shadow-lg ${
+                    isMe
                       ? 'chat-bubble-out text-black font-semibold'
                       : 'chat-bubble-in text-zinc-100 font-normal'
-                    }`}
+                  }`}
                 >
                   <p className="select-text whitespace-pre-wrap">{item.text}</p>
 
                   {/* Timestamp & Read Receipt Checkmarks */}
                   <div
-                    className={`flex items-center justify-end gap-1 mt-1 text-[10.5px] font-bold select-none ${isMe ? 'text-black/70' : 'text-zinc-400'
-                      }`}
+                    className={`flex items-center justify-end gap-1 mt-1 text-[10.5px] font-bold select-none ${
+                      isMe ? 'text-black/70' : 'text-zinc-400'
+                    }`}
                   >
                     <span>{formatMessageTime(item.createdAt)}</span>
                     {isMe && (
@@ -351,7 +380,7 @@ const ChatWindow = () => {
       {showScrollDownBtn && (
         <button
           type="button"
-          onClick={() => scrollToBottomSmooth()}
+          onClick={() => scrollToBottom(false)}
           className="absolute bottom-20 right-6 z-40 bg-[#18181b] hover:bg-[#1db954] text-zinc-300 hover:text-black border border-white/10 p-3 rounded-full shadow-2xl transition-all cursor-pointer animate-in fade-in zoom-in-95 duration-200"
           title="Jump to latest messages"
         >
