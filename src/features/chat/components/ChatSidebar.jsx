@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { MessageSquare, Users, UserPlus, Check, X, Search, Clock, Inbox, Sparkles } from 'lucide-react';
+import { MessageSquare, Users, Inbox, UserPlus, Search, Clock, Sparkles } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
 import UserSearchModal from './UserSearchModal';
+import FriendsListView from './FriendsListView';
+import FriendRequestsView from './FriendRequestsView';
 
 const formatTime = (dateStr) => {
   if (!dateStr) return '';
@@ -26,11 +28,11 @@ const formatTime = (dateStr) => {
 };
 
 const SkeletonItem = () => (
-  <div className="p-3 rounded-xl bg-[#121214] border border-white/5 animate-pulse flex items-center gap-3">
-    <div className="h-10 w-10 rounded-full bg-zinc-800/80 shrink-0" />
-    <div className="flex-1 space-y-2 min-w-0">
-      <div className="h-3.5 bg-zinc-800/80 rounded w-2/3" />
-      <div className="h-2.5 bg-zinc-800/60 rounded w-full" />
+  <div className="p-4 rounded-2xl bg-[#121214] border border-white/5 animate-pulse flex items-center gap-3.5">
+    <div className="h-12 w-12 rounded-2xl bg-zinc-800/80 shrink-0" />
+    <div className="flex-1 space-y-2.5 min-w-0">
+      <div className="h-4 bg-zinc-800/80 rounded-md w-2/3" />
+      <div className="h-3 bg-zinc-800/60 rounded-md w-full" />
     </div>
   </div>
 );
@@ -43,124 +45,80 @@ const ChatSidebar = () => {
   const { user } = useAuth();
   const {
     conversations,
-    friends,
     pendingRequests,
     activeConversation,
     unreadCounts,
+    totalUnreadCount,
     selectConversation,
-    openChatWithFriend,
-    handleAcceptRequest,
-    handleRejectRequest,
     isLoadingConversations,
-    isLoadingFriends,
+    typingUsers,
     isUserOnline
   } = useChat();
-
-  const handleTabChange = (newTab) => {
-    setActiveTab(newTab);
-    setFilterText('');
-  };
 
   const getOtherParticipant = (conv) => {
     if (!conv || !conv.participants || !user) return null;
     const currentUserId = user.id || user._id;
-    return conv.participants.find(p => (p._id || p.id).toString() !== currentUserId.toString()) || conv.participants[0];
+    return (
+      conv.participants.find((p) => (p._id || p.id).toString() !== currentUserId.toString()) ||
+      conv.participants[0]
+    );
   };
 
-  // Instant client-side search filtering across existing conversations ONLY
-  const filteredConversations = conversations.filter(c => {
+  // Instant client-side search filtering across existing conversations
+  const filteredConversations = conversations.filter((c) => {
     const friend = getOtherParticipant(c);
     if (!friend) return false;
-    const searchLower = filterText.toLowerCase().trim();
-    if (!searchLower) return true;
+    const q = filterText.toLowerCase().trim();
+    if (!q) return true;
     return (
-      friend.username?.toLowerCase().includes(searchLower) ||
-      friend.fullName?.toLowerCase().includes(searchLower) ||
-      friend.email?.toLowerCase().includes(searchLower) ||
-      c.lastMessage?.toLowerCase().includes(searchLower)
-    );
-  });
-
-  // Instant client-side search filtering across friends list ONLY
-  const filteredFriends = friends.filter(f => {
-    const friendUser = f.user;
-    if (!friendUser) return false;
-    const searchLower = filterText.toLowerCase().trim();
-    if (!searchLower) return true;
-    return (
-      friendUser.username?.toLowerCase().includes(searchLower) ||
-      friendUser.fullName?.toLowerCase().includes(searchLower) ||
-      friendUser.email?.toLowerCase().includes(searchLower)
-    );
-  });
-
-  // Instant client-side search filtering across pending friend requests ONLY
-  const filteredRequests = pendingRequests.filter(req => {
-    const sender = req.sender;
-    if (!sender) return false;
-    const searchLower = filterText.toLowerCase().trim();
-    if (!searchLower) return true;
-    return (
-      sender.username?.toLowerCase().includes(searchLower) ||
-      sender.fullName?.toLowerCase().includes(searchLower) ||
-      sender.email?.toLowerCase().includes(searchLower)
+      friend.username?.toLowerCase().includes(q) ||
+      friend.fullName?.toLowerCase().includes(q) ||
+      friend.email?.toLowerCase().includes(q) ||
+      c.lastMessage?.toLowerCase().includes(q)
     );
   });
 
   return (
-    <aside className={`w-full md:w-80 h-full bg-[#09090b] border-r border-white/5 flex-col shrink-0 select-none ${
-      activeConversation ? 'hidden md:flex' : 'flex'
-    }`}>
-      {/* Sidebar Top Header & Controls - Structured 3-Section Layout */}
-      <div className="px-4 sm:px-5 py-4 sm:py-5 border-b border-white/5 space-y-3.5 bg-[#09090b]">
-        {/* SECTION 1: HEADER & ADD FRIEND */}
+    <aside
+      className={`w-full md:w-96 lg:w-[26rem] h-full bg-[#09090b] border-r border-white/5 flex-col shrink-0 select-none ${
+        activeConversation ? 'hidden md:flex' : 'flex'
+      }`}
+    >
+      {/* 📌 SIDEBAR HEADER & NAVIGATION MODE SELECTOR */}
+      <div className="px-4 sm:px-5 py-4 border-b border-white/5 space-y-3.5 bg-[#09090b]">
+        {/* SECTION 1: LOGO/TITLE & ADD FRIEND ACTION */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#1db954]/20 via-[#1db954]/10 to-transparent border border-[#1db954]/25 flex items-center justify-center text-[#1db954] shadow-md shadow-[#1db954]/5 shrink-0">
-              <MessageSquare className="h-4.5 w-4.5" />
+            <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#1db954]/20 via-[#1db954]/10 to-transparent border border-[#1db954]/30 flex items-center justify-center text-[#1db954] shadow-md shadow-[#1db954]/10 shrink-0">
+              <MessageSquare className="h-5 w-5" />
             </div>
-            <div className="min-w-0">
-              <h2 className="text-lg font-black tracking-tight text-white leading-none">Messages</h2>
-              <span className="text-[10.5px] font-semibold text-zinc-400 mt-1 block">
-                {friends.length} Friends
-              </span>
+            <div>
+              <h2 className="text-xl font-black tracking-tight text-white leading-none">Chat Hub</h2>
+              <p className="text-[11px] font-semibold text-zinc-400 mt-1">
+                {conversations.length} conversations
+              </p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={() => setIsSearchOpen(true)}
-            className="flex items-center gap-1.5 bg-[#1db954] text-black hover:bg-[#1ed760] px-3.5 py-1.5 rounded-full text-xs font-black transition-all shadow-md shadow-[#1db954]/15 cursor-pointer active:scale-95 shrink-0 outline-none focus:outline-none focus:ring-0"
+            className="flex items-center gap-1.5 bg-[#1db954] text-black hover:bg-[#1ed760] px-3.5 py-2 rounded-full text-xs font-black transition-all shadow-md shadow-[#1db954]/20 cursor-pointer active:scale-95 shrink-0 touch-target"
           >
-            <UserPlus className="h-3.5 w-3.5 stroke-[2.5]" />
-            Add Friend
+            <UserPlus className="h-4 w-4 stroke-[2.5]" />
+            <span>Add Friend</span>
           </button>
         </div>
 
-        {/* SECTION 2: CONTEXT-AWARE SEARCH BAR */}
-        <div className="relative">
-          <Search className="absolute left-3.5 top-3 h-4 w-4 text-zinc-500 pointer-events-none" />
-          <input
-            type="text"
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            placeholder={
-              activeTab === 'chats'
-                ? 'Search conversations...'
-                : activeTab === 'friends'
-                ? 'Search friends...'
-                : 'Search requests...'
-            }
-            className="w-full bg-[#121214] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-xl pl-9 pr-3 py-2 border border-white/5 focus:outline-none focus:border-[#1db954]/60 focus:ring-1 focus:ring-[#1db954]/30 transition-all h-10"
-          />
-        </div>
-
-        {/* SECTION 3: 3 NAVIGATION MODE TABS */}
-        <div className="flex bg-[#121214] p-1 rounded-xl border border-white/5 text-xs gap-1">
+        {/* SECTION 2: 3-TAB NAVIGATION MODE BAR */}
+        <div className="flex bg-[#121214] p-1 rounded-2xl border border-white/5 text-xs font-bold gap-1">
           <button
             type="button"
-            onClick={() => handleTabChange('chats')}
-            className={`flex-1 py-2 font-black rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
+            onClick={() => {
+              setActiveTab('chats');
+              setFilterText('');
+            }}
+            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none ${
               activeTab === 'chats'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
@@ -168,12 +126,20 @@ const ChatSidebar = () => {
           >
             <MessageSquare className="h-4 w-4 text-[#1db954]" />
             Chats
+            {totalUnreadCount > 0 && (
+              <span className="bg-[#1db954] text-black font-black text-[10px] px-1.5 py-0.2 rounded-full">
+                {totalUnreadCount}
+              </span>
+            )}
           </button>
 
           <button
             type="button"
-            onClick={() => handleTabChange('friends')}
-            className={`flex-1 py-2 font-black rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
+            onClick={() => {
+              setActiveTab('friends');
+              setFilterText('');
+            }}
+            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none ${
               activeTab === 'friends'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
@@ -185,8 +151,11 @@ const ChatSidebar = () => {
 
           <button
             type="button"
-            onClick={() => handleTabChange('requests')}
-            className={`flex-1 py-2 font-black rounded-lg transition-all flex items-center justify-center gap-1.5 relative cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
+            onClick={() => {
+              setActiveTab('requests');
+              setFilterText('');
+            }}
+            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none ${
               activeTab === 'requests'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
@@ -195,21 +164,35 @@ const ChatSidebar = () => {
             <Inbox className="h-4 w-4 text-amber-400" />
             Requests
             {pendingRequests.length > 0 && (
-              <span className="bg-[#1db954] text-black font-black text-[10px] px-1.5 py-0.2 rounded-full shadow-md animate-pulse shrink-0 ml-0.5">
+              <span className="bg-amber-400 text-black font-black text-[10px] px-1.5 py-0.2 rounded-full animate-pulse">
                 {pendingRequests.length}
               </span>
             )}
           </button>
         </div>
+
+        {/* SECTION 3: SEARCH BAR (Only visible on Chats tab) */}
+        {activeTab === 'chats' && (
+          <div className="relative">
+            <Search className="absolute left-3.5 top-3 h-4 w-4 text-zinc-500 pointer-events-none" />
+            <input
+              type="text"
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              placeholder="Search chats by name or message..."
+              className="w-full bg-[#121214] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-xl pl-9 pr-3 py-2 border border-white/5 focus:outline-none focus:border-[#1db954]/60 transition-all h-10"
+            />
+          </div>
+        )}
       </div>
 
-      {/* Main Tab Content Viewport */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1.5 custom-scrollbar">
-        {/* --- CHATS TAB --- */}
+      {/* 📜 MAIN TAB VIEWPORT CONTENT */}
+      <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
+        {/* --- CHATS TAB VIEW --- */}
         {activeTab === 'chats' && (
-          <div className="space-y-2 p-1">
+          <div className="p-3 space-y-2">
             {isLoadingConversations ? (
-              <div className="space-y-2">
+              <div className="space-y-2.5 p-1">
                 <SkeletonItem />
                 <SkeletonItem />
                 <SkeletonItem />
@@ -217,51 +200,75 @@ const ChatSidebar = () => {
             ) : filteredConversations.length > 0 ? (
               filteredConversations.map((conv) => {
                 const friend = getOtherParticipant(conv);
-                const isActive = activeConversation && activeConversation._id === conv._id;
                 if (!friend) return null;
 
+                const isActive = activeConversation && activeConversation._id === conv._id;
                 const friendId = friend._id || friend.id;
                 const online = isUserOnline(friendId);
-                const unread = unreadCounts[conv._id] !== undefined ? unreadCounts[conv._id] : (conv.unreadCount || 0);
+                const unread =
+                  unreadCounts[conv._id] !== undefined
+                    ? unreadCounts[conv._id]
+                    : conv.unreadCount || 0;
+                const isTyping = typingUsers && typingUsers[conv._id];
 
                 return (
                   <button
                     key={conv._id}
+                    type="button"
                     onClick={() => selectConversation(conv)}
-                    className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between gap-3 cursor-pointer outline-none focus:outline-none focus:ring-0 select-none ${
+                    className={`w-full text-left p-3.5 sm:p-4 rounded-2xl transition-all flex items-center justify-between gap-3.5 cursor-pointer select-none touch-target ${
                       isActive
-                        ? 'bg-[#18181b] text-white border border-[#1db954]/60 shadow-md shadow-[#1db954]/10'
-                        : 'bg-[#121214] hover:bg-[#18181b] text-zinc-300 border border-white/5 hover:border-white/10'
+                        ? 'bg-[#18181b] text-white border border-[#1db954]/60 shadow-lg shadow-[#1db954]/10'
+                        : 'bg-[#121214]/80 hover:bg-[#18181b] text-zinc-300 border border-white/5 hover:border-white/10'
                     }`}
                   >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      {/* Avatar with status ring */}
                       <div className="relative shrink-0">
-                        <div className={`h-10 w-10 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
-                          online ? 'border-[#1db954]/50' : 'border-white/10'
-                        }`}>
+                        <div
+                          className={`h-12 w-12 rounded-2xl bg-zinc-800 border text-white font-black flex items-center justify-center text-sm shadow-md ${
+                            online ? 'border-[#1db954]/60' : 'border-white/10'
+                          }`}
+                        >
                           {friend.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
                         </div>
                         <span
-                          className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-[#09090b] ${
+                          className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#121214] ${
                             online ? 'bg-[#1db954]' : 'bg-zinc-600'
                           }`}
-                          title={online ? 'Online' : 'Offline'}
                         />
                       </div>
 
+                      {/* Content details */}
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <p className="text-xs sm:text-sm font-bold truncate text-white">{friend.username}</p>
-                          <span className="text-[11px] text-zinc-400 font-semibold shrink-0 ml-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className="text-sm font-black truncate text-white leading-tight">
+                            {friend.username}
+                          </h4>
+                          <span className="text-[11px] text-zinc-400 font-semibold shrink-0 ml-2">
                             {formatTime(conv.lastMessageAt || conv.updatedAt)}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between gap-1">
-                          <p className={`text-xs truncate leading-snug ${unread > 0 ? 'text-white font-black' : 'text-zinc-400'}`}>
-                            {conv.lastMessage || <span className="italic text-zinc-500">No messages yet</span>}
-                          </p>
+
+                        <div className="flex items-center justify-between gap-2">
+                          {isTyping ? (
+                            <p className="text-xs font-bold text-[#1db954] flex items-center gap-1 animate-pulse truncate">
+                              <span>typing...</span>
+                            </p>
+                          ) : (
+                            <p
+                              className={`text-xs truncate leading-snug ${
+                                unread > 0 ? 'text-white font-extrabold' : 'text-zinc-400 font-medium'
+                              }`}
+                            >
+                              {conv.lastMessage || (
+                                <span className="italic text-zinc-500">No messages yet</span>
+                              )}
+                            </p>
+                          )}
+
                           {unread > 0 && (
-                            <span className="bg-[#1db954] text-black font-black text-[10px] px-1.5 py-0.2 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse shrink-0">
+                            <span className="bg-[#1db954] text-black font-black text-[11px] px-2 py-0.5 rounded-full shadow-md shadow-[#1db954]/20 animate-pulse shrink-0">
                               {unread}
                             </span>
                           )}
@@ -272,152 +279,44 @@ const ChatSidebar = () => {
                 );
               })
             ) : (
-              <div className="p-8 text-center space-y-3">
-                <div className="h-12 w-12 rounded-full bg-[#121214] border border-white/5 flex items-center justify-center mx-auto text-zinc-600">
-                  <MessageSquare className="h-6 w-6" />
+              /* Empty state */
+              <div className="h-80 flex flex-col items-center justify-center text-center p-8 space-y-3">
+                <div className="h-16 w-16 rounded-3xl bg-[#121214] border border-white/5 flex items-center justify-center text-zinc-600">
+                  <MessageSquare className="h-8 w-8 stroke-[1.75]" />
                 </div>
-                <p className="text-xs text-zinc-400 font-bold">No conversations found.</p>
+                <div className="space-y-1">
+                  <h4 className="text-base font-black text-white">No Conversations Found</h4>
+                  <p className="text-xs text-zinc-400">
+                    {filterText ? `No chat matches "${filterText}".` : 'Start a chat with one of your friends.'}
+                  </p>
+                </div>
                 <button
-                  onClick={() => handleTabChange('friends')}
-                  className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer"
+                  type="button"
+                  onClick={() => setActiveTab('friends')}
+                  className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer pt-1"
                 >
-                  Message a friend to start chatting
+                  Go to Friends List →
                 </button>
               </div>
             )}
           </div>
         )}
 
-        {/* --- FRIENDS TAB --- */}
+        {/* --- FRIENDS TAB VIEW --- */}
         {activeTab === 'friends' && (
-          <div className="space-y-2 p-1">
-            {isLoadingFriends ? (
-              <div className="space-y-2">
-                <SkeletonItem />
-                <SkeletonItem />
-              </div>
-            ) : filteredFriends.length > 0 ? (
-              filteredFriends.map((f) => {
-                const friendUser = f.user;
-                if (!friendUser) return null;
-
-                const friendId = friendUser._id || friendUser.id;
-                const online = isUserOnline(friendId);
-
-                return (
-                  <div
-                    key={f.friendshipId || friendUser._id}
-                    className="flex items-center justify-between p-2.5 bg-[#121214] border border-white/5 rounded-xl hover:border-white/10 transition-all"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="relative shrink-0">
-                        <div className={`h-9 w-9 rounded-full bg-zinc-800 border text-white font-bold flex items-center justify-center text-xs ${
-                          online ? 'border-[#1db954]/50' : 'border-white/10'
-                        }`}>
-                          {friendUser.username ? friendUser.username.substring(0, 2).toUpperCase() : 'U'}
-                        </div>
-                        <span
-                          className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-[#09090b] ${
-                            online ? 'bg-[#1db954]' : 'bg-zinc-600'
-                          }`}
-                          title={online ? 'Online' : 'Offline'}
-                        />
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-white truncate">{friendUser.username}</p>
-                        <p className="text-[10px] text-zinc-500 truncate">{friendUser.fullName || friendUser.email}</p>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        openChatWithFriend(friendUser);
-                        handleTabChange('chats');
-                      }}
-                      className="bg-[#1db954] text-black hover:bg-[#1ed760] text-[11px] font-extrabold px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-sm shadow-[#1db954]/10 active:scale-95"
-                    >
-                      <MessageSquare className="h-3 w-3 fill-current" />
-                      Message
-                    </button>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="p-8 text-center space-y-2">
-                <p className="text-xs text-zinc-400 font-bold">No friends found.</p>
-                <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer"
-                >
-                  Find users & add friends
-                </button>
-              </div>
-            )}
-          </div>
+          <FriendsListView
+            onOpenSearch={() => setIsSearchOpen(true)}
+            onSelectFriend={() => setActiveTab('chats')}
+          />
         )}
 
-        {/* --- DEDICATED INCOMING REQUESTS TAB --- */}
+        {/* --- REQUESTS TAB VIEW --- */}
         {activeTab === 'requests' && (
-          <div className="space-y-3 p-1">
-            {filteredRequests.length > 0 ? (
-              filteredRequests.map((req) => (
-                <div
-                  key={req._id}
-                  className="flex flex-col gap-3 bg-[#121214] border border-amber-500/30 p-3.5 rounded-2xl shadow-xl hover:border-amber-500/50 transition-all animate-in fade-in duration-200"
-                >
-                  <div className="flex items-center justify-between gap-3 min-w-0">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-10 w-10 rounded-full bg-zinc-800 border border-white/10 text-white font-black flex items-center justify-center text-xs shrink-0 shadow-md">
-                        {req.sender?.username ? req.sender.username.substring(0, 2).toUpperCase() : 'U'}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-black text-white truncate">{req.sender?.username}</p>
-                        <p className="text-[11px] text-zinc-400 truncate">{req.sender?.fullName || req.sender?.email}</p>
-                      </div>
-                    </div>
-                    <span className="text-[10px] text-amber-400/80 font-bold shrink-0 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                      {formatTime(req.createdAt)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
-                    <button
-                      onClick={() => handleRejectRequest(req._id)}
-                      className="px-3.5 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer border border-red-500/20"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                      Reject
-                    </button>
-                    <button
-                      onClick={() => handleAcceptRequest(req._id)}
-                      className="px-4 py-1.5 rounded-full bg-[#1db954] hover:bg-[#1ed760] text-black text-xs font-extrabold transition-all flex items-center gap-1 cursor-pointer shadow-md shadow-[#1db954]/25 active:scale-95"
-                    >
-                      <Check className="h-3.5 w-3.5 stroke-[3]" />
-                      Accept Friend
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="p-8 text-center space-y-3">
-                <div className="h-12 w-12 rounded-full bg-[#121214] border border-white/5 flex items-center justify-center mx-auto text-amber-400">
-                  <Inbox className="h-6 w-6" />
-                </div>
-                <h4 className="text-sm font-bold text-white">No matching requests found.</h4>
-                <p className="text-xs text-zinc-500">Incoming friend requests will appear here in real-time.</p>
-                <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className="text-xs font-bold text-[#1db954] hover:underline cursor-pointer"
-                >
-                  Send friend requests to users
-                </button>
-              </div>
-            )}
-          </div>
+          <FriendRequestsView onOpenSearch={() => setIsSearchOpen(false)} />
         )}
       </div>
 
+      {/* User Search Modal */}
       <UserSearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </aside>
   );

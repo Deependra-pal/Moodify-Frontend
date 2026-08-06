@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, UserPlus, X, Loader2, Check, AlertCircle } from 'lucide-react';
+import { Search, UserPlus, X, Loader2, Check, AlertCircle, Sparkles } from 'lucide-react';
 import { searchUsers } from '../services/chatService';
 import useChat from '../hooks/useChat';
 
@@ -34,7 +34,7 @@ const UserSearchModal = ({ isOpen, onClose }) => {
   const onSendRequest = async (targetId) => {
     setSendingId(targetId);
     const res = await handleSendFriendRequest(targetId);
-    setStatusMessage(prev => ({
+    setStatusMessage((prev) => ({
       ...prev,
       [targetId]: { success: res.success, text: res.message }
     }));
@@ -42,49 +42,52 @@ const UserSearchModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl p-4">
-      <div className="bg-[#121214] border border-white/10 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 sm:p-6 animate-in fade-in duration-200">
+      <div className="bg-[#121214] border border-white/10 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] glass-panel">
         {/* Header */}
-        <div className="p-3.5 px-4 border-b border-white/5 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <UserPlus className="h-4 w-4 text-[#1db954]" />
+        <div className="p-4 sm:p-5 border-b border-white/5 flex items-center justify-between">
+          <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-[#1db954]/20 text-[#1db954] flex items-center justify-center">
+              <UserPlus className="h-4 w-4" />
+            </div>
             Find & Add Friends
           </h3>
           <button
+            type="button"
             onClick={onClose}
-            className="text-zinc-400 hover:text-white p-1 rounded-full hover:bg-zinc-800 transition-colors cursor-pointer"
+            className="text-zinc-400 hover:text-white p-2 rounded-2xl hover:bg-white/5 transition-colors cursor-pointer touch-target"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Compact Search Bar */}
-        <form onSubmit={handleSearch} className="p-3 border-b border-white/5 flex gap-2">
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} className="p-4 border-b border-white/5 flex gap-2.5">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
+            <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-zinc-500 pointer-events-none" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by username, name, or email..."
-              className="w-full bg-[#18181b] text-white text-[11px] placeholder-zinc-500 rounded-full pl-8.5 pr-3 py-1.5 h-8 border border-white/10 focus:outline-none focus:border-[#1db954]/60 transition-all"
+              placeholder="Search by username, full name, or email..."
+              className="w-full bg-[#18181b] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-2xl pl-10 pr-3 py-2 border border-white/10 focus:outline-none focus:border-[#1db954]/60 transition-all h-11"
             />
           </div>
           <button
             type="submit"
             disabled={!query.trim() || isSearching}
-            className="bg-[#1db954] text-black font-extrabold px-3.5 py-1.5 rounded-full text-xs h-8 hover:bg-[#1ed760] disabled:opacity-50 transition-colors cursor-pointer shrink-0"
+            className="bg-[#1db954] text-black font-black px-5 py-2 rounded-2xl text-xs sm:text-sm h-11 hover:bg-[#1ed760] disabled:opacity-50 transition-all cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95 touch-target"
           >
-            {isSearching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Search'}
+            {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Search'}
           </button>
         </form>
 
-        {/* Results List */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+        {/* Results List Viewport */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
           {isSearching ? (
-            <div className="flex items-center justify-center py-6 text-zinc-400 text-xs gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-[#1db954]" />
-              <span>Searching users...</span>
+            <div className="flex flex-col items-center justify-center py-12 text-zinc-400 text-xs gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-[#1db954]" />
+              <span className="font-bold">Searching Moodify network...</span>
             </div>
           ) : results.length > 0 ? (
             results.map((u) => {
@@ -92,36 +95,38 @@ const UserSearchModal = ({ isOpen, onClose }) => {
               return (
                 <div
                   key={u._id}
-                  className="flex items-center justify-between bg-[#18181b]/60 border border-white/5 p-2.5 rounded-xl hover:border-white/10 transition-all"
+                  className="flex items-center justify-between bg-[#18181b]/80 border border-white/5 p-3.5 sm:p-4 rounded-2xl hover:border-white/10 transition-all"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="h-8.5 w-8.5 rounded-full bg-zinc-800 text-white font-bold flex items-center justify-center text-xs shrink-0 border border-white/10">
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="h-11 w-11 rounded-2xl bg-zinc-800 text-white font-black flex items-center justify-center text-xs shrink-0 border border-white/10 shadow-md">
                       {u.username ? u.username.substring(0, 2).toUpperCase() : 'U'}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-white truncate">{u.username}</p>
-                      <p className="text-[10px] text-zinc-400 truncate">{u.fullName || u.email}</p>
+                      <h4 className="text-sm font-black text-white truncate">{u.username}</h4>
+                      <p className="text-xs text-zinc-400 truncate mt-0.5">{u.fullName || u.email}</p>
                     </div>
                   </div>
 
                   {status ? (
-                    <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${
-                      status.success ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
-                    }`}>
-                      {status.success ? <Check className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
+                    <span
+                      className={`text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 ${status.success ? 'bg-emerald-500/10 text-[#1db954] border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        }`}
+                    >
+                      {status.success ? <Check className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                       {status.text}
                     </span>
                   ) : (
                     <button
+                      type="button"
                       onClick={() => onSendRequest(u._id)}
                       disabled={sendingId === u._id}
-                      className="bg-zinc-800 text-white hover:bg-[#1db954] hover:text-black border border-white/10 hover:border-transparent text-[10px] font-extrabold px-3 py-1.5 rounded-full transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+                      className="bg-zinc-800 text-white hover:bg-[#1db954] hover:text-black border border-white/10 hover:border-transparent text-xs font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 shrink-0 cursor-pointer touch-target active:scale-95 disabled:opacity-50"
                     >
                       {sendingId === u._id ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <>
-                          <UserPlus className="h-3 w-3" />
+                          <UserPlus className="h-4 w-4" />
                           Add Friend
                         </>
                       )}
@@ -131,9 +136,18 @@ const UserSearchModal = ({ isOpen, onClose }) => {
               );
             })
           ) : query && !isSearching ? (
-            <p className="text-center text-xs text-zinc-500 py-6">No users found matching "{query}"</p>
+            <div className="text-center text-xs text-zinc-400 py-12 space-y-2">
+              <p className="font-bold text-sm text-white">No users found</p>
+              <p>No Moodify account matched "{query}". Try a different username or email.</p>
+            </div>
           ) : (
-            <p className="text-center text-xs text-zinc-500 py-6">Type a username or email to search for users.</p>
+            <div className="text-center text-xs text-zinc-400 py-12 space-y-2">
+              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center mx-auto text-zinc-500 mb-3">
+                <Sparkles className="h-6 w-6 text-[#1db954]" />
+              </div>
+              <p className="font-bold text-sm text-white">Discover Music Connections</p>
+              <p>Type a username, full name, or email above to find users.</p>
+            </div>
           )}
         </div>
       </div>

@@ -21,7 +21,7 @@ export const ChatProvider = ({ children }) => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
   const [messages, setMessages] = useState([]);
-  
+
   // Real-Time States
   const [onlineUsers, setOnlineUsers] = useState([]); // List of online User IDs
   const [typingUsers, setTypingUsers] = useState({}); // { [conversationId]: { userId, username } }
@@ -148,7 +148,7 @@ export const ChatProvider = ({ children }) => {
       if (res.success && res.data.conversation) {
         const conv = res.data.conversation;
         setActiveConversation(conv);
-        
+
         // Update conversations list if new
         setConversations(prev => {
           const exists = prev.some(c => c._id === conv._id);
