@@ -129,23 +129,24 @@ const MusicPlayer = () => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  if (!isPlayerVisible) {
-    if (currentSong) {
-      return (
-        <button
-          onClick={() => setIsPlayerVisible(true)}
-          className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 right-6 z-40 bg-[#1db954] hover:bg-[#1ed760] text-black h-12 px-5 rounded-full shadow-2xl active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-2 font-bold text-xs border border-black/10 animate-fade-in"
-          title="Restore Music Player"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
-          </span>
-          Show Player
-        </button>
-      );
-    }
+  if (!currentSong) {
     return null;
+  }
+
+  if (!isPlayerVisible) {
+    return (
+      <button
+        onClick={() => setIsPlayerVisible(true)}
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 right-6 z-40 bg-[#1db954] hover:bg-[#1ed760] text-black h-12 px-5 rounded-full shadow-2xl active:scale-95 transition-all duration-200 cursor-pointer flex items-center gap-2 font-bold text-xs border border-black/10 animate-fade-in"
+        title="Restore Music Player"
+      >
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
+        </span>
+        Show Player
+      </button>
+    );
   }
 
   const title = currentSong ? (currentSong.name || 'Unknown Title') : (spotifyToken ? (!deviceId ? 'Initialising Player...' : 'No track selected') : 'Spotify not connected');

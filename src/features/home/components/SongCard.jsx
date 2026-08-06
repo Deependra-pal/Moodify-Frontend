@@ -29,12 +29,12 @@ const SongCard = ({
         onClick={(e) => {
           if (!disabled && onPlayClick) onPlayClick(e);
         }}
-        className={`flex md:hidden items-center justify-between p-3 bg-[#181818]/60 hover:bg-[#282828]/60 active:bg-[#282828]/80 border border-neutral-900 rounded-xl gap-3 w-full cursor-pointer transition-all duration-300 ease-out ${
+        className={`flex md:hidden items-center justify-between p-3 bg-[#121214] hover:bg-[#18181c] active:bg-[#1f1f24] border border-white/10 rounded-2xl gap-3 w-full cursor-pointer transition-all duration-300 ease-out ${
           isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
         }`}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className="relative h-12 w-12 shrink-0 rounded bg-neutral-950 overflow-hidden border border-neutral-800">
+          <div className="relative h-12 w-12 shrink-0 rounded-xl bg-neutral-950 overflow-hidden border border-white/10">
             <img
               src={imageUrl || defaultAlbum}
               alt={title}
@@ -107,7 +107,7 @@ const SongCard = ({
         onClick={(e) => {
           if (!disabled && onPlayClick) onPlayClick(e);
         }}
-        className={`hidden md:flex flex-col justify-between bg-[#181818] border border-neutral-900 rounded-xl p-4 hover:bg-[#282828] group shadow-md hover:shadow-xl relative cursor-pointer transition-all duration-300 ease-out ${
+        className={`hidden md:flex flex-col justify-between bg-[#121214] hover:bg-[#18181c] border border-white/10 hover:border-[#1db954]/40 rounded-2xl p-4 group shadow-lg hover:shadow-2xl relative cursor-pointer transition-all duration-300 ease-out ${
           isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
         }`}
       >
