@@ -23,7 +23,6 @@ const EMOJI_CATEGORIES = [
 const EmojiPicker = ({ onSelectEmoji, onClose }) => {
   const containerRef = useRef(null);
 
-  // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -64,9 +63,7 @@ const EmojiPicker = ({ onSelectEmoji, onClose }) => {
                 <button
                   key={idx}
                   type="button"
-                  onClick={() => {
-                    onSelectEmoji(emoji);
-                  }}
+                  onClick={() => onSelectEmoji(emoji)}
                   className="h-9 w-9 text-lg flex items-center justify-center rounded-xl hover:bg-white/10 active:scale-110 transition-all cursor-pointer select-none"
                 >
                   {emoji}

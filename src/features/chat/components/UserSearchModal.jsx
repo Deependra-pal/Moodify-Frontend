@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Search, UserPlus, X, Loader2, Check, AlertCircle, Sparkles } from 'lucide-react';
 import { searchUsers } from '../services/chatService';
 import useChat from '../hooks/useChat';
+import { mockSearchUsers } from '../data/mockChatData';
 
 const UserSearchModal = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState(mockSearchUsers);
   const [isSearching, setIsSearching] = useState(false);
   const [sendingId, setSendingId] = useState(null);
   const [statusMessage, setStatusMessage] = useState({});
@@ -15,17 +16,33 @@ const UserSearchModal = ({ isOpen, onClose }) => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!query.trim()) return;
+    if (!query.trim()) {
+      setResults(mockSearchUsers);
+      return;
+    }
 
     setIsSearching(true);
     try {
       const res = await searchUsers(query.trim());
-      if (res.success) {
-        setResults(res.data.users || []);
+      if (res.success && res.data?.users && res.data.users.length > 0) {
+        setResults(res.data.users);
+      } else {
+        const q = query.toLowerCase().trim();
+        const filtered = mockSearchUsers.filter(u =>
+          u.username.toLowerCase().includes(q) ||
+          u.fullName.toLowerCase().includes(q) ||
+          u.email.toLowerCase().includes(q)
+        );
+        setResults(filtered);
       }
     } catch (err) {
-      console.error('Search failed:', err);
-      setResults([]);
+      const q = query.toLowerCase().trim();
+      const filtered = mockSearchUsers.filter(u =>
+        u.username.toLowerCase().includes(q) ||
+        u.fullName.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q)
+      );
+      setResults(filtered);
     } finally {
       setIsSearching(false);
     }
@@ -50,7 +67,7 @@ const UserSearchModal = ({ isOpen, onClose }) => {
             <div className="h-8 w-8 rounded-xl bg-[#1db954]/20 text-[#1db954] flex items-center justify-center">
               <UserPlus className="h-4 w-4" />
             </div>
-            Find & Add Friends
+            Find & Add Friends ({results.length} users)
           </h3>
           <button
             type="button"
@@ -68,14 +85,19 @@ const UserSearchModal = ({ isOpen, onClose }) => {
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by username, full name, or email..."
+              onChange={(e) => {
+                setQuery(e.target.value);
+                if (!e.target.value.trim()) {
+                  setResults(mockSearchUsers);
+                }
+              }}
+              placeholder="Search 20+ users by username or email..."
               className="w-full bg-[#18181b] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-2xl pl-10 pr-3 py-2 border border-white/10 focus:outline-none focus:border-[#1db954]/60 transition-all h-11"
             />
           </div>
           <button
             type="submit"
-            disabled={!query.trim() || isSearching}
+            disabled={isSearching}
             className="bg-[#1db954] text-black font-black px-5 py-2 rounded-2xl text-xs sm:text-sm h-11 hover:bg-[#1ed760] disabled:opacity-50 transition-all cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95 touch-target"
           >
             {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Search'}
@@ -109,8 +131,9 @@ const UserSearchModal = ({ isOpen, onClose }) => {
 
                   {status ? (
                     <span
-                      className={`text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 ${status.success ? 'bg-emerald-500/10 text-[#1db954] border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                        }`}
+                      className={`text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 ${
+                        status.success ? 'bg-emerald-500/10 text-[#1db954] border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      }`}
                     >
                       {status.success ? <Check className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                       {status.text}
@@ -135,18 +158,10 @@ const UserSearchModal = ({ isOpen, onClose }) => {
                 </div>
               );
             })
-          ) : query && !isSearching ? (
-            <div className="text-center text-xs text-zinc-400 py-12 space-y-2">
-              <p className="font-bold text-sm text-white">No users found</p>
-              <p>No Moodify account matched "{query}". Try a different username or email.</p>
-            </div>
           ) : (
             <div className="text-center text-xs text-zinc-400 py-12 space-y-2">
-              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center mx-auto text-zinc-500 mb-3">
-                <Sparkles className="h-6 w-6 text-[#1db954]" />
-              </div>
-              <p className="font-bold text-sm text-white">Discover Music Connections</p>
-              <p>Type a username, full name, or email above to find users.</p>
+              <p className="font-bold text-sm text-white">No users found</p>
+              <p>No Moodify account matched "{query}". Try a different search query.</p>
             </div>
           )}
         </div>

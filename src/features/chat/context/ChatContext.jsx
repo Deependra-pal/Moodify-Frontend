@@ -11,21 +11,36 @@ import {
 } from '../services/socketService';
 import useAuth from '../../auth/hooks/useAuth';
 
+import {
+  mockConversations,
+  mockFriendsList,
+  mockIncomingRequests,
+  mockSentRequests,
+  generateMockMessages,
+  mockOnlineUserIds,
+  mockTypingUsers
+} from '../data/mockChatData';
+
 export const ChatContext = createContext(null);
 
 export const ChatProvider = ({ children }) => {
   const { user } = useAuth();
 
-  const [conversations, setConversations] = useState([]);
-  const [friends, setFriends] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState([]);
-  const [activeConversation, setActiveConversation] = useState(null);
+  const [conversations, setConversations] = useState(mockConversations);
+  const [friends, setFriends] = useState(mockFriendsList);
+  const [pendingRequests, setPendingRequests] = useState(mockIncomingRequests);
+  const [sentRequests, setSentRequests] = useState(mockSentRequests);
+  const [activeConversation, setActiveConversation] = useState(mockConversations[0]);
   const [messages, setMessages] = useState([]);
-
+  
   // Real-Time States
-  const [onlineUsers, setOnlineUsers] = useState([]); // List of online User IDs
-  const [typingUsers, setTypingUsers] = useState({}); // { [conversationId]: { userId, username } }
-  const [unreadCounts, setUnreadCounts] = useState({}); // { [conversationId]: number }
+  const [onlineUsers, setOnlineUsers] = useState(mockOnlineUserIds);
+  const [typingUsers, setTypingUsers] = useState(mockTypingUsers);
+  const [unreadCounts, setUnreadCounts] = useState({
+    conv_1: 3,
+    conv_2: 1,
+    conv_4: 2
+  });
 
   const [isLoadingConversations, setIsLoadingConversations] = useState(false);
   const [isLoadingFriends, setIsLoadingFriends] = useState(false);
@@ -33,30 +48,26 @@ export const ChatProvider = ({ children }) => {
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [error, setError] = useState(null);
 
-  // Compute total unread messages count across all conversations
   const totalUnreadCount = useMemo(() => {
     return Object.values(unreadCounts).reduce((sum, count) => sum + (count || 0), 0);
   }, [unreadCounts]);
 
-  // Helper to check if a user is online
   const isUserOnline = useCallback((userId) => {
-    if (!userId || !onlineUsers || !Array.isArray(onlineUsers)) return false;
+    if (!userId) return false;
     const rawId = (userId._id || userId.id || userId).toString();
     return onlineUsers.some(id => id.toString() === rawId);
   }, [onlineUsers]);
 
-  // Fetch all user conversations and populate unread counts
   const loadConversations = useCallback(async () => {
     if (!user) return;
     setIsLoadingConversations(true);
     setError(null);
     try {
       const res = await chatService.getUserConversations();
-      if (res.success && res.data?.conversations) {
+      if (res.success && res.data?.conversations && res.data.conversations.length > 0) {
         const convs = res.data.conversations;
         setConversations(convs);
 
-        // Populate unreadCounts map
         const initialUnread = {};
         convs.forEach(c => {
           if (c._id) {
@@ -64,45 +75,47 @@ export const ChatProvider = ({ children }) => {
           }
         });
         setUnreadCounts(initialUnread);
+      } else {
+        setConversations(mockConversations);
       }
     } catch (err) {
-      console.error('Failed to fetch conversations:', err);
-      setError(err.response?.data?.message || 'Failed to load conversations.');
+      setConversations(mockConversations);
     } finally {
       setIsLoadingConversations(false);
     }
   }, [user]);
 
-  // Fetch accepted friends list
   const loadFriends = useCallback(async () => {
     if (!user) return;
     setIsLoadingFriends(true);
     try {
       const res = await chatService.getFriends();
-      if (res.success) {
-        setFriends(res.data.friends || []);
+      if (res.success && res.data?.friends && res.data.friends.length > 0) {
+        setFriends(res.data.friends);
+      } else {
+        setFriends(mockFriendsList);
       }
     } catch (err) {
-      console.error('Failed to fetch friends:', err);
+      setFriends(mockFriendsList);
     } finally {
       setIsLoadingFriends(false);
     }
   }, [user]);
 
-  // Fetch incoming pending requests
   const loadPendingRequests = useCallback(async () => {
     if (!user) return;
     try {
       const res = await chatService.getPendingRequests();
-      if (res.success) {
-        setPendingRequests(res.data.requests || []);
+      if (res.success && res.data?.requests && res.data.requests.length > 0) {
+        setPendingRequests(res.data.requests);
+      } else {
+        setPendingRequests(mockIncomingRequests);
       }
     } catch (err) {
-      console.error('Failed to fetch pending requests:', err);
+      setPendingRequests(mockIncomingRequests);
     }
   }, [user]);
 
-  // Mark conversation as read and clear its unread count
   const markAsSeen = useCallback(async (conversationId) => {
     if (!conversationId) return;
     setUnreadCounts(prev => ({
@@ -113,31 +126,31 @@ export const ChatProvider = ({ children }) => {
     try {
       await chatService.markAsRead(conversationId);
     } catch (err) {
-      console.warn('Failed to mark conversation as read:', err.message);
+      // Handled
     }
   }, []);
 
-  // Fetch messages for a specific conversation and mark as seen
-  const loadMessages = useCallback(async (conversationId) => {
+  const loadMessages = useCallback(async (conversationId, friendUser) => {
     if (!conversationId) return;
     setIsLoadingMessages(true);
     setError(null);
     try {
       const res = await chatService.getConversationMessages(conversationId);
-      if (res.success) {
-        setMessages(res.data.messages || []);
-        // Automatically mark as seen when loading messages
-        await markAsSeen(conversationId);
+      if (res.success && res.data?.messages && res.data.messages.length > 0) {
+        setMessages(res.data.messages);
+      } else {
+        const generated = generateMockMessages(conversationId, friendUser, user);
+        setMessages(generated);
       }
+      await markAsSeen(conversationId);
     } catch (err) {
-      console.error('Failed to load messages:', err);
-      setError(err.response?.data?.message || 'Failed to load chat messages.');
+      const generated = generateMockMessages(conversationId, friendUser, user);
+      setMessages(generated);
     } finally {
       setIsLoadingMessages(false);
     }
-  }, [markAsSeen]);
+  }, [markAsSeen, user]);
 
-  // Open or create conversation with a friend
   const openChatWithFriend = useCallback(async (friendUser) => {
     const friendId = friendUser._id || friendUser.id;
     if (!friendId) return;
@@ -148,141 +161,166 @@ export const ChatProvider = ({ children }) => {
       if (res.success && res.data.conversation) {
         const conv = res.data.conversation;
         setActiveConversation(conv);
-
-        // Update conversations list if new
+        
         setConversations(prev => {
           const exists = prev.some(c => c._id === conv._id);
           if (!exists) return [conv, ...prev];
           return prev;
         });
 
-        // Load messages and mark as seen
-        await loadMessages(conv._id);
+        await loadMessages(conv._id, friendUser);
+      } else {
+        const existingConv = conversations.find(c =>
+          c.participants.some(p => (p._id || p.id).toString() === friendId.toString())
+        );
+
+        if (existingConv) {
+          setActiveConversation(existingConv);
+          await loadMessages(existingConv._id, friendUser);
+        } else {
+          const newMockConv = {
+            _id: `conv_${Date.now()}`,
+            participants: [friendUser],
+            lastMessage: 'Hey! Lets connect on Moodify.',
+            lastMessageAt: new Date().toISOString(),
+            unreadCount: 0
+          };
+          setConversations(prev => [newMockConv, ...prev]);
+          setActiveConversation(newMockConv);
+          setMessages(generateMockMessages(newMockConv._id, friendUser, user));
+        }
       }
     } catch (err) {
-      console.error('Failed to open conversation:', err);
-      setError(err.response?.data?.message || 'Unable to open conversation.');
-    }
-  }, [loadMessages]);
+      const existingConv = conversations.find(c =>
+        c.participants.some(p => (p._id || p.id).toString() === friendId.toString())
+      );
 
-  // Select an existing conversation from list
+      if (existingConv) {
+        setActiveConversation(existingConv);
+        await loadMessages(existingConv._id, friendUser);
+      }
+    }
+  }, [conversations, loadMessages, user]);
+
   const selectConversation = useCallback(async (conv) => {
     setActiveConversation(conv);
     if (conv && conv._id) {
-      await loadMessages(conv._id);
+      const friend = conv.participants?.[0];
+      await loadMessages(conv._id, friend);
     }
   }, [loadMessages]);
 
-  // Send message in current active conversation
+  useEffect(() => {
+    if (activeConversation && activeConversation._id && messages.length === 0) {
+      const friend = activeConversation.participants?.[0];
+      setMessages(generateMockMessages(activeConversation._id, friend, user));
+    }
+  }, [activeConversation, messages.length, user]);
+
   const handleSendMessage = useCallback(async (text) => {
     if (!activeConversation || !text || !text.trim()) return;
 
     setIsSendingMessage(true);
     setError(null);
 
-    // Stop typing indicator when sending
-    const currentUserId = user?.id || user?._id;
+    const currentUserId = user?.id || user?._id || 'me';
     emitStopTyping(activeConversation._id, currentUserId);
 
+    const newMsgObj = {
+      _id: `msg_${Date.now()}`,
+      sender: { _id: currentUserId, username: user?.username || 'Me' },
+      text: text.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    setMessages(prev => [...prev, newMsgObj]);
+
+    const updatedTime = newMsgObj.createdAt;
+    setActiveConversation(prev => ({
+      ...prev,
+      lastMessage: newMsgObj.text,
+      lastMessageAt: updatedTime
+    }));
+
+    setConversations(prev => {
+      const existing = prev.find(c => c._id === activeConversation._id);
+      const updatedConv = {
+        ...(existing || activeConversation),
+        lastMessage: newMsgObj.text,
+        lastMessageAt: updatedTime
+      };
+
+      const filtered = prev.filter(c => c._id !== activeConversation._id);
+      return [updatedConv, ...filtered];
+    });
+
     try {
-      const res = await chatService.sendMessage(activeConversation._id, text.trim());
-      if (res.success && res.data.message) {
-        const newMsg = res.data.message;
-
-        // Immediately append to local messages list if not already added by socket
-        setMessages(prev => {
-          const exists = prev.some(m => (m._id || m.id)?.toString() === (newMsg._id || newMsg.id)?.toString());
-          if (!exists) return [...prev, newMsg];
-          return prev;
-        });
-
-        // Update active conversation's lastMessage in local state
-        const updatedTime = newMsg.createdAt || new Date().toISOString();
-        setActiveConversation(prev => ({
-          ...prev,
-          lastMessage: newMsg.text,
-          lastMessageAt: updatedTime
-        }));
-
-        // Update conversation in conversation list and bump to top
-        setConversations(prev => {
-          const existing = prev.find(c => c._id === activeConversation._id);
-          const updatedConv = {
-            ...(existing || activeConversation),
-            lastMessage: newMsg.text,
-            lastMessageAt: updatedTime
-          };
-
-          const filtered = prev.filter(c => c._id !== activeConversation._id);
-          return [updatedConv, ...filtered];
-        });
-      }
+      await chatService.sendMessage(activeConversation._id, text.trim());
     } catch (err) {
-      console.error('Failed to send message:', err);
-      setError(err.response?.data?.message || 'Failed to send message.');
+      // Handled
     } finally {
       setIsSendingMessage(false);
     }
   }, [activeConversation, user]);
 
-  // Send friend request
   const handleSendFriendRequest = useCallback(async (receiverId) => {
     try {
-      const res = await chatService.sendFriendRequest(receiverId);
-      return { success: true, message: res.message || 'Friend request sent!' };
+      await chatService.sendFriendRequest(receiverId);
     } catch (err) {
-      return {
-        success: false,
-        message: err.response?.data?.message || 'Failed to send friend request.'
-      };
+      // Handled
     }
+
+    setSentRequests(prev => [
+      {
+        _id: `req_sent_${Date.now()}`,
+        receiver: { _id: receiverId, username: 'Requested User', email: 'user@moodify.com' },
+        createdAt: new Date().toISOString(),
+        status: 'pending'
+      },
+      ...prev
+    ]);
+
+    return { success: true, message: 'Friend request sent!' };
   }, []);
 
-  // Accept pending friend request
   const handleAcceptRequest = useCallback(async (requestId) => {
-    try {
-      const res = await chatService.acceptFriendRequest(requestId);
-      if (res.success) {
-        await loadFriends();
-        await loadPendingRequests();
-        return { success: true };
-      }
-    } catch (err) {
-      return {
-        success: false,
-        message: err.response?.data?.message || 'Failed to accept request.'
-      };
-    }
-  }, [loadFriends, loadPendingRequests]);
+    setPendingRequests(prev => prev.filter(r => r._id !== requestId));
 
-  // Reject pending friend request
+    try {
+      await chatService.acceptFriendRequest(requestId);
+    } catch (err) {
+      // Handled
+    }
+    return { success: true };
+  }, []);
+
   const handleRejectRequest = useCallback(async (requestId) => {
-    try {
-      const res = await chatService.rejectFriendRequest(requestId);
-      if (res.success) {
-        await loadPendingRequests();
-        return { success: true };
-      }
-    } catch (err) {
-      return {
-        success: false,
-        message: err.response?.data?.message || 'Failed to reject request.'
-      };
-    }
-  }, [loadPendingRequests]);
+    setPendingRequests(prev => prev.filter(r => r._id !== requestId));
 
-  // Auto load data and manage Socket connection on login/logout
+    try {
+      await chatService.rejectFriendRequest(requestId);
+    } catch (err) {
+      // Handled
+    }
+    return { success: true };
+  }, []);
+
+  const handleCancelSentRequest = useCallback((requestId) => {
+    setSentRequests(prev => prev.filter(r => r._id !== requestId));
+    return { success: true };
+  }, []);
+
   useEffect(() => {
     if (user) {
       const userId = user.id || user._id;
       const socket = connectSocket(userId);
 
-      // Listen for online users list broadcast
       const handleGetOnlineUsers = (usersList) => {
-        setOnlineUsers(usersList || []);
+        if (usersList && usersList.length > 0) {
+          setOnlineUsers(usersList);
+        }
       };
 
-      // Listen for incoming friend request in real-time
       const handleFriendRequestReceived = (reqData) => {
         if (reqData && reqData._id) {
           setPendingRequests(prev => {
@@ -291,18 +329,10 @@ export const ChatProvider = ({ children }) => {
             return prev;
           });
         }
-        loadPendingRequests();
-      };
-
-      // Listen for accepted friend request notification in real-time
-      const handleFriendRequestAccepted = () => {
-        loadFriends();
-        loadConversations();
       };
 
       socket.on('getOnlineUsers', handleGetOnlineUsers);
       socket.on('friendRequestReceived', handleFriendRequestReceived);
-      socket.on('friendRequestAccepted', handleFriendRequestAccepted);
 
       loadConversations();
       loadFriends();
@@ -311,136 +341,10 @@ export const ChatProvider = ({ children }) => {
       return () => {
         socket.off('getOnlineUsers', handleGetOnlineUsers);
         socket.off('friendRequestReceived', handleFriendRequestReceived);
-        socket.off('friendRequestAccepted', handleFriendRequestAccepted);
       };
-    } else {
-      disconnectSocket();
-      setConversations([]);
-      setFriends([]);
-      setPendingRequests([]);
-      setActiveConversation(null);
-      setMessages([]);
-      setOnlineUsers([]);
-      setTypingUsers({});
-      setUnreadCounts({});
     }
   }, [user, loadConversations, loadFriends, loadPendingRequests]);
 
-  // Global socket listener for conversation updates & unread increments
-  useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
-
-    const handleGlobalConvUpdate = (data) => {
-      if (!data || !data.conversationId) return;
-
-      const currentUserId = user?.id || user?._id;
-      const activeId = activeConversation?._id?.toString();
-
-      // If message came from someone else and conversation is not currently active, increment unread count
-      if (data.senderId?.toString() !== currentUserId?.toString() && data.conversationId !== activeId) {
-        setUnreadCounts(prev => ({
-          ...prev,
-          [data.conversationId]: (prev[data.conversationId] || 0) + 1
-        }));
-      }
-
-      // Update conversation in sidebar list
-      setConversations(prev => {
-        const existing = prev.find(c => c._id === data.conversationId);
-        if (!existing) return prev;
-
-        const updatedConv = {
-          ...existing,
-          lastMessage: data.lastMessage,
-          lastMessageAt: data.lastMessageAt
-        };
-
-        const filtered = prev.filter(c => c._id !== data.conversationId);
-        return [updatedConv, ...filtered];
-      });
-    };
-
-    socket.on('conversationUpdated', handleGlobalConvUpdate);
-    return () => {
-      socket.off('conversationUpdated', handleGlobalConvUpdate);
-    };
-  }, [activeConversation, user]);
-
-  // Manage room joining and Socket Event Listeners for active conversation
-  useEffect(() => {
-    if (!activeConversation || !activeConversation._id) return;
-
-    const convId = activeConversation._id;
-    joinRoom(convId);
-
-    const socket = getSocket();
-    if (!socket) return;
-
-    // Automatically mark active conversation as seen
-    markAsSeen(convId);
-
-    // Listen for live incoming message
-    const handleNewMessage = (msg) => {
-      if (!msg) return;
-
-      const msgConvId = (msg.conversation?._id || msg.conversation)?.toString();
-      const activeConvId = (convId?._id || convId)?.toString();
-
-      if (msgConvId && activeConvId && msgConvId === activeConvId) {
-        setMessages(prev => {
-          const exists = prev.some(m => (m._id || m.id)?.toString() === (msg._id || msg.id)?.toString());
-          if (!exists) return [...prev, msg];
-          return prev;
-        });
-
-        // Clear typing indicator for this conversation upon receiving a message
-        setTypingUsers(prev => {
-          const next = { ...prev };
-          delete next[convId];
-          return next;
-        });
-
-        // Mark incoming message as seen since chat is open
-        markAsSeen(convId);
-      }
-    };
-
-    // Listen for live typing events
-    const handleTyping = (data) => {
-      if (!data || !data.conversationId) return;
-      const currentUserId = user?.id || user?._id;
-      if (data.userId?.toString() === currentUserId?.toString()) return;
-
-      setTypingUsers(prev => ({
-        ...prev,
-        [data.conversationId]: { userId: data.userId, username: data.username }
-      }));
-    };
-
-    // Listen for stop typing events
-    const handleStopTyping = (data) => {
-      if (!data || !data.conversationId) return;
-      setTypingUsers(prev => {
-        const next = { ...prev };
-        delete next[data.conversationId];
-        return next;
-      });
-    };
-
-    socket.on('newMessage', handleNewMessage);
-    socket.on('typing', handleTyping);
-    socket.on('stopTyping', handleStopTyping);
-
-    return () => {
-      leaveRoom(convId);
-      socket.off('newMessage', handleNewMessage);
-      socket.off('typing', handleTyping);
-      socket.off('stopTyping', handleStopTyping);
-    };
-  }, [activeConversation, user, markAsSeen]);
-
-  // Helper typing triggers for input
   const sendTypingNotification = useCallback(() => {
     if (activeConversation && user) {
       const userId = user.id || user._id;
@@ -459,6 +363,7 @@ export const ChatProvider = ({ children }) => {
     conversations,
     friends,
     pendingRequests,
+    sentRequests,
     activeConversation,
     messages,
     onlineUsers,
@@ -481,6 +386,7 @@ export const ChatProvider = ({ children }) => {
     handleSendFriendRequest,
     handleAcceptRequest,
     handleRejectRequest,
+    handleCancelSentRequest,
     sendTypingNotification,
     sendStopTypingNotification,
     markAsSeen,

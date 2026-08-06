@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   MessageSquare,
   AlertCircle,
@@ -7,8 +7,8 @@ import {
   Phone,
   Video,
   Info,
-  Check,
-  CheckCheck
+  CheckCheck,
+  ArrowDown
 } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
@@ -81,9 +81,11 @@ const ChatWindow = () => {
     setError
   } = useChat();
 
+  const scrollContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const isInitialLoadRef = useRef(true);
+  const [showScrollDownBtn, setShowScrollDownBtn] = useState(false);
 
-  // Get recipient participant details
   const friend =
     activeConversation?.participants?.find(
       (p) => (p._id || p.id).toString() !== (user?.id || user?._id)?.toString()
@@ -93,12 +95,68 @@ const ChatWindow = () => {
   const isOnline = isUserOnline(friendId);
   const activeTyping = activeConversation && typingUsers ? typingUsers[activeConversation._id] : null;
 
-  // Auto-scroll to bottom when new messages arrive or typing status updates
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, activeConversation, activeTyping]);
+  // Helper to check if user is scrolled near the bottom (within 150px threshold)
+  const isNearBottom = () => {
+    if (!scrollContainerRef.current) return true;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    return scrollHeight - scrollTop - clientHeight < 150;
+  };
 
-  // Group messages by date
+  // Helper to perform instant scroll to bottom
+  const scrollToBottomInstant = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+    }
+  };
+
+  // Helper to perform smooth scroll to bottom
+  const scrollToBottomSmooth = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Detect manual scroll position to show/hide "Scroll to bottom" button
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    const isScrolledUp = scrollHeight - scrollTop - clientHeight > 200;
+    setShowScrollDownBtn(isScrolledUp);
+  };
+
+  // Reset initial load flag when conversation changes
+  useEffect(() => {
+    isInitialLoadRef.current = true;
+    setShowScrollDownBtn(false);
+  }, [activeConversation?._id]);
+
+  // Handle WhatsApp-Style Auto-Scroll:
+  // - On initial chat open: Instant scroll to the latest message at bottom.
+  // - On new messages or typing: Smooth scroll IF user is already near bottom.
+  useLayoutEffect(() => {
+    if (!activeConversation || messages.length === 0) return;
+
+    if (isInitialLoadRef.current) {
+      scrollToBottomInstant();
+      requestAnimationFrame(() => scrollToBottomInstant());
+      const timer = setTimeout(() => scrollToBottomInstant(), 60);
+      isInitialLoadRef.current = false;
+      return () => clearTimeout(timer);
+    } else {
+      if (isNearBottom()) {
+        scrollToBottomSmooth();
+      }
+    }
+  }, [messages, activeConversation?._id, activeTyping]);
+
   const groupedMessages = [];
   let currentDateKey = null;
 
@@ -118,7 +176,6 @@ const ChatWindow = () => {
     });
   });
 
-  // Empty state when no conversation is selected (Desktop view)
   if (!activeConversation) {
     return (
       <div className="hidden md:flex flex-1 h-full bg-[#09090b] flex-col items-center justify-center p-8 text-center select-none border-l border-white/5">
@@ -135,7 +192,7 @@ const ChatWindow = () => {
 
   return (
     <div
-      className={`flex-1 h-full bg-[#09090b] flex-col min-w-0 overflow-hidden ${
+      className={`flex-1 h-full bg-[#09090b] flex-col min-w-0 overflow-hidden relative ${
         activeConversation ? 'flex fixed inset-0 z-50 md:relative md:inset-auto md:z-auto' : 'hidden md:flex'
       }`}
     >
@@ -186,7 +243,7 @@ const ChatWindow = () => {
           </div>
         </div>
 
-        {/* Header Actions (Call/Video/Info Placeholders) */}
+        {/* Header Actions */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <button
             type="button"
@@ -233,7 +290,11 @@ const ChatWindow = () => {
       )}
 
       {/* 📜 MESSAGES SCROLL VIEWPORT */}
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 pb-4 space-y-4 custom-scrollbar min-h-0">
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 sm:px-6 pt-6 pb-4 space-y-4 custom-scrollbar min-h-0 relative"
+      >
         {isLoadingMessages ? (
           <MessageSkeleton />
         ) : messages.length > 0 ? (
@@ -265,7 +326,7 @@ const ChatWindow = () => {
                   }`}
                 >
                   <p className="select-text whitespace-pre-wrap">{item.text}</p>
-                  
+
                   {/* Timestamp & Read Receipt Checkmarks */}
                   <div
                     className={`flex items-center justify-end gap-1 mt-1 text-[10.5px] font-bold select-none ${
@@ -310,6 +371,18 @@ const ChatWindow = () => {
 
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Floating Scroll-To-Latest-Message Button (WhatsApp style) */}
+      {showScrollDownBtn && (
+        <button
+          type="button"
+          onClick={() => scrollToBottomSmooth()}
+          className="absolute bottom-20 right-6 z-40 bg-[#18181b] hover:bg-[#1db954] text-zinc-300 hover:text-black border border-white/10 p-3 rounded-full shadow-2xl transition-all cursor-pointer animate-in fade-in zoom-in-95 duration-200"
+          title="Jump to latest messages"
+        >
+          <ArrowDown className="h-4 w-4" />
+        </button>
+      )}
 
       {/* 📌 PINNED BOTTOM MESSAGE INPUT BAR */}
       <MessageInput />

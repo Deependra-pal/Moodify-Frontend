@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Users, Inbox, UserPlus, Search, Clock, Sparkles } from 'lucide-react';
+import { MessageSquare, Users, Inbox, UserPlus, Search } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
 import UserSearchModal from './UserSearchModal';
@@ -64,7 +64,6 @@ const ChatSidebar = () => {
     );
   };
 
-  // Instant client-side search filtering across existing conversations
   const filteredConversations = conversations.filter((c) => {
     const friend = getOtherParticipant(c);
     if (!friend) return false;
@@ -86,7 +85,7 @@ const ChatSidebar = () => {
     >
       {/* 📌 SIDEBAR HEADER & NAVIGATION MODE SELECTOR */}
       <div className="px-4 sm:px-5 py-4 border-b border-white/5 space-y-3.5 bg-[#09090b]">
-        {/* SECTION 1: LOGO/TITLE & ADD FRIEND ACTION */}
+        {/* LOGO & ADD FRIEND ACTION */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-[#1db954]/20 via-[#1db954]/10 to-transparent border border-[#1db954]/30 flex items-center justify-center text-[#1db954] shadow-md shadow-[#1db954]/10 shrink-0">
@@ -110,7 +109,7 @@ const ChatSidebar = () => {
           </button>
         </div>
 
-        {/* SECTION 2: 3-TAB NAVIGATION MODE BAR */}
+        {/* 3-TAB NAVIGATION MODE BAR */}
         <div className="flex bg-[#121214] p-1 rounded-2xl border border-white/5 text-xs font-bold gap-1">
           <button
             type="button"
@@ -171,7 +170,7 @@ const ChatSidebar = () => {
           </button>
         </div>
 
-        {/* SECTION 3: SEARCH BAR (Only visible on Chats tab) */}
+        {/* SEARCH BAR (Only visible on Chats tab) */}
         {activeTab === 'chats' && (
           <div className="relative">
             <Search className="absolute left-3.5 top-3 h-4 w-4 text-zinc-500 pointer-events-none" />
@@ -312,7 +311,7 @@ const ChatSidebar = () => {
 
         {/* --- REQUESTS TAB VIEW --- */}
         {activeTab === 'requests' && (
-          <FriendRequestsView onOpenSearch={() => setIsSearchOpen(false)} />
+          <FriendRequestsView />
         )}
       </div>
 
