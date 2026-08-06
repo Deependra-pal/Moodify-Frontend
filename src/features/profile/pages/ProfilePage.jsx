@@ -3,7 +3,7 @@ import useProfile from '../hooks/useProfile';
 import useAuth from '../../auth/hooks/useAuth';
 import useChat from '../../chat/hooks/useChat';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Save, Play, RefreshCw, CheckCircle2, AlertTriangle, Users, UserCheck, Heart, Edit3, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react';
+import { Mail, Save, Play, RefreshCw, CheckCircle2, AlertTriangle, Users, UserCheck, Heart, Edit3, MessageSquare, ShieldCheck, Sparkles, UserMinus } from 'lucide-react';
 import { ProfileSkeleton } from '../../../components/common/Skeletons';
 
 /**
@@ -21,10 +21,11 @@ const ProfilePage = () => {
     setSuccess,
     setError
   } = useProfile();
-  const { friends, openChatWithFriend } = useChat();
+  const { friends, openChatWithFriend, handleRemoveFriend } = useChat();
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'friends' | 'settings'
+  const [removedIds, setRemovedIds] = useState([]);
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -273,16 +274,16 @@ const ProfilePage = () => {
               </h2>
             </div>
 
-            {friends.length > 0 ? (
+            {friends.filter(f => f.user && !removedIds.includes(f.user._id) && !removedIds.includes(f.friendshipId)).length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
-                {friends.map((f) => {
+                {friends.filter(f => f.user && !removedIds.includes(f.user._id) && !removedIds.includes(f.friendshipId)).map((f) => {
                   const friendUser = f.user;
                   if (!friendUser) return null;
 
                   return (
                     <div
                       key={f.friendshipId || friendUser._id}
-                      className="bg-[#121214] border border-white/5 p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3 hover:border-white/10 transition-all"
+                      className="bg-[#121214] border border-white/5 p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3 hover:border-white/10 transition-all animate-in fade-in duration-200"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-zinc-800 border border-white/10 text-white font-bold flex items-center justify-center text-xs sm:text-sm shrink-0">
@@ -294,17 +295,34 @@ const ProfilePage = () => {
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          openChatWithFriend(friendUser);
-                          navigate('/chat');
-                        }}
-                        className="bg-[#1db954] text-black hover:bg-[#1ed760] text-xs font-extrabold px-3.5 py-2.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95 touch-target min-h-[44px]"
-                      >
-                        <MessageSquare className="h-3.5 w-3.5 fill-current" />
-                        Chat
-                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            openChatWithFriend(friendUser);
+                            navigate('/chat');
+                          }}
+                          className="bg-[#1db954] text-black hover:bg-[#1ed760] text-xs font-extrabold px-3.5 py-2.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95 touch-target min-h-[44px]"
+                        >
+                          <MessageSquare className="h-3.5 w-3.5 fill-current" />
+                          Chat
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const targetId = friendUser._id || f.friendshipId;
+                            setRemovedIds((prev) => [...prev, friendUser._id, f.friendshipId].filter(Boolean));
+                            if (targetId) {
+                              await handleRemoveFriend(targetId);
+                            }
+                          }}
+                          className="p-2.5 text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-full transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20 active:scale-95"
+                          title="Unfriend"
+                        >
+                          <UserMinus className="h-4 w-4 text-rose-400" />
+                        </button>
+                      </div>
                     </div>
                   );
                 })}

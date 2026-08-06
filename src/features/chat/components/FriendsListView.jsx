@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { Users, Search, MessageSquare, UserPlus, UserMinus } from 'lucide-react';
+import { Users, Search, MessageSquare, UserPlus, UserMinus, Loader2 } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import { FriendCardSkeleton } from '../../../components/common/Skeletons';
 
 const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
   const [filterText, setFilterText] = useState('');
+  const [removedIds, setRemovedIds] = useState([]);
   const { friends, isLoadingFriends, isUserOnline, openChatWithFriend, handleRemoveFriend } = useChat();
 
   const filteredFriends = friends.filter((f) => {
     const friendUser = f.user;
     if (!friendUser) return false;
+    if (removedIds.includes(friendUser._id) || removedIds.includes(f.friendshipId)) return false;
     const q = filterText.toLowerCase().trim();
     if (!q) return true;
     return (
@@ -25,6 +27,23 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
   const handleMessage = (friendUser) => {
     openChatWithFriend(friendUser);
     if (onSelectFriend) onSelectFriend();
+  };
+
+  const onUnfriendClick = async (friendUser, friendshipId) => {
+    const targetId = friendUser?._id || friendshipId;
+    if (!targetId) return;
+
+    // Instant optimistic disappearance on click!
+    setRemovedIds((prev) => [...prev, friendUser._id, friendshipId].filter(Boolean));
+
+    try {
+      await handleRemoveFriend(targetId);
+      if (friendshipId && friendshipId !== targetId) {
+        await handleRemoveFriend(friendshipId);
+      }
+    } catch (err) {
+      console.error('Failed to unfriend:', err);
+    }
   };
 
   return (
@@ -47,43 +66,52 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
           <button
             type="button"
             onClick={onOpenSearch}
-            className="flex items-center gap-2 bg-[#1db954] text-black hover:bg-[#1ed760] px-4 py-2.5 rounded-full text-xs font-black transition-all shadow-md shadow-[#1db954]/20 cursor-pointer active:scale-95 shrink-0 touch-target"
+            className="flex items-center gap-2 bg-[#1db954] text-black hover:bg-[#1ed760] px-4 py-2.5 rounded-full text-xs font-black transition-all shadow-md shadow-[#1db954]/20 cursor-pointer active:scale-95 shrink-0 touch-target min-h-[44px]"
           >
             <UserPlus className="h-4 w-4 stroke-[2.5]" />
-            <span className="hidden sm:inline">Add Friend</span>
+            <span>Find Friends</span>
           </button>
         </div>
 
-        {/* Search Bar */}
+        {/* Filter Input */}
         <div className="relative">
-          <Search className="absolute left-3.5 top-3 h-4 w-4 text-zinc-500 pointer-events-none" />
+          <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-zinc-500 pointer-events-none" />
           <input
             type="text"
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            placeholder="Search friends by username or email..."
-            className="w-full bg-[#121214] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-xl pl-9 pr-3 py-2 border border-white/5 focus:outline-none focus:border-[#1db954]/60 transition-all h-10"
+            placeholder="Search connections by username or name..."
+            className="w-full bg-[#121214] text-white text-xs sm:text-sm placeholder-zinc-500 rounded-xl pl-9 pr-3 py-2.5 border border-white/10 focus:outline-none focus:border-[#1db954]/60 transition-all h-11"
           />
         </div>
       </div>
 
-      {/* 📜 Friends Grid / List Viewport */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar">
+      {/* 📜 Friends Viewport */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar pb-24 md:pb-6">
         {isLoadingFriends ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            <FriendCardSkeleton />
+          <div className="space-y-3">
             <FriendCardSkeleton />
             <FriendCardSkeleton />
             <FriendCardSkeleton />
           </div>
-        ) : filteredFriends.length > 0 ? (
+        ) : filteredFriends.length === 0 ? (
+          <div className="text-center py-16 space-y-3 text-zinc-400">
+            <div className="h-16 w-16 rounded-3xl bg-[#121214] border border-white/10 flex items-center justify-center text-zinc-500 mx-auto shadow-xl">
+              <Users className="h-8 w-8 text-zinc-600" />
+            </div>
+            <h3 className="text-base font-black text-white">No Friends Found</h3>
+            <p className="text-xs max-w-xs mx-auto text-zinc-500">
+              {filterText ? `No connection matching "${filterText}"` : 'Your friends list is currently empty. Click "Find Friends" above to connect!'}
+            </p>
+          </div>
+        ) : (
           <>
             {/* ONLINE FRIENDS SECTION */}
             {onlineFriends.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2 px-1">
                   <span className="h-2 w-2 rounded-full bg-[#1db954] animate-pulse" />
-                  <h3 className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-[#1db954]">
                     Online Now ({onlineFriends.length})
                   </h3>
                 </div>
@@ -96,11 +124,11 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                     return (
                       <div
                         key={f.friendshipId || friendUser._id}
-                        className="bg-[#121214] border border-white/10 hover:border-[#1db954]/50 p-4 rounded-2xl transition-all flex items-center justify-between gap-3 shadow-md glass-panel group"
+                        className="bg-[#121214] border border-white/10 hover:border-[#1db954]/40 p-4 rounded-2xl transition-all flex items-center justify-between gap-3 shadow-md glass-panel group animate-in fade-in duration-200"
                       >
                         <div className="flex items-center gap-3.5 min-w-0">
                           <div className="relative shrink-0">
-                            <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-[#1db954]/60 text-white font-black flex items-center justify-center text-xs shadow-md">
+                            <div className="h-11 w-11 rounded-2xl bg-zinc-800 border border-[#1db954]/60 text-white font-black flex items-center justify-center text-xs shadow-md">
                               {friendUser.username ? friendUser.username.substring(0, 2).toUpperCase() : 'U'}
                             </div>
                             <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#121214] bg-[#1db954]" />
@@ -113,8 +141,8 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                             <p className="text-xs text-zinc-400 truncate mt-0.5">
                               {friendUser.fullName || friendUser.email}
                             </p>
-                            <span className="text-[10px] font-bold text-[#1db954] block mt-0.5">
-                              {f.mutualCount || Math.floor(Math.random() * 20) + 3} mutual friends
+                            <span className="text-[10px] font-medium text-emerald-400/80 block mt-0.5">
+                              Active now
                             </span>
                           </div>
                         </div>
@@ -131,15 +159,11 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
 
                           <button
                             type="button"
-                            onClick={async () => {
-                              if (window.confirm(`Unfriend ${friendUser.username}?`)) {
-                                await handleRemoveFriend(friendUser._id || f.friendshipId);
-                              }
-                            }}
-                            className="p-3 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20"
+                            onClick={() => onUnfriendClick(friendUser, f.friendshipId)}
+                            className="p-3 text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20 active:scale-95"
                             title="Unfriend"
                           >
-                            <UserMinus className="h-4 w-4" />
+                            <UserMinus className="h-4 w-4 text-rose-400" />
                           </button>
                         </div>
                       </div>
@@ -167,7 +191,7 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                     return (
                       <div
                         key={f.friendshipId || friendUser._id}
-                        className="bg-[#121214] border border-white/5 hover:border-white/20 p-4 rounded-2xl transition-all flex items-center justify-between gap-3 shadow-md glass-panel group"
+                        className="bg-[#121214] border border-white/5 hover:border-white/20 p-4 rounded-2xl transition-all flex items-center justify-between gap-3 shadow-md glass-panel group animate-in fade-in duration-200"
                       >
                         <div className="flex items-center gap-3.5 min-w-0">
                           <div className="relative shrink-0">
@@ -184,9 +208,6 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                             <p className="text-xs text-zinc-400 truncate mt-0.5">
                               {friendUser.fullName || friendUser.email}
                             </p>
-                            <span className="text-[10px] font-medium text-zinc-500 block mt-0.5">
-                              {f.mutualCount || Math.floor(Math.random() * 15) + 1} mutual friends
-                            </span>
                           </div>
                         </div>
 
@@ -202,15 +223,11 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
 
                           <button
                             type="button"
-                            onClick={async () => {
-                              if (window.confirm(`Unfriend ${friendUser.username}?`)) {
-                                await handleRemoveFriend(friendUser._id || f.friendshipId);
-                              }
-                            }}
-                            className="p-3 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20"
+                            onClick={() => onUnfriendClick(friendUser, f.friendshipId)}
+                            className="p-3 text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20 active:scale-95"
                             title="Unfriend"
                           >
-                            <UserMinus className="h-4 w-4" />
+                            <UserMinus className="h-4 w-4 text-rose-400" />
                           </button>
                         </div>
                       </div>
@@ -220,19 +237,6 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
               </div>
             )}
           </>
-        ) : (
-          /* Empty State */
-          <div className="h-80 flex flex-col items-center justify-center text-center p-8 space-y-4">
-            <div className="h-20 w-20 rounded-3xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shadow-2xl shadow-sky-500/10">
-              <Users className="h-9 w-9 stroke-[1.75]" />
-            </div>
-            <div className="max-w-sm space-y-1">
-              <h3 className="text-lg font-black text-white">No Friends Matching Search</h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                No friends matched "{filterText}". Try searching for a different username.
-              </p>
-            </div>
-          </div>
         )}
       </div>
     </div>

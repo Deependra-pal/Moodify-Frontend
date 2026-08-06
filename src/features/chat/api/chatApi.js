@@ -84,7 +84,7 @@ export const chatApi = apiSlice.injectEndpoints({
         url: `/friends/${friendId}`,
         method: 'DELETE'
       }),
-      invalidatesTags: ['Friends', 'Conversations']
+      invalidatesTags: ['Friends', 'Conversations', 'Requests', 'SentRequests']
     }),
     searchUsers: builder.query({
       query: (query) => `/users/search?q=${encodeURIComponent(query)}`
