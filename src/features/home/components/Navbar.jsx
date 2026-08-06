@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Music, LogOut, User } from 'lucide-react';
 import useAuth from '../../auth/hooks/useAuth';
-import { usePlayer } from '../../../context/PlayerContext';
+import usePlayer from '../../home/hooks/usePlayer';
 import { loginWithSpotify } from '../../../utils/spotifyAuth';
 import Logo from '../../../components/Logo';
 import NotificationDropdown from '../../notifications/components/NotificationDropdown';

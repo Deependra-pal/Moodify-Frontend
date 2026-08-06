@@ -6,7 +6,7 @@ import CameraPlaceholder from '../../FaceExpression/components/CameraPlaceholder
 import SongCard from '../components/SongCard';
 import useRecommendations from '../hooks/useRecommendations';
 import useFavorites from '../../favorites/hooks/useFavorites';
-import { usePlayer } from '../../../context/PlayerContext';
+import usePlayer from '../hooks/usePlayer';
 import { exchangeCodeForToken } from '../../../utils/spotifyAuth';
 import { Music, AlertCircle, RefreshCw, Search } from 'lucide-react';
 import api from '../../../services/api';
@@ -61,10 +61,7 @@ const HomePage = () => {
     }
   }, [setSpotifyToken, navigate]);
 
-  // Load user favorites on mount to track favorite status of recommendations
-  useEffect(() => {
-    fetchFavorites();
-  }, [fetchFavorites]);
+
 
   const handleRecommend = useCallback(async (emotion) => {
     try {

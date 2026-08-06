@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import useHistory from '../hooks/useHistory';
 import useFavorites from '../../favorites/hooks/useFavorites';
-import { usePlayer } from '../../../context/PlayerContext';
+import usePlayer from '../../home/hooks/usePlayer';
 import { History, Trash2, Play, Pause, Heart, RefreshCw } from 'lucide-react';
 import defaultAlbum from '../../../assets/default_album.png';
 import { HistoryItemSkeleton } from '../../../components/common/Skeletons';
@@ -30,30 +30,11 @@ const formatPlayedAt = (dateString) => {
  * Provides clear history actions and favorites sync.
  */
 const HistoryPage = () => {
-  const { history, loading, error, fetchHistory, clearHistory } = useHistory();
-  const { favorites, fetchFavorites, addFavorite, removeFavorite } = useFavorites();
+  const { history, loading, error, clearHistory } = useHistory();
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
   const { playTrack, pauseTrack, isPlaying, currentSong, playbackSource } = usePlayer();
 
-  // Local snapshot of history list to maintain page stability while browsing
-  // Pre-fill with context cache to prevent layout flashes on back-navigation
-  const [displayHistory, setDisplayHistory] = useState(history);
-
-  useEffect(() => {
-    // Force fetch to get freshest DB records on mount, then write to displayHistory
-    fetchHistory(true).then((data) => {
-      if (data) {
-        setDisplayHistory(data);
-      }
-    });
-    fetchFavorites();
-  }, [fetchHistory, fetchFavorites]);
-
-  // Instantly clear displayHistory if history context gets emptied
-  useEffect(() => {
-    if (history.length === 0) {
-      setDisplayHistory([]);
-    }
-  }, [history]);
+  const displayHistory = history;
 
   // Pre-mapped history playlist memoized to prevent N^2 allocations or inline mappings
   const historyPlaylist = useMemo(() => {

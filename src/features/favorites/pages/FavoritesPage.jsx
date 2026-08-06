@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import useFavorites from '../hooks/useFavorites';
 import SongCard from '../../home/components/SongCard';
 import { Heart, Music, RefreshCw } from 'lucide-react';
-import { usePlayer } from '../../../context/PlayerContext';
+import usePlayer from '../../home/hooks/usePlayer';
 import { GridSkeleton } from '../../../components/common/Skeletons';
 
 /**
@@ -14,9 +14,7 @@ const FavoritesPage = () => {
   const { playTrack, currentSong, isPlaying, playbackSource } = usePlayer();
   const [removingIds, setRemovingIds] = useState([]);
 
-  useEffect(() => {
-    fetchFavorites();
-  }, [fetchFavorites]);
+
 
   const handleClearAll = useCallback(async () => {
     if (window.confirm('Are you sure you want to clear all your favorites?')) {

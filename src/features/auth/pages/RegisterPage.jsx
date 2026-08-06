@@ -63,26 +63,14 @@ const RegisterPage = () => {
 
     setIsSubmitting(true);
     try {
-      await register(username, email, password);
-      navigate('/login', {
-        state: { registeredEmail: email }
-      });
-    } catch (err) {
-      console.error('Registration error:', err);
-      if (err.response?.data) {
-        const data = err.response.data;
-        if (data.errors && Array.isArray(data.errors)) {
-          const fieldErrors = {};
-          data.errors.forEach((validationErr) => {
-            fieldErrors[validationErr.field] = validationErr.message;
-          });
-          setErrors(fieldErrors);
-        } else {
-          setErrors({ api: data.message || 'Registration failed. Please check details.' });
-        }
+      const result = await register(username, email, password);
+      if (result.success) {
+        navigate('/', { replace: true });
       } else {
-        setErrors({ api: 'Unable to connect to the server. Please check your connection.' });
+        setErrors({ api: result.message || 'Registration failed.' });
       }
+    } catch (err) {
+      setErrors({ api: 'Unable to connect to the server. Please check your connection.' });
     } finally {
       setIsSubmitting(false);
     }

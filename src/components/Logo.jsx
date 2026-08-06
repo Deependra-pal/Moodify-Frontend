@@ -58,7 +58,6 @@ const Logo = ({ size = 'md', showSubtitle = false, className = '' }) => {
           <span className={`${currentSize.title} font-black tracking-tight text-white leading-none font-sans`}>
             Moodify
           </span>
-          <span className="h-1.5 w-1.5 rounded-full bg-[#1db954] animate-pulse" />
         </div>
         {showSubtitle && (
           <span className={`${currentSize.sub} font-bold text-zinc-400 uppercase tracking-widest mt-0.5`}>

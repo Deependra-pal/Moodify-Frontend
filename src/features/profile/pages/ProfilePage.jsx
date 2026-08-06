@@ -35,9 +35,7 @@ const ProfilePage = () => {
     profilePicture: ''
   });
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+
 
   useEffect(() => {
     if (profile) {

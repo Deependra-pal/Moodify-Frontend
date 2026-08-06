@@ -71,33 +71,20 @@ const LoginPage = () => {
 
     setIsSubmitting(true);
     try {
-      await login(email, password);
+      const result = await login(email, password);
 
-      // Handle remember me logic
-      if (rememberMe) {
-        localStorage.setItem('moodify_remembered_email', email);
-      } else {
-        localStorage.removeItem('moodify_remembered_email');
-      }
-
-      // Redirect user to home
-      navigate(from, { replace: true });
-    } catch (err) {
-      console.error('Login error:', err);
-      if (err.response?.data) {
-        const data = err.response.data;
-        if (data.errors && Array.isArray(data.errors)) {
-          const fieldErrors = {};
-          data.errors.forEach((validationErr) => {
-            fieldErrors[validationErr.field] = validationErr.message;
-          });
-          setErrors(fieldErrors);
+      if (result.success) {
+        if (rememberMe) {
+          localStorage.setItem('moodify_remembered_email', email);
         } else {
-          setErrors({ api: data.message || 'Invalid email or password.' });
+          localStorage.removeItem('moodify_remembered_email');
         }
+        navigate(from, { replace: true });
       } else {
-        setErrors({ api: 'Unable to connect to the server. Please check your connection.' });
+        setErrors({ api: result.message || 'Invalid email or password.' });
       }
+    } catch (err) {
+      setErrors({ api: 'Unable to connect to the server. Please check your connection.' });
     } finally {
       setIsSubmitting(false);
     }

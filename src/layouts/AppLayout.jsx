@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import Sidebar from '../features/home/components/Sidebar';
 import MusicPlayer from '../features/home/components/MusicPlayer';
-import { usePlayer } from '../context/PlayerContext';
+import usePlayer from '../features/home/hooks/usePlayer';
 
 /**
  * Shared layout component wrapping all authenticated dashboard screens.

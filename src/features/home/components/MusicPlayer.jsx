@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { usePlayer } from '../../../context/PlayerContext';
+import usePlayer from '../hooks/usePlayer';
 import useFavorites from '../../favorites/hooks/useFavorites';
 import {
   Play,

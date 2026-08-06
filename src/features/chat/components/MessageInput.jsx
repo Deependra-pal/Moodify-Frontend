@@ -8,6 +8,7 @@ const MessageInput = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const fileInputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   const {
     handleSendMessage,
@@ -34,7 +35,9 @@ const MessageInput = () => {
       setText('');
       setShowAttachmentMenu(false);
       setShowEmojiPicker(false);
-      handleSendImageMessage(dataUrl, caption);
+      if (handleSendImageMessage) {
+        handleSendImageMessage(dataUrl, caption);
+      }
     };
     reader.readAsDataURL(file);
     e.target.value = '';
@@ -45,17 +48,17 @@ const MessageInput = () => {
     setText(val);
 
     if (val.trim()) {
-      sendTypingNotification();
+      if (sendTypingNotification) sendTypingNotification();
 
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
 
       typingTimeoutRef.current = setTimeout(() => {
-        sendStopTypingNotification();
+        if (sendStopTypingNotification) sendStopTypingNotification();
       }, 2000);
     } else {
-      sendStopTypingNotification();
+      if (sendStopTypingNotification) sendStopTypingNotification();
     }
   };
 
@@ -66,13 +69,15 @@ const MessageInput = () => {
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    sendStopTypingNotification();
+    if (sendStopTypingNotification) sendStopTypingNotification();
 
     const messageText = text;
     setText('');
     setShowEmojiPicker(false);
     setShowAttachmentMenu(false);
-    await handleSendMessage(messageText);
+    if (handleSendMessage) {
+      await handleSendMessage(messageText);
+    }
   };
 
   const handleKeyDown = (e) => {
