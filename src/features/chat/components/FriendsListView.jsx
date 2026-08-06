@@ -122,7 +122,7 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                         <button
                           type="button"
                           onClick={() => handleMessage(friendUser)}
-                          className="bg-[#1db954] text-black hover:bg-[#1ed760] text-xs font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95 touch-target"
+                          className="bg-[#1db954] text-black hover:bg-[#1ed760] text-xs sm:text-sm font-extrabold px-4 py-3 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95 touch-target min-h-[44px]"
                         >
                           <MessageSquare className="h-4 w-4 fill-current" />
                           Chat
@@ -178,7 +178,7 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                         <button
                           type="button"
                           onClick={() => handleMessage(friendUser)}
-                          className="bg-zinc-800 text-white hover:bg-[#1db954] hover:text-black border border-white/10 hover:border-transparent text-xs font-black px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95 touch-target"
+                          className="bg-zinc-800 text-white hover:bg-[#1db954] hover:text-black border border-white/10 hover:border-transparent text-xs sm:text-sm font-extrabold px-4 py-3 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95 touch-target min-h-[44px]"
                         >
                           <MessageSquare className="h-4 w-4" />
                           Message

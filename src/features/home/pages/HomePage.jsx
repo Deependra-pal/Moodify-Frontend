@@ -156,21 +156,21 @@ const HomePage = () => {
           </div>
 
           {/* Custom Search bar next to curations */}
-          <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full max-w-md">
-            <div className="relative flex-1">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-lg">
+            <div className="relative w-full flex-1">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by artist or track name..."
-                className="w-full bg-[#242424] border border-neutral-800 rounded-full pl-10 pr-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#1db954] transition-colors"
+                className="w-full bg-[#242424] border border-neutral-800 rounded-full pl-11 pr-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#1db954] transition-colors h-11 sm:h-12"
               />
-              <Search className="absolute left-4 top-3.5 h-3.5 w-3.5 text-neutral-500" />
+              <Search className="absolute left-4 top-3.5 sm:top-4 h-4 w-4 text-neutral-500" />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="bg-[#1db954] hover:bg-[#1ed760] text-black active:scale-95 px-5 py-2.5 rounded-full text-xs font-black transition-all duration-150 cursor-pointer disabled:opacity-50 shrink-0 shadow-md"
+              className="w-full sm:w-auto bg-[#1db954] hover:bg-[#1ed760] text-black active:scale-95 px-6 py-3 rounded-full text-xs sm:text-sm font-black transition-all duration-150 cursor-pointer disabled:opacity-50 shrink-0 shadow-md min-h-[44px] touch-target"
             >
               Search
             </button>

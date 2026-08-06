@@ -156,10 +156,10 @@ const ProfilePage = () => {
       <section className="bg-[#09090b] px-6 sm:px-10 py-3 border-b border-white/5 sticky top-0 z-20 backdrop-blur-md">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Tabs Group */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0 w-full sm:w-auto">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer ${activeTab === 'overview'
+              className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-extrabold transition-all cursor-pointer min-h-[44px] touch-target shrink-0 ${activeTab === 'overview'
                 ? 'bg-white text-black shadow-md'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
                 }`}
@@ -168,22 +168,22 @@ const ProfilePage = () => {
             </button>
             <button
               onClick={() => setActiveTab('friends')}
-              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'friends'
+              className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-extrabold transition-all cursor-pointer flex items-center gap-1.5 min-h-[44px] touch-target shrink-0 ${activeTab === 'friends'
                 ? 'bg-white text-black shadow-md'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
                 }`}
             >
-              <Users className="h-3.5 w-3.5" />
+              <Users className="h-4 w-4" />
               Friends ({friends.length})
             </button>
             <button
               onClick={() => setActiveTab('settings')}
-              className={`px-5 py-2 rounded-full text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'settings'
+              className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-extrabold transition-all cursor-pointer flex items-center gap-1.5 min-h-[44px] touch-target shrink-0 ${activeTab === 'settings'
                 ? 'bg-white text-black shadow-md'
                 : 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
                 }`}
             >
-              <Edit3 className="h-3.5 w-3.5" />
+              <Edit3 className="h-4 w-4" />
               Edit Profile
             </button>
           </div>

@@ -197,7 +197,7 @@ const HistoryPage = () => {
                             playTrack(trackToPlay, historyPlaylist, 'history');
                           }
                         }}
-                        className={`h-9 w-9 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${isPlayingFromHistory
+                        className={`h-11 w-11 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 touch-target min-h-[44px] min-w-[44px] ${isPlayingFromHistory
                           ? 'bg-[#1db954] text-black font-bold scale-105 shadow-lg shadow-[#1db954]/25'
                           : 'bg-white hover:bg-neutral-200 text-black'
                           }`}

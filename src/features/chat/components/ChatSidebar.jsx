@@ -121,7 +121,7 @@ const ChatSidebar = () => {
               setActiveTab('chats');
               setFilterText('');
             }}
-            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none ${
+            className={`flex-1 py-2.5 sm:py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none min-h-[44px] text-xs sm:text-sm font-extrabold ${
               activeTab === 'chats'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
@@ -142,7 +142,7 @@ const ChatSidebar = () => {
               setActiveTab('friends');
               setFilterText('');
             }}
-            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none ${
+            className={`flex-1 py-2.5 sm:py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none min-h-[44px] text-xs sm:text-sm font-extrabold ${
               activeTab === 'friends'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'
@@ -158,7 +158,7 @@ const ChatSidebar = () => {
               setActiveTab('requests');
               setFilterText('');
             }}
-            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none ${
+            className={`flex-1 py-2.5 sm:py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer touch-target select-none min-h-[44px] text-xs sm:text-sm font-extrabold ${
               activeTab === 'requests'
                 ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
                 : 'text-zinc-400 hover:text-white border border-transparent'

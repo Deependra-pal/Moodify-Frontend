@@ -174,7 +174,7 @@ const FriendRequestsView = () => {
                           type="button"
                           onClick={() => onReject(req._id)}
                           disabled={isProcessing}
-                          className="flex-1 py-2.5 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-red-500/20 cursor-pointer touch-target active:scale-95 disabled:opacity-50"
+                          className="flex-1 py-3 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs sm:text-sm font-extrabold transition-all flex items-center justify-center gap-1.5 border border-red-500/20 cursor-pointer touch-target active:scale-95 disabled:opacity-50 min-h-[44px]"
                         >
                           <X className="h-4 w-4" />
                           Decline
@@ -184,7 +184,7 @@ const FriendRequestsView = () => {
                           type="button"
                           onClick={() => onAccept(req._id)}
                           disabled={isProcessing}
-                          className="flex-1 py-2.5 px-4 rounded-xl bg-[#1db954] hover:bg-[#1ed760] text-black text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#1db954]/20 cursor-pointer touch-target active:scale-95 disabled:opacity-50"
+                          className="flex-1 py-3 px-4 rounded-xl bg-[#1db954] hover:bg-[#1ed760] text-black text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#1db954]/20 cursor-pointer touch-target active:scale-95 disabled:opacity-50 min-h-[44px]"
                         >
                           <Check className="h-4 w-4 stroke-[3]" />
                           Accept Friend
