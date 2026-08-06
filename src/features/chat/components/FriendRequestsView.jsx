@@ -81,31 +81,31 @@ const FriendRequestsView = () => {
         </div>
 
         {/* Sub-Tab Selector */}
-        <div className="flex bg-[#121214] p-1 rounded-2xl border border-white/5 text-xs font-bold w-fit">
+        <div className="flex bg-[#141416] p-1.5 rounded-2xl border border-white/10 text-xs font-bold gap-1.5 shadow-inner w-full max-w-sm mx-auto">
           <button
             type="button"
             onClick={() => setRequestTab('incoming')}
-            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer touch-target ${
+            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer touch-target select-none min-h-[44px] text-xs font-extrabold ${
               requestTab === 'incoming'
-                ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#222226] text-white shadow-md border border-white/10'
+                : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
             <Inbox className="h-4 w-4 text-amber-400" />
-            Incoming {pendingRequests.length > 0 ? `(${pendingRequests.length})` : ''}
+            <span>Incoming {pendingRequests.length > 0 ? `(${pendingRequests.length})` : ''}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setRequestTab('sent')}
-            className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 cursor-pointer touch-target ${
+            className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer touch-target select-none min-h-[44px] text-xs font-extrabold ${
               requestTab === 'sent'
-                ? 'bg-[#18181b] text-white shadow-sm border border-white/10'
-                : 'text-zinc-400 hover:text-white'
+                ? 'bg-[#222226] text-white shadow-md border border-white/10'
+                : 'text-zinc-400 hover:text-white border border-transparent'
             }`}
           >
             <Send className="h-4 w-4 text-sky-400" />
-            Sent {sentRequests.length > 0 ? `(${sentRequests.length})` : ''}
+            <span>Sent {sentRequests.length > 0 ? `(${sentRequests.length})` : ''}</span>
           </button>
         </div>
       </div>

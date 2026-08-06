@@ -5,6 +5,7 @@ import useChat from '../../chat/hooks/useChat';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Save, Play, RefreshCw, CheckCircle2, AlertTriangle, Users, UserCheck, Heart, Edit3, MessageSquare, ShieldCheck, Sparkles, UserMinus } from 'lucide-react';
 import { ProfileSkeleton } from '../../../components/common/Skeletons';
+import PageContainer from '../../../components/common/PageContainer';
 
 /**
  * Spotify-Authentic User Profile page with Tabbed Navigation.
@@ -97,30 +98,30 @@ const ProfilePage = () => {
   const followingCount = friends?.length || 0;
   const displayName = profile?.fullName || profile?.username || 'User Profile';
 
-  return (
-    <div className="flex-1 w-full bg-[#09090b] text-zinc-100 flex flex-col font-sans select-none">
+  const headerElement = (
+    <>
       {/* --- SPOTIFY HERO HEADER BANNER --- */}
-      <header className="bg-gradient-to-b from-[#1a3d24] via-[#102417] to-[#09090b] px-4 sm:px-8 md:px-10 pt-6 sm:pt-10 pb-6 sm:pb-8 border-b border-white/5 relative overflow-hidden">
+      <header className="bg-gradient-to-b from-[#1a3d24] via-[#102417] to-[#09090b] px-4 sm:px-6 md:px-8 py-5 sm:py-7 border-b border-white/5 relative overflow-hidden">
         {/* Background glow */}
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#1db954]/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center sm:items-end gap-5 sm:gap-8 relative z-10">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 relative z-10">
           {/* Circular Spotify Avatar */}
-          <div className="h-28 w-28 sm:h-40 sm:w-40 md:h-48 md:w-48 rounded-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-black flex items-center justify-center text-white font-black text-4xl sm:text-6xl md:text-7xl shadow-2xl border-4 border-[#09090b] shrink-0 shadow-black/80">
+          <div className="h-24 w-24 sm:h-32 sm:w-32 md:h-36 md:w-36 rounded-full bg-gradient-to-br from-zinc-800 via-zinc-900 to-black flex items-center justify-center text-white font-black text-3xl sm:text-5xl md:text-6xl shadow-2xl border-4 border-[#09090b] shrink-0 shadow-black/80">
             {getInitials(displayName)}
           </div>
 
           {/* Profile Header Details */}
-          <div className="space-y-2 text-center sm:text-left min-w-0 flex-1">
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20 px-3 py-1 rounded-full inline-block">
+          <div className="space-y-1.5 text-center sm:text-left min-w-0 flex-1">
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20 px-3 py-0.5 rounded-full inline-block">
               Public Profile
             </span>
-            <h1 className="text-2xl sm:text-5xl md:text-6xl font-black tracking-tight text-white truncate leading-tight py-0.5">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight text-white truncate leading-tight py-0.5">
               {displayName}
             </h1>
 
             {/* Spotify Meta Stats Line */}
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-2 text-xs font-semibold text-zinc-300 pt-1">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-2 text-xs font-semibold text-zinc-300 pt-0.5">
               <span className="text-white font-bold">{profile?.username}</span>
               <span className="text-zinc-500">•</span>
               <span className="text-white font-bold">{followersCount}</span>
@@ -134,7 +135,7 @@ const ProfilePage = () => {
             </div>
 
             {profile?.bio && (
-              <p className="text-xs text-zinc-400 max-w-xl line-clamp-2 pt-1 font-normal italic">
+              <p className="text-xs text-zinc-400 max-w-xl line-clamp-2 pt-0.5 font-normal italic">
                 "{profile.bio}"
               </p>
             )}
@@ -143,8 +144,8 @@ const ProfilePage = () => {
       </header>
 
       {/* --- SPOTIFY TAB NAVIGATION BAR --- */}
-      <section className="bg-[#09090b] px-4 sm:px-8 md:px-10 py-2.5 sm:py-3 border-b border-white/5 sticky top-0 z-20 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <section className="bg-[#09090b] px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 border-b border-white/5 sticky top-0 z-20 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           {/* Tabs Group */}
           <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0 w-full sm:w-auto">
             <button
@@ -189,9 +190,11 @@ const ProfilePage = () => {
           </span>
         </div>
       </section>
+    </>
+  );
 
-      {/* --- TAB CONTENT AREA --- */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-8 md:px-10 py-5 sm:py-8 space-y-6 sm:space-y-8 pb-4 md:pb-6">
+  return (
+    <PageContainer header={headerElement}>
         {/* --- OVERVIEW TAB --- */}
         {activeTab === 'overview' && (
           <div className="space-y-6 sm:space-y-8">
@@ -450,8 +453,7 @@ const ProfilePage = () => {
             </form>
           </div>
         )}
-      </main>
-    </div>
+    </PageContainer>
   );
 };
 

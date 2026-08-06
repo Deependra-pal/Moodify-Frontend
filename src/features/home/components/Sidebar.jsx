@@ -93,7 +93,7 @@ const Sidebar = () => {
       </aside>
 
       {/* --- MOBILE BOTTOM TAB BAR --- */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[calc(4.25rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] bg-[#09090b]/95 backdrop-blur-xl border-t border-white/10 flex items-center justify-around z-50 px-1 py-1 shadow-2xl">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] bg-[#09090b]/95 backdrop-blur-xl border-t border-white/10 flex items-center justify-between z-50 px-2 shadow-2xl">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -101,20 +101,20 @@ const Sidebar = () => {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `flex flex-col items-center justify-center flex-1 h-full min-h-[44px] gap-1 text-[11px] font-extrabold tracking-wide transition-all relative touch-target select-none ${
+                `flex flex-col items-center justify-center flex-1 h-full min-h-[44px] py-1 gap-1 text-[11px] font-extrabold tracking-wide transition-all relative touch-target select-none ${
                   isActive ? 'text-[#1db954] scale-105' : 'text-zinc-400 hover:text-zinc-200'
                 }`
               }
             >
-              <div className="relative">
-                <Icon className="h-5.5 w-5.5 stroke-[2.2]" />
+              <div className="relative flex items-center justify-center">
+                <Icon className="h-5 w-5 stroke-[2.2]" />
                 {item.badge > 0 && (
-                  <span className="absolute -top-1 -right-2.5 bg-[#1db954] text-black text-[10px] font-black px-1.5 py-0.2 rounded-full shadow-md animate-pulse">
+                  <span className="absolute -top-1.5 -right-2 bg-[#1db954] text-black text-[9px] font-black px-1.5 py-0.2 rounded-full shadow-md animate-pulse">
                     {item.badge}
                   </span>
                 )}
               </div>
-              <span className="leading-none">{item.label}</span>
+              <span className="leading-none text-center truncate">{item.label}</span>
             </NavLink>
           );
         })}

@@ -12,6 +12,8 @@ import { Music, AlertCircle, RefreshCw, Search } from 'lucide-react';
 import api from '../../../services/api';
 import { GridSkeleton } from '../../../components/common/Skeletons';
 
+import PageContainer from '../../../components/common/PageContainer';
+
 /**
  * HomePage container component.
  * Mobile-first responsive flow: Welcome -> Face Scan -> Music Curations.
@@ -99,10 +101,7 @@ const HomePage = () => {
   }, [getFavoriteItem, addFavorite, removeFavorite]);
 
   return (
-    <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col font-sans h-full overflow-hidden select-none animate-in fade-in duration-300">
-      <Navbar />
-
-      <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 pt-4 sm:pt-6 overflow-y-auto custom-scrollbar pb-4 md:pb-6 space-y-6 sm:space-y-8">
+    <PageContainer header={<Navbar />} maxWidthClass="max-w-6xl">
         {/* STEP 1: Welcome Tagline & Header */}
         <HeroSection />
 
@@ -224,8 +223,7 @@ const HomePage = () => {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </PageContainer>
   );
 };
 

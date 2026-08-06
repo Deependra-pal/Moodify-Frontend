@@ -1,0 +1,74 @@
+import React from 'react';
+
+/**
+ * Standardized Reusable Page Container for Moodify.
+ * Enforces unified max-width, horizontal padding (px-4 sm:px-6 md:px-8),
+ * consistent vertical rhythm, and smooth scrolling without double padding.
+ */
+export const PageContainer = ({
+  children,
+  header,
+  className = '',
+  maxWidthClass = 'max-w-6xl',
+  noScroll = false
+}) => {
+  return (
+    <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col font-sans h-full overflow-hidden select-none">
+      {header && <div className="shrink-0">{header}</div>}
+
+      <main
+        className={`flex-1 w-full ${maxWidthClass} mx-auto px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 pb-6 sm:pb-8 space-y-6 sm:space-y-8 ${
+          noScroll ? 'overflow-hidden flex flex-col' : 'overflow-y-auto custom-scrollbar'
+        } ${className}`}
+      >
+        {children}
+      </main>
+    </div>
+  );
+};
+
+/**
+ * Compact Standardized Hero Banner for Pages (Favorites, History, Profile, etc.).
+ * Reduces wasted vertical height while preserving Spotify-authentic aesthetic.
+ */
+export const PageHeader = ({
+  title,
+  subtitle,
+  badge,
+  icon: Icon,
+  actions,
+  gradient = 'from-[#1a3d24] via-[#102417] to-[#09090b]'
+}) => {
+  return (
+    <header className={`bg-gradient-to-b ${gradient} px-4 sm:px-6 md:px-8 py-5 sm:py-6 border-b border-white/5 relative overflow-hidden shadow-lg`}>
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+        <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left min-w-0 w-full sm:w-auto">
+          {Icon && (
+            <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#1db954] shadow-xl shrink-0">
+              <Icon className="h-7 w-7 sm:h-8 sm:w-8" />
+            </div>
+          )}
+          <div className="space-y-1 min-w-0 flex-1">
+            {badge && (
+              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20 px-2.5 py-0.5 rounded-full inline-block">
+                {badge}
+              </span>
+            )}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white truncate leading-tight">
+              {title}
+            </h1>
+            {subtitle && (
+              <p className="text-xs sm:text-sm font-semibold text-zinc-400 truncate">
+                {subtitle}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {actions && <div className="shrink-0 flex items-center gap-2 self-center sm:self-end">{actions}</div>}
+      </div>
+    </header>
+  );
+};
+
+export default PageContainer;
