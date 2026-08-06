@@ -61,7 +61,7 @@ const NotificationDropdown = () => {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-[#121214] border border-white/10 hover:border-[#1db954]/50 hover:bg-[#18181b] text-zinc-300 hover:text-white flex items-center justify-center transition-all cursor-pointer touch-target shrink-0"
+        className="relative h-10 w-10 sm:h-11 sm:w-11 rounded-2xl bg-[#121214] border border-white/10 hover:border-[#1db954]/50 hover:bg-[#18181b] text-zinc-300 hover:text-white flex items-center justify-center transition-all cursor-pointer touch-target shrink-0 active:scale-95"
         title="Notifications"
       >
         <Bell className="h-5 w-5" />
@@ -72,14 +72,14 @@ const NotificationDropdown = () => {
         )}
       </button>
 
-      {/* Popover Menu Dropdown */}
+      {/* Popover Menu Dropdown - Fully Responsive on Mobile & Desktop */}
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-transparent"
+            className="fixed inset-0 z-40 bg-black/40 sm:bg-transparent backdrop-blur-xs sm:backdrop-blur-none"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-[#121214] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 glass-panel">
+          <div className="fixed sm:absolute top-16 sm:top-full right-3 sm:right-0 left-3 sm:left-auto sm:mt-3 w-auto sm:w-96 max-w-[calc(100vw-1.5rem)] bg-[#121214] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150 glass-panel">
             {/* Header */}
             <div className="p-3.5 sm:p-4 border-b border-white/5 flex items-center justify-between bg-[#09090b]">
               <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ const NotificationDropdown = () => {
                 <button
                   type="button"
                   onClick={handleMarkAllRead}
-                  className="text-xs text-zinc-400 hover:text-[#1db954] font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                  className="text-xs text-zinc-400 hover:text-[#1db954] font-bold transition-colors flex items-center gap-1 cursor-pointer touch-target min-h-[44px] sm:min-h-0"
                 >
                   <CheckCheck className="h-3.5 w-3.5" />
                   Mark read
@@ -105,7 +105,7 @@ const NotificationDropdown = () => {
             </div>
 
             {/* List Viewport */}
-            <div className="max-h-96 overflow-y-auto divide-y divide-white/5 custom-scrollbar">
+            <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto divide-y divide-white/5 custom-scrollbar">
               {isLoading ? (
                 <div className="p-6 text-center text-xs text-zinc-500 font-medium">
                   Loading notifications...
@@ -119,7 +119,7 @@ const NotificationDropdown = () => {
                       !n.isRead ? 'bg-[#18181b]/70 border-l-2 border-[#1db954]' : ''
                     }`}
                   >
-                    <div className="h-9 w-9 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-xs font-bold text-white shrink-0 mt-0.5">
+                    <div className="h-9 w-9 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center text-xs font-bold text-white shrink-0 mt-0.5 shadow-sm">
                       {n.sender?.username ? n.sender.username.substring(0, 2).toUpperCase() : 'M'}
                     </div>
 

@@ -45,6 +45,7 @@ const ChatSidebar = () => {
   const { user } = useAuth();
   const {
     conversations,
+    friends = [],
     pendingRequests,
     activeConversation,
     unreadCounts,
@@ -56,6 +57,8 @@ const ChatSidebar = () => {
     activeTab,
     setActiveTab
   } = useChat();
+
+  const onlineFriendsCount = friends.filter((f) => isUserOnline(f.user?._id || f.user?.id)).length;
 
   const getOtherParticipant = (conv) => {
     if (!conv || !conv.participants || !Array.isArray(conv.participants)) return null;
@@ -95,10 +98,15 @@ const ChatSidebar = () => {
           <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#1db954]/20 via-[#1db954]/10 to-transparent border border-[#1db954]/30 flex items-center justify-center text-[#1db954] shadow-lg shadow-[#1db954]/10 shrink-0">
             <MessageSquare className="h-5.5 w-5.5" />
           </div>
-          <div className="space-y-0.5">
+          <div>
             <h2 className="text-2xl font-black tracking-tight text-white leading-none">Chat Hub</h2>
-            <p className="text-xs font-semibold text-zinc-400">
-              {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
+            <p className={`text-xs font-semibold mt-1 flex items-center gap-1.5 ${
+              onlineFriendsCount > 0 ? 'text-[#1db954]' : 'text-zinc-400'
+            }`}>
+              {onlineFriendsCount > 0 && (
+                <span className="h-2 w-2 rounded-full bg-[#1db954] animate-pulse" />
+              )}
+              {onlineFriendsCount} friend{onlineFriendsCount !== 1 ? 's' : ''} online
             </p>
           </div>
         </div>

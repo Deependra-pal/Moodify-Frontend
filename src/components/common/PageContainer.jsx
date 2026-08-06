@@ -37,20 +37,42 @@ export const PageHeader = ({
   badge,
   icon: Icon,
   actions,
-  gradient = 'from-[#1a3d24] via-[#102417] to-[#09090b]'
+  themeColor = 'green',
+  gradient
 }) => {
+  const isRed = themeColor === 'red';
+  const isBlue = themeColor === 'blue';
+
+  const defaultGradient = isRed
+    ? 'from-red-950/60 via-[#181014] to-[#09090b]'
+    : isBlue
+    ? 'from-sky-950/60 via-[#101a24] to-[#09090b]'
+    : 'from-[#1a3d24] via-[#102417] to-[#09090b]';
+
+  const iconStyle = isRed
+    ? 'bg-red-500/10 border border-red-500/20 text-rose-500'
+    : isBlue
+    ? 'bg-sky-500/10 border border-sky-500/20 text-sky-400'
+    : 'bg-[#1db954]/10 border border-[#1db954]/20 text-[#1db954]';
+
+  const badgeStyle = isRed
+    ? 'text-rose-400 bg-rose-500/10 border border-rose-500/20'
+    : isBlue
+    ? 'text-sky-400 bg-sky-500/10 border border-sky-500/20'
+    : 'text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20';
+
   return (
-    <header className={`bg-gradient-to-b ${gradient} px-4 sm:px-6 md:px-8 py-5 sm:py-6 border-b border-white/5 relative overflow-hidden shadow-lg`}>
+    <header className={`bg-gradient-to-b ${gradient || defaultGradient} px-4 sm:px-6 md:px-8 py-5 sm:py-6 border-b border-white/5 relative overflow-hidden shadow-lg`}>
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left min-w-0 w-full sm:w-auto">
           {Icon && (
-            <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#1db954] shadow-xl shrink-0">
-              <Icon className="h-7 w-7 sm:h-8 sm:w-8" />
+            <div className={`h-14 w-14 sm:h-16 sm:w-16 rounded-2xl flex items-center justify-center shadow-xl shrink-0 ${iconStyle}`}>
+              <Icon className={`h-7 w-7 sm:h-8 sm:w-8 ${isRed ? 'fill-current' : ''}`} />
             </div>
           )}
           <div className="space-y-1 min-w-0 flex-1">
             {badge && (
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20 px-2.5 py-0.5 rounded-full inline-block">
+              <span className={`text-[10px] sm:text-[11px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full inline-block ${badgeStyle}`}>
                 {badge}
               </span>
             )}

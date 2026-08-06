@@ -55,7 +55,7 @@ const FavoritesPage = () => {
       subtitle={`${favorites.length} songs favorited • Your personal emotional soundtrack`}
       badge="Collection"
       icon={Heart}
-      gradient="from-red-950/60 via-[#181014] to-[#09090b]"
+      themeColor="red"
       actions={
         favorites.length > 0 && (
           <button

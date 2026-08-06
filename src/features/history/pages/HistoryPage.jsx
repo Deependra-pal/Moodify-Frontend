@@ -141,16 +141,16 @@ const HistoryPage = () => {
       subtitle={`${displayHistory.length} tracks played • Grouped by date & time`}
       badge="History Log"
       icon={History}
-      gradient="from-[#1b1b3a] via-[#121226] to-[#09090b]"
+      themeColor="blue"
       actions={
         displayHistory.length > 0 && (
           <button
             type="button"
             onClick={clearHistory}
-            className="flex items-center gap-2 bg-[#282828] hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/20 active:scale-95 border border-neutral-800 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 touch-target min-h-[44px]"
+            className="px-3.5 py-2 text-xs font-extrabold uppercase tracking-wider text-rose-400 hover:text-white border border-rose-500/20 hover:border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl cursor-pointer transition-all active:scale-95 shrink-0 touch-target min-h-[44px] flex items-center gap-2"
           >
-            <Trash2 className="h-3.5 w-3.5" />
-            Clear History
+            <Trash2 className="h-3.5 w-3.5 text-rose-400" />
+            <span>Clear History</span>
           </button>
         )
       }
