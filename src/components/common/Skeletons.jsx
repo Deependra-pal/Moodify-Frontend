@@ -114,9 +114,9 @@ export const ProfileSkeleton = () => (
   </div>
 );
 
-// 8. Page Loading Fallback (For Suspense route transitions)
+// 8. Page Loading Fallback (Single Premium Moodify Loader for App startup & route transitions)
 export const PageLoadingFallback = () => (
-  <div className="h-full w-full min-h-[60vh] bg-[#09090b] flex flex-col items-center justify-center space-y-4 select-none animate-in fade-in duration-200">
+  <div className="fixed inset-0 z-50 bg-[#09090b] flex flex-col items-center justify-center space-y-4 select-none animate-in fade-in duration-200">
     <div className="relative flex items-center justify-center">
       <div className="h-16 w-16 rounded-full border-2 border-[#1db954]/20 border-t-[#1db954] animate-spin" />
       <div className="absolute h-8 w-8 rounded-full bg-[#1db954]/10 flex items-center justify-center">

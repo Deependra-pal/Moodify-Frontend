@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './features/auth/components/ProtectedRoute';
 import AppLayout from './layouts/AppLayout';
 import { PageLoadingFallback } from './components/common/Skeletons';
+import useAuth from './features/auth/hooks/useAuth';
 
 // --- ROUTE LEVEL CODE SPLITTING (React.lazy) ---
 const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
@@ -14,84 +15,100 @@ const ProfilePage = lazy(() => import('./features/profile/pages/ProfilePage'));
 const ChatPage = lazy(() => import('./features/chat/pages/ChatPage'));
 
 /**
+ * Inner Application Router Content.
+ * Holds initial auth check at the top level to guarantee exactly ONE loading screen during startup.
+ */
+const AppContent = () => {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <PageLoadingFallback />;
+  }
+
+  return (
+    <Suspense fallback={<PageLoadingFallback />}>
+      <Routes>
+        {/* Public Authentication Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* Protected Main Application Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <HomePage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ChatPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/callback"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <HomePage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <FavoritesPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <HistoryPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ProfilePage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all Fallback Redirect */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
+  );
+};
+
+/**
  * Main application component powered by Redux Toolkit + RTK Query.
- * Wraps routes in BrowserRouter and Suspense for smooth code splitting.
+ * Single unified loading experience from app start until application is ready.
  */
 const App = () => {
   return (
     <BrowserRouter>
-      <Suspense fallback={<PageLoadingFallback />}>
-        <Routes>
-          {/* Public Authentication Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-
-          {/* Protected Main Application Routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <HomePage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/chat"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <ChatPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/callback"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <HomePage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/favorites"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <FavoritesPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/history"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <HistoryPage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <ProfilePage />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Catch-all Fallback Redirect */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
+      <AppContent />
     </BrowserRouter>
   );
 };
