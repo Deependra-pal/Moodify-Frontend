@@ -8,7 +8,9 @@ import {
   Video,
   Info,
   CheckCheck,
-  ArrowDown
+  ArrowDown,
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import useAuth from '../../auth/hooks/useAuth';
@@ -78,6 +80,7 @@ const ChatWindow = () => {
     typingUsers,
     isUserOnline,
     selectConversation,
+    retryImageUpload,
     setError
   } = useChat();
 
@@ -323,13 +326,51 @@ const ChatWindow = () => {
                 className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} animate-in fade-in duration-200`}
               >
                 <div
-                  className={`max-w-[85%] sm:max-w-[70%] md:max-w-[60%] px-4 py-3 text-sm sm:text-base leading-relaxed break-words shadow-lg ${
+                  className={`max-w-[85%] sm:max-w-[70%] md:max-w-[60%] p-3 text-sm sm:text-base leading-relaxed break-words shadow-lg ${
                     isMe
                       ? 'chat-bubble-out text-black font-semibold'
                       : 'chat-bubble-in text-zinc-100 font-normal'
                   }`}
                 >
-                  <p className="select-text whitespace-pre-wrap">{item.text}</p>
+                  {/* Image Attachment Rendering */}
+                  {item.image && (
+                    <div className="relative rounded-xl overflow-hidden mb-2 max-w-full border border-black/10 shadow-sm bg-black/20 group">
+                      <img
+                        src={item.image}
+                        alt="Attached media"
+                        className="w-full max-h-72 object-cover rounded-lg select-none pointer-events-auto"
+                      />
+
+                      {/* Optimistic Uploading Overlay Indicator */}
+                      {item.status === 'uploading' && (
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-2 p-3 text-white text-xs font-bold animate-in fade-in duration-200">
+                          <Loader2 className="h-6 w-6 animate-spin text-[#1db954]" />
+                          <span className="tracking-wide">Uploading...</span>
+                        </div>
+                      )}
+
+                      {/* Upload Failure Overlay & Retry Button */}
+                      {item.status === 'failed' && (
+                        <div className="absolute inset-0 bg-black/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-2 p-3 text-center text-white text-xs font-bold animate-in fade-in duration-200">
+                          <AlertCircle className="h-6 w-6 text-rose-500 animate-pulse" />
+                          <span className="text-rose-300 font-black">Failed to send image</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (retryImageUpload) retryImageUpload(item._id);
+                            }}
+                            className="flex items-center gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-extrabold px-3 py-1.5 rounded-full transition-all cursor-pointer shadow-md active:scale-95 touch-target min-h-[36px]"
+                          >
+                            <RefreshCw className="h-3.5 w-3.5" />
+                            Retry
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {item.text && <p className="select-text whitespace-pre-wrap px-1">{item.text}</p>}
 
                   {/* Timestamp & Read Receipt Checkmarks */}
                   <div

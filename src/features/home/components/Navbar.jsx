@@ -5,6 +5,7 @@ import useAuth from '../../auth/hooks/useAuth';
 import { usePlayer } from '../../../context/PlayerContext';
 import { loginWithSpotify } from '../../../utils/spotifyAuth';
 import Logo from '../../../components/Logo';
+import NotificationDropdown from '../../notifications/components/NotificationDropdown';
 
 /**
  * Spotify-inspired Top Navbar component.
@@ -30,6 +31,8 @@ const Navbar = () => {
 
       {/* User Actions Panel */}
       <div className="flex items-center gap-3 sm:gap-4 relative">
+        {/* Persistent Notification Dropdown */}
+        <NotificationDropdown />
         {/* Spotify OAuth Status Button */}
         {spotifyToken ? (
           <div className="flex items-center gap-1.5 sm:gap-2">

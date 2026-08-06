@@ -7,15 +7,38 @@ const MessageInput = () => {
   const [text, setText] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
-  const typingTimeoutRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const {
     handleSendMessage,
+    handleSendImageMessage,
     isSendingMessage,
     activeConversation,
     sendTypingNotification,
     sendStopTypingNotification
   } = useChat();
+
+  const handleImageFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const caption = text;
+      setText('');
+      setShowAttachmentMenu(false);
+      setShowEmojiPicker(false);
+      handleSendImageMessage(dataUrl, caption);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const handleTextChange = (e) => {
     const val = e.target.value;
@@ -83,14 +106,23 @@ const MessageInput = () => {
         />
       )}
 
+      {/* Hidden File Input for Image Upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        onChange={handleImageFileSelect}
+        className="hidden"
+      />
+
       {/* Attachment Tooltip/Menu Popover */}
       {showAttachmentMenu && (
         <div className="absolute bottom-20 left-12 z-50 bg-[#18181b] border border-white/10 p-2.5 rounded-2xl shadow-2xl flex items-center gap-2 animate-in fade-in zoom-in-95 duration-150 text-xs font-bold text-zinc-300">
           <button
             type="button"
             onClick={() => {
-              alert('Image attachment coming soon!');
               setShowAttachmentMenu(false);
+              fileInputRef.current?.click();
             }}
             className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-xl transition-all text-white cursor-pointer min-h-[44px]"
           >
@@ -100,7 +132,7 @@ const MessageInput = () => {
           <button
             type="button"
             onClick={() => {
-              alert('File sharing coming soon!');
+              alert('Document attachment coming soon!');
               setShowAttachmentMenu(false);
             }}
             className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-xl transition-all text-white cursor-pointer min-h-[44px]"

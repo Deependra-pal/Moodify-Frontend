@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Users, Search, MessageSquare, UserPlus } from 'lucide-react';
+import { Users, Search, MessageSquare, UserPlus, UserMinus } from 'lucide-react';
 import useChat from '../hooks/useChat';
 import { FriendCardSkeleton } from '../../../components/common/Skeletons';
 
 const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
   const [filterText, setFilterText] = useState('');
-  const { friends, isLoadingFriends, isUserOnline, openChatWithFriend } = useChat();
+  const { friends, isLoadingFriends, isUserOnline, openChatWithFriend, handleRemoveFriend } = useChat();
 
   const filteredFriends = friends.filter((f) => {
     const friendUser = f.user;
@@ -119,14 +119,29 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                           </div>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => handleMessage(friendUser)}
-                          className="bg-[#1db954] text-black hover:bg-[#1ed760] text-xs sm:text-sm font-extrabold px-4 py-3 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95 touch-target min-h-[44px]"
-                        >
-                          <MessageSquare className="h-4 w-4 fill-current" />
-                          Chat
-                        </button>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleMessage(friendUser)}
+                            className="bg-[#1db954] text-black hover:bg-[#1ed760] text-xs sm:text-sm font-extrabold px-3.5 py-3 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 shadow-md shadow-[#1db954]/15 active:scale-95 touch-target min-h-[44px]"
+                          >
+                            <MessageSquare className="h-4 w-4 fill-current" />
+                            Chat
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (window.confirm(`Unfriend ${friendUser.username}?`)) {
+                                await handleRemoveFriend(f.friendshipId || friendUser._id);
+                              }
+                            }}
+                            className="p-3 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20"
+                            title="Unfriend"
+                          >
+                            <UserMinus className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
@@ -175,14 +190,29 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
                           </div>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => handleMessage(friendUser)}
-                          className="bg-zinc-800 text-white hover:bg-[#1db954] hover:text-black border border-white/10 hover:border-transparent text-xs sm:text-sm font-extrabold px-4 py-3 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95 touch-target min-h-[44px]"
-                        >
-                          <MessageSquare className="h-4 w-4" />
-                          Message
-                        </button>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleMessage(friendUser)}
+                            className="bg-zinc-800 text-white hover:bg-[#1db954] hover:text-black border border-white/10 hover:border-transparent text-xs sm:text-sm font-extrabold px-3.5 py-3 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95 touch-target min-h-[44px]"
+                          >
+                            <MessageSquare className="h-4 w-4" />
+                            Message
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (window.confirm(`Unfriend ${friendUser.username}?`)) {
+                                await handleRemoveFriend(f.friendshipId || friendUser._id);
+                              }
+                            }}
+                            className="p-3 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all cursor-pointer touch-target min-h-[44px] border border-transparent hover:border-rose-500/20"
+                            title="Unfriend"
+                          >
+                            <UserMinus className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}

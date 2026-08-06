@@ -46,6 +46,11 @@ export const getFriends = async () => {
   return response.data;
 };
 
+export const removeFriend = async (friendId) => {
+  const response = await api.delete(`/friends/${friendId}`);
+  return response.data;
+};
+
 // --- CONVERSATIONS ---
 export const getOrCreateConversation = async (receiverId) => {
   const response = await api.post('/conversations', { receiverId });
@@ -58,8 +63,8 @@ export const getUserConversations = async () => {
 };
 
 // --- MESSAGES ---
-export const sendMessage = async (conversationId, text) => {
-  const response = await api.post('/messages', { conversationId, text });
+export const sendMessage = async (conversationId, text, image = null) => {
+  const response = await api.post('/messages', { conversationId, text, image });
   return response.data;
 };
 

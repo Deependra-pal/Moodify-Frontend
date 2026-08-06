@@ -230,6 +230,129 @@ export const ChatProvider = ({ children }) => {
     }
   }, [activeConversation, user]);
 
+  // Optimistic Image Message Handler
+  const handleSendImageMessage = useCallback(async (imageDataUrl, text = '') => {
+    if (!activeConversation || !imageDataUrl) return;
+
+    const tempId = `temp_img_${Date.now()}`;
+    const currentUserId = user?.id || user?._id || 'me';
+
+    const optimisticMsg = {
+      _id: tempId,
+      conversation: activeConversation._id,
+      sender: { _id: currentUserId, username: user?.username || 'Me' },
+      text: text || '',
+      image: imageDataUrl,
+      status: 'uploading', // 'uploading' | 'sent' | 'failed'
+      imageDataUrl,
+      createdAt: new Date().toISOString()
+    };
+
+    // 1. Instantly append to conversation messages state
+    setMessages((prev) => [...prev, optimisticMsg]);
+
+    // Update conversation snippet in sidebar
+    setConversations((prev) => {
+      const existing = prev.find((c) => c._id === activeConversation._id);
+      const updatedConv = {
+        ...(existing || activeConversation),
+        lastMessage: text ? `📷 ${text}` : '📷 Photo',
+        lastMessageAt: optimisticMsg.createdAt
+      };
+      const filtered = prev.filter((c) => c._id !== activeConversation._id);
+      return [updatedConv, ...filtered];
+    });
+
+    // 2. Perform background upload process
+    try {
+      const res = await chatService.sendMessage(activeConversation._id, text, imageDataUrl);
+      if (res.success && res.data?.message) {
+        const serverMsg = res.data.message;
+        setMessages((prev) =>
+          prev.map((msg) => {
+            if (msg._id === tempId) {
+              return {
+                ...serverMsg,
+                status: 'sent'
+              };
+            }
+            return msg;
+          })
+        );
+      } else {
+        throw new Error('Image upload failed');
+      }
+    } catch (err) {
+      console.error('Optimistic image upload error:', err);
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg._id === tempId) {
+            return { ...msg, status: 'failed' };
+          }
+          return msg;
+        })
+      );
+    }
+  }, [activeConversation, user]);
+
+  // Retry Failed Image Upload
+  const retryImageUpload = useCallback(async (tempId) => {
+    const targetMsg = messages.find((m) => m._id === tempId);
+    if (!targetMsg || !targetMsg.imageDataUrl) return;
+
+    setMessages((prev) =>
+      prev.map((msg) => {
+        if (msg._id === tempId) {
+          return { ...msg, status: 'uploading' };
+        }
+        return msg;
+      })
+    );
+
+    try {
+      const res = await chatService.sendMessage(activeConversation._id, targetMsg.text || '', targetMsg.imageDataUrl);
+      if (res.success && res.data?.message) {
+        const serverMsg = res.data.message;
+        setMessages((prev) =>
+          prev.map((msg) => {
+            if (msg._id === tempId) {
+              return {
+                ...serverMsg,
+                status: 'sent'
+              };
+            }
+            return msg;
+          })
+        );
+      } else {
+        throw new Error('Retry failed');
+      }
+    } catch (err) {
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg._id === tempId) {
+            return { ...msg, status: 'failed' };
+          }
+          return msg;
+        })
+      );
+    }
+  }, [activeConversation, messages]);
+
+  // Unfriend / Remove Friend API call
+  const handleRemoveFriend = useCallback(async (friendId) => {
+    try {
+      const res = await chatService.removeFriend(friendId);
+      if (res.success) {
+        await loadFriends();
+        return { success: true, message: 'Friend removed' };
+      }
+      return { success: false, message: res.message || 'Unable to remove friend.' };
+    } catch (err) {
+      return { success: false, message: err.response?.data?.message || 'Unable to remove friend.' };
+    }
+  }, [loadFriends]);
+
   // Send Friend Request API call
   const handleSendFriendRequest = useCallback(async (receiverId) => {
     try {
@@ -382,6 +505,9 @@ export const ChatProvider = ({ children }) => {
     openChatWithFriend,
     selectConversation,
     handleSendMessage,
+    handleSendImageMessage,
+    retryImageUpload,
+    handleRemoveFriend,
     handleSendFriendRequest,
     handleAcceptRequest,
     handleRejectRequest,
