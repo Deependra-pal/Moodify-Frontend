@@ -147,9 +147,9 @@ const HistoryPage = () => {
           <button
             type="button"
             onClick={clearHistory}
-            className="px-3.5 py-2 text-xs font-extrabold uppercase tracking-wider text-rose-400 hover:text-white border border-rose-500/20 hover:border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl cursor-pointer transition-all active:scale-95 shrink-0 touch-target min-h-[44px] flex items-center gap-2"
+            className="px-3.5 py-2 text-xs font-extrabold uppercase tracking-wider text-sky-400 hover:text-white border border-sky-500/20 hover:border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 rounded-xl cursor-pointer transition-all active:scale-95 shrink-0 touch-target min-h-[44px] flex items-center gap-2"
           >
-            <Trash2 className="h-3.5 w-3.5 text-rose-400" />
+            <Trash2 className="h-3.5 w-3.5 text-sky-400" />
             <span>Clear History</span>
           </button>
         )
