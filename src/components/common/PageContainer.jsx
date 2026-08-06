@@ -17,9 +17,8 @@ export const PageContainer = ({
       {header && <div className="shrink-0">{header}</div>}
 
       <main
-        className={`flex-1 w-full ${maxWidthClass} mx-auto px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 pb-6 sm:pb-8 space-y-6 sm:space-y-8 ${
-          noScroll ? 'overflow-hidden flex flex-col' : 'overflow-y-auto custom-scrollbar'
-        } ${className}`}
+        className={`flex-1 w-full ${maxWidthClass} mx-auto px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 pb-6 sm:pb-8 space-y-6 sm:space-y-8 ${noScroll ? 'overflow-hidden flex flex-col' : 'overflow-y-auto custom-scrollbar'
+          } ${className}`}
       >
         {children}
       </main>
@@ -46,20 +45,20 @@ export const PageHeader = ({
   const defaultGradient = isRed
     ? 'from-red-950/60 via-[#181014] to-[#09090b]'
     : isBlue
-    ? 'from-sky-950/60 via-[#101a24] to-[#09090b]'
-    : 'from-[#1a3d24] via-[#102417] to-[#09090b]';
+      ? 'from-sky-950/60 via-[#101a24] to-[#09090b]'
+      : 'from-[#1a3d24] via-[#102417] to-[#09090b]';
 
   const iconStyle = isRed
     ? 'bg-red-500/10 border border-red-500/20 text-rose-500'
     : isBlue
-    ? 'bg-sky-500/10 border border-sky-500/20 text-sky-400'
-    : 'bg-[#1db954]/10 border border-[#1db954]/20 text-[#1db954]';
+      ? 'bg-sky-500/10 border border-sky-500/20 text-sky-400'
+      : 'bg-[#1db954]/10 border border-[#1db954]/20 text-[#1db954]';
 
   const badgeStyle = isRed
     ? 'text-rose-400 bg-rose-500/10 border border-rose-500/20'
     : isBlue
-    ? 'text-sky-400 bg-sky-500/10 border border-sky-500/20'
-    : 'text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20';
+      ? 'text-sky-400 bg-sky-500/10 border border-sky-500/20'
+      : 'text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20';
 
   return (
     <header className={`bg-gradient-to-b ${gradient || defaultGradient} px-4 sm:px-6 md:px-8 py-5 sm:py-6 border-b border-white/5 relative overflow-hidden shadow-lg`}>

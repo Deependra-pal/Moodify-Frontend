@@ -101,7 +101,7 @@ const ProfilePage = () => {
   const headerElement = (
     <>
       {/* --- SPOTIFY HERO HEADER BANNER --- */}
-      <header className="bg-gradient-to-b from-[#1a3d24] via-[#102417] to-[#09090b] px-4 sm:px-6 md:px-8 py-5 sm:py-7 border-b border-white/5 relative overflow-hidden">
+      <header className="bg-gradient-to-b from-[#1a3d24]/80 via-[#102417] to-[#09090b] px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 border-b border-white/5 relative overflow-hidden shadow-2xl">
         {/* Background glow */}
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#1db954]/10 rounded-full blur-3xl pointer-events-none" />
 
