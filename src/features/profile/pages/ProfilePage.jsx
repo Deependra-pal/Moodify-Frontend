@@ -4,6 +4,7 @@ import useAuth from '../../auth/hooks/useAuth';
 import useChat from '../../chat/hooks/useChat';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Save, Calendar, Play, RefreshCw, BarChart2, CheckCircle2, AlertTriangle, Users, UserCheck, Heart, Edit3, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react';
+import { ProfileSkeleton } from '../../../components/common/Skeletons';
 
 /**
  * Spotify-Authentic User Profile page with Tabbed Navigation.
@@ -92,11 +93,8 @@ const ProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col items-center justify-center space-y-4">
-        <RefreshCw className="h-9 w-9 text-[#1db954] animate-spin" />
-        <p className="text-xs font-semibold tracking-wider text-zinc-400">
-          Loading Spotify Profile...
-        </p>
+      <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col p-6 sm:p-10 max-w-7xl mx-auto">
+        <ProfileSkeleton />
       </div>
     );
   }

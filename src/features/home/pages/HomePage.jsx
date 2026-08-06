@@ -10,6 +10,7 @@ import { usePlayer } from '../../../context/PlayerContext';
 import { exchangeCodeForToken } from '../../../utils/spotifyAuth';
 import { Music, AlertCircle, RefreshCw, Search } from 'lucide-react';
 import api from '../../../services/api';
+import { GridSkeleton } from '../../../components/common/Skeletons';
 
 /**
  * HomePage container component.
@@ -186,11 +187,8 @@ const HomePage = () => {
           )}
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-16 space-y-4">
-              <RefreshCw className="h-10 w-10 text-[#1db954] animate-spin" />
-              <p className="text-sm font-semibold tracking-wider text-neutral-400">
-                Retrieving tracks...
-              </p>
+            <div className="pt-2">
+              <GridSkeleton count={6} />
             </div>
           ) : songs.length > 0 ? (
             <div className="max-h-[440px] sm:max-h-[520px] overflow-y-auto overscroll-y-auto custom-scrollbar pr-1 pt-2">

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Users, Search, MessageSquare, UserPlus } from 'lucide-react';
 import useChat from '../hooks/useChat';
+import { FriendCardSkeleton } from '../../../components/common/Skeletons';
 
 const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
   const [filterText, setFilterText] = useState('');
-  const { friends, isUserOnline, openChatWithFriend } = useChat();
+  const { friends, isLoadingFriends, isUserOnline, openChatWithFriend } = useChat();
 
   const filteredFriends = friends.filter((f) => {
     const friendUser = f.user;
@@ -68,7 +69,14 @@ const FriendsListView = ({ onOpenSearch, onSelectFriend }) => {
 
       {/* 📜 Friends Grid / List Viewport */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar">
-        {filteredFriends.length > 0 ? (
+        {isLoadingFriends ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <FriendCardSkeleton />
+            <FriendCardSkeleton />
+            <FriendCardSkeleton />
+            <FriendCardSkeleton />
+          </div>
+        ) : filteredFriends.length > 0 ? (
           <>
             {/* ONLINE FRIENDS SECTION */}
             {onlineFriends.length > 0 && (

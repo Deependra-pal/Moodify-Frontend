@@ -4,6 +4,7 @@ import useFavorites from '../../favorites/hooks/useFavorites';
 import { usePlayer } from '../../../context/PlayerContext';
 import { History, Trash2, Play, Pause, Heart, RefreshCw } from 'lucide-react';
 import defaultAlbum from '../../../assets/default_album.png';
+import { HistoryItemSkeleton } from '../../../components/common/Skeletons';
 
 // Relative play timestamp formatter (Pure helper moved outside to avoid re-creation)
 const formatPlayedAt = (dateString) => {
@@ -141,11 +142,12 @@ const HistoryPage = () => {
         )}
 
         {loading && displayHistory.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 space-y-4">
-            <RefreshCw className="h-10 w-10 text-[#1db954] animate-spin" />
-            <p className="text-sm font-semibold tracking-wider text-neutral-400">
-              Fetching play logs...
-            </p>
+          <div className="space-y-3">
+            <HistoryItemSkeleton />
+            <HistoryItemSkeleton />
+            <HistoryItemSkeleton />
+            <HistoryItemSkeleton />
+            <HistoryItemSkeleton />
           </div>
         ) : displayHistory.length > 0 ? (
           <div className="bg-[#181818] border border-neutral-900 rounded-2xl overflow-hidden shadow-xl">

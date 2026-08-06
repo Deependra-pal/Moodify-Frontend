@@ -3,6 +3,7 @@ import useFavorites from '../hooks/useFavorites';
 import SongCard from '../../home/components/SongCard';
 import { Heart, Music, RefreshCw } from 'lucide-react';
 import { usePlayer } from '../../../context/PlayerContext';
+import { GridSkeleton } from '../../../components/common/Skeletons';
 
 /**
  * Favorites page displaying the collection of user's favorited songs.
@@ -94,11 +95,8 @@ const FavoritesPage = () => {
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 space-y-4">
-            <RefreshCw className="h-10 w-10 text-red-500 animate-spin" />
-            <p className="text-sm font-semibold tracking-wider text-neutral-400">
-              Loading your collection...
-            </p>
+          <div className="pt-2">
+            <GridSkeleton count={5} />
           </div>
         ) : favorites.length > 0 ? (
           <div className="w-full">

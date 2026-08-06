@@ -5,6 +5,7 @@ import useAuth from '../../auth/hooks/useAuth';
 import UserSearchModal from './UserSearchModal';
 import FriendsListView from './FriendsListView';
 import FriendRequestsView from './FriendRequestsView';
+import { ConversationItemSkeleton } from '../../../components/common/Skeletons';
 
 const formatTime = (dateStr) => {
   if (!dateStr) return '';
@@ -194,10 +195,11 @@ const ChatSidebar = () => {
         {activeTab === 'chats' && (
           <div className="p-3 space-y-2">
             {isLoadingConversations ? (
-              <div className="space-y-2.5 p-1">
-                <SkeletonItem />
-                <SkeletonItem />
-                <SkeletonItem />
+              <div className="space-y-2 p-1">
+                <ConversationItemSkeleton />
+                <ConversationItemSkeleton />
+                <ConversationItemSkeleton />
+                <ConversationItemSkeleton />
               </div>
             ) : filteredConversations.length > 0 ? (
               filteredConversations.map((conv) => {
