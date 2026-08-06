@@ -29,7 +29,11 @@ const SongCard = ({
         onClick={(e) => {
           if (!disabled && onPlayClick) onPlayClick(e);
         }}
-        className={`flex md:hidden items-center justify-between p-3 bg-[#121214] hover:bg-[#18181c] active:bg-[#1f1f24] border border-white/10 rounded-2xl gap-3 w-full cursor-pointer transition-all duration-300 ease-out ${
+        className={`flex md:hidden items-center justify-between p-3 border rounded-2xl gap-3 w-full cursor-pointer transition-all duration-300 ease-out ${
+          isPlaying
+            ? 'bg-[#122216] border-[#1db954]/60 shadow-md shadow-[#1db954]/10'
+            : 'bg-[#121214] hover:bg-[#18181c] active:bg-[#1f1f24] border-white/10'
+        } ${
           isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
         }`}
       >
@@ -90,7 +94,7 @@ const SongCard = ({
             }}
             disabled={disabled}
             className={`h-9 w-9 rounded-full text-black flex items-center justify-center font-bold shadow-md transform transition-all duration-200 active:scale-90 cursor-pointer ${
-              isPlaying ? 'bg-neutral-200 hover:bg-neutral-300' : 'bg-[#1db954] hover:bg-[#1ed760]'
+              isPlaying ? 'bg-[#1db954] text-black font-bold scale-105 shadow-lg shadow-[#1db954]/25' : 'bg-[#1db954] hover:bg-[#1ed760] text-black'
             }`}
           >
             {isPlaying ? (
@@ -107,7 +111,11 @@ const SongCard = ({
         onClick={(e) => {
           if (!disabled && onPlayClick) onPlayClick(e);
         }}
-        className={`hidden md:flex flex-col justify-between bg-[#121214] hover:bg-[#18181c] border border-white/10 hover:border-[#1db954]/40 rounded-2xl p-4 group shadow-lg hover:shadow-2xl relative cursor-pointer transition-all duration-300 ease-out ${
+        className={`hidden md:flex flex-col justify-between border rounded-2xl p-4 group shadow-lg hover:shadow-2xl relative cursor-pointer transition-all duration-300 ease-out ${
+          isPlaying
+            ? 'bg-[#122216] border-[#1db954]/60 shadow-[#1db954]/10'
+            : 'bg-[#121214] hover:bg-[#18181c] border-white/10 hover:border-[#1db954]/40'
+        } ${
           isRemoving ? 'opacity-0 -translate-y-2 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'
         }`}
       >

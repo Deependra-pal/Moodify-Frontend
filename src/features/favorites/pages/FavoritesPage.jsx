@@ -7,11 +7,11 @@ import { GridSkeleton } from '../../../components/common/Skeletons';
 
 /**
  * Favorites page displaying the collection of user's favorited songs.
- * Fixed header with smooth internal scroll viewport & bottom nav clearance.
+ * Instant pause/resume toggle & matching Spotify Green active colors.
  */
 const FavoritesPage = () => {
   const { favorites, loading, error, removeFavorite, clearAllFavorites } = useFavorites();
-  const { playTrack, currentSong, isPlaying, playbackSource } = usePlayer();
+  const { playTrack, pauseTrack, resumeTrack, currentSong, isPlaying } = usePlayer();
   const [removingIds, setRemovingIds] = useState([]);
 
   const handleClearAll = useCallback(async () => {
@@ -51,7 +51,7 @@ const FavoritesPage = () => {
   return (
     <div className="flex-1 w-full bg-[#09090b] text-white flex flex-col font-sans h-full overflow-hidden select-none">
       {/* 📌 Fixed Top Header Banner */}
-      <header className="bg-gradient-to-b from-red-900/40 via-[#141014] to-[#09090b] px-4 sm:px-6 py-4 sm:py-6 border-b border-white/5 shrink-0 shadow-lg">
+      <header className="bg-gradient-to-b from-red-950/60 via-[#181014] to-[#09090b] px-4 sm:px-6 py-4 sm:py-6 border-b border-white/5 shrink-0 shadow-lg">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6">
           <div className="h-20 w-20 sm:h-28 sm:w-28 md:h-32 md:w-32 bg-gradient-to-br from-red-600 to-red-950 rounded-2xl flex items-center justify-center shadow-2xl shrink-0 border border-red-500/20">
             <Heart className="h-10 w-10 sm:h-14 sm:w-14 md:h-16 md:w-16 text-white fill-current animate-pulse" />
@@ -99,7 +99,6 @@ const FavoritesPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {favorites.map((fav, index) => {
               const isCurrentPlaying =
-                isPlaying &&
                 currentSong &&
                 ((currentSong.uri && currentSong.uri === (fav.spotifyUri || fav.uri)) ||
                   (currentSong.spotifyUrl && currentSong.spotifyUrl === fav.spotifyUrl) ||
@@ -107,7 +106,7 @@ const FavoritesPage = () => {
 
               const playObj = playlistObjs[index];
               const isRemoving = removingIds.includes(fav._id);
-              const isPlayingFromFavorites = isCurrentPlaying && playbackSource === 'favorites';
+              const activePlaying = isCurrentPlaying && isPlaying;
 
               return (
                 <div
@@ -124,11 +123,19 @@ const FavoritesPage = () => {
                     album={fav.album}
                     imageUrl={fav.image}
                     spotifyUrl={fav.spotifyUrl}
-                    isPlaying={isPlayingFromFavorites}
-                    isNowPlaying={isCurrentPlaying}
+                    isPlaying={activePlaying}
+                    isNowPlaying={isCurrentPlaying && isPlaying}
                     isFavorite={!isRemoving}
                     isRemoving={isRemoving}
-                    onPlayClick={() => playTrack(playObj, playlistObjs, 'favorites')}
+                    onPlayClick={() => {
+                      if (activePlaying) {
+                        pauseTrack();
+                      } else if (isCurrentPlaying && !isPlaying) {
+                        resumeTrack();
+                      } else {
+                        playTrack(playObj, playlistObjs, 'favorites');
+                      }
+                    }}
                     onFavoriteClick={() => handleRemove(fav._id)}
                   />
                 </div>
