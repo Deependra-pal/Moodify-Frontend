@@ -96,66 +96,47 @@ const ChatWindow = () => {
   const activeTyping = activeConversation && typingUsers ? typingUsers[activeConversation._id] : null;
 
   // Helper to check if user is scrolled near the bottom (within 150px threshold)
-  const isNearBottom = () => {
+  const isNearBottom = useCallback(() => {
     if (!scrollContainerRef.current) return true;
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
     return scrollHeight - scrollTop - clientHeight < 150;
-  };
+  }, []);
 
-  // Helper to perform instant scroll to bottom
-  const scrollToBottomInstant = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-    }
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
-    }
-  };
-
-  // Helper to perform smooth scroll to bottom
-  const scrollToBottomSmooth = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    } else if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        top: scrollContainerRef.current.scrollHeight,
+  // Fast & lightweight scroll helper
+  const scrollToBottom = useCallback((instant = false) => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    if (instant) {
+      container.scrollTop = container.scrollHeight;
+    } else {
+      container.scrollTo({
+        top: container.scrollHeight,
         behavior: 'smooth'
       });
     }
-  };
+  }, []);
 
-  // Detect manual scroll position to show/hide "Scroll to bottom" button
-  const handleScroll = () => {
+  // Detect manual scroll position for floating jump-to-bottom button
+  const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-    const isScrolledUp = scrollHeight - scrollTop - clientHeight > 200;
-    setShowScrollDownBtn(isScrolledUp);
-  };
+    setShowScrollDownBtn(scrollHeight - scrollTop - clientHeight > 200);
+  }, []);
 
-  // Reset initial load flag when conversation changes
-  useEffect(() => {
-    isInitialLoadRef.current = true;
-    setShowScrollDownBtn(false);
-  }, [activeConversation?._id]);
-
-  // Handle WhatsApp-Style Auto-Scroll:
-  // - On initial chat open: Instant scroll to the latest message at bottom.
-  // - On new messages or typing: Smooth scroll IF user is already near bottom.
+  // Instant scroll on active conversation change or when message loading finishes
   useLayoutEffect(() => {
-    if (!activeConversation || messages.length === 0) return;
+    if (!activeConversation) return;
+    scrollToBottom(true);
+    const frame = requestAnimationFrame(() => scrollToBottom(true));
+    return () => cancelAnimationFrame(frame);
+  }, [activeConversation?._id, isLoadingMessages, scrollToBottom]);
 
-    if (isInitialLoadRef.current) {
-      scrollToBottomInstant();
-      requestAnimationFrame(() => scrollToBottomInstant());
-      const timer = setTimeout(() => scrollToBottomInstant(), 60);
-      isInitialLoadRef.current = false;
-      return () => clearTimeout(timer);
-    } else {
-      if (isNearBottom()) {
-        scrollToBottomSmooth();
-      }
+  // Smooth scroll on incoming/outgoing messages if user is near bottom
+  useEffect(() => {
+    if (messages.length > 0 && isNearBottom()) {
+      scrollToBottom(false);
     }
-  }, [messages, activeConversation?._id, activeTyping]);
+  }, [messages.length, activeTyping, isNearBottom, scrollToBottom]);
 
   const groupedMessages = [];
   let currentDateKey = null;
@@ -192,9 +173,8 @@ const ChatWindow = () => {
 
   return (
     <div
-      className={`flex-1 h-full bg-[#09090b] flex-col min-w-0 overflow-hidden relative ${
-        activeConversation ? 'flex fixed inset-0 z-50 md:relative md:inset-auto md:z-auto' : 'hidden md:flex'
-      }`}
+      className={`flex-1 h-full bg-[#09090b] flex-col min-w-0 overflow-hidden relative ${activeConversation ? 'flex fixed inset-0 z-50 md:relative md:inset-auto md:z-auto' : 'hidden md:flex'
+        }`}
     >
       {/* 📌 STICKY WHATSAPP-STYLE HEADER */}
       <div className="sticky top-0 z-30 px-4 sm:px-6 py-3.5 sm:py-4 bg-[#121214] border-b border-white/5 flex items-center justify-between shrink-0 shadow-lg glass-panel">
@@ -212,16 +192,14 @@ const ChatWindow = () => {
           {/* Avatar with Status Ring */}
           <div className="relative shrink-0">
             <div
-              className={`h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-zinc-800 border text-white font-black flex items-center justify-center text-sm shadow-md ${
-                isOnline ? 'border-[#1db954]/60 shadow-md shadow-[#1db954]/20' : 'border-white/10'
-              }`}
+              className={`h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-zinc-800 border text-white font-black flex items-center justify-center text-sm shadow-md ${isOnline ? 'border-[#1db954]/60 shadow-md shadow-[#1db954]/20' : 'border-white/10'
+                }`}
             >
               {friend?.username ? friend.username.substring(0, 2).toUpperCase() : 'U'}
             </div>
             <span
-              className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-full border-2 border-[#121214] ${
-                isOnline ? 'bg-[#1db954]' : 'bg-zinc-600'
-              }`}
+              className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-full border-2 border-[#121214] ${isOnline ? 'bg-[#1db954]' : 'bg-zinc-600'
+                }`}
             />
           </div>
 
@@ -232,9 +210,8 @@ const ChatWindow = () => {
             </h3>
             <p className="text-xs font-semibold flex items-center gap-1.5 truncate">
               <span
-                className={`inline-block h-2 w-2 rounded-full ${
-                  isOnline ? 'bg-[#1db954] animate-pulse' : 'bg-zinc-600'
-                }`}
+                className={`inline-block h-2 w-2 rounded-full ${isOnline ? 'bg-[#1db954] animate-pulse' : 'bg-zinc-600'
+                  }`}
               />
               <span className={isOnline ? 'text-[#1db954] font-bold' : 'text-zinc-400 font-medium'}>
                 {isOnline ? 'Online' : 'Offline'}
@@ -319,19 +296,17 @@ const ChatWindow = () => {
                 className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} animate-in fade-in duration-200`}
               >
                 <div
-                  className={`max-w-[85%] sm:max-w-[70%] md:max-w-[60%] px-4 py-3 text-sm sm:text-base leading-relaxed break-words shadow-lg ${
-                    isMe
+                  className={`max-w-[85%] sm:max-w-[70%] md:max-w-[60%] px-4 py-3 text-sm sm:text-base leading-relaxed break-words shadow-lg ${isMe
                       ? 'chat-bubble-out text-black font-semibold'
                       : 'chat-bubble-in text-zinc-100 font-normal'
-                  }`}
+                    }`}
                 >
                   <p className="select-text whitespace-pre-wrap">{item.text}</p>
 
                   {/* Timestamp & Read Receipt Checkmarks */}
                   <div
-                    className={`flex items-center justify-end gap-1 mt-1 text-[10.5px] font-bold select-none ${
-                      isMe ? 'text-black/70' : 'text-zinc-400'
-                    }`}
+                    className={`flex items-center justify-end gap-1 mt-1 text-[10.5px] font-bold select-none ${isMe ? 'text-black/70' : 'text-zinc-400'
+                      }`}
                   >
                     <span>{formatMessageTime(item.createdAt)}</span>
                     {isMe && (

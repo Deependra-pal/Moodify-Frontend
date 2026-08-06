@@ -21,6 +21,16 @@ export const getPendingRequests = async () => {
   return response.data;
 };
 
+export const getSentRequests = async () => {
+  const response = await api.get('/friends/sent');
+  return response.data;
+};
+
+export const cancelSentRequest = async (requestId) => {
+  const response = await api.delete(`/friends/sent/${requestId}`);
+  return response.data;
+};
+
 export const acceptFriendRequest = async (requestId) => {
   const response = await api.post('/friends/accept', { requestId });
   return response.data;
