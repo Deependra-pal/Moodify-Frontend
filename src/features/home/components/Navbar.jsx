@@ -23,7 +23,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-[#0b0b0b] border-b border-neutral-900 px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-50 select-none">
+    <nav className="bg-[#0b0b0b] border-b border-neutral-900 px-4 sm:px-6 py-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] flex items-center justify-between sticky top-0 z-50 select-none">
       {/* Brand Logo */}
       <Link to="/" className="hover:opacity-90 transition-opacity">
         <Logo size="sm" />

@@ -17,8 +17,9 @@ export const PageContainer = ({
       {header && <div className="shrink-0">{header}</div>}
 
       <main
-        className={`flex-1 w-full ${maxWidthClass} mx-auto px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 pb-6 sm:pb-8 space-y-6 sm:space-y-8 ${noScroll ? 'overflow-hidden flex flex-col' : 'overflow-y-auto custom-scrollbar'
-          } ${className}`}
+        className={`flex-1 w-full ${maxWidthClass} mx-auto px-4 sm:px-6 md:px-8 pt-6 sm:pt-8 md:pt-10 pb-28 md:pb-12 space-y-6 sm:space-y-8 md:space-y-10 ${
+          noScroll ? 'overflow-hidden flex flex-col' : 'overflow-y-auto custom-scrollbar'
+        } ${className}`}
       >
         {children}
       </main>
@@ -61,7 +62,7 @@ export const PageHeader = ({
       : 'text-[#1db954] bg-[#1db954]/10 border border-[#1db954]/20';
 
   return (
-    <header className={`bg-gradient-to-b ${gradient || defaultGradient} px-4 sm:px-6 md:px-8 py-5 sm:py-6 border-b border-white/5 relative overflow-hidden shadow-lg`}>
+    <header className={`bg-gradient-to-b ${gradient || defaultGradient} px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 pt-[calc(1.5rem+env(safe-area-inset-top,0px))] border-b border-white/5 relative overflow-hidden shadow-lg`}>
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left min-w-0 w-full sm:w-auto">
           {Icon && (

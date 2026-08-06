@@ -92,7 +92,7 @@ const ChatSidebar = () => {
       }`}
     >
       {/* 📌 SIDEBAR HEADER & NAVIGATION MODE SELECTOR */}
-      <div className="px-5 sm:px-6 py-5 border-b border-white/5 space-y-4.5 bg-[#0c0c0e]">
+      <div className="px-5 sm:px-6 py-5 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] border-b border-white/5 space-y-4.5 bg-[#0c0c0e]">
         {/* LOGO TITLE */}
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[#1db954]/20 via-[#1db954]/10 to-transparent border border-[#1db954]/30 flex items-center justify-center text-[#1db954] shadow-lg shadow-[#1db954]/10 shrink-0">

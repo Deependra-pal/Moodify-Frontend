@@ -204,7 +204,7 @@ const ChatWindow = () => {
       }`}
     >
       {/* 📌 STICKY WHATSAPP-STYLE HEADER */}
-      <div className="sticky top-0 z-30 px-4 sm:px-6 py-3.5 sm:py-4 bg-[#121214] border-b border-white/5 flex items-center justify-between shrink-0 shadow-lg glass-panel">
+      <div className="sticky top-0 z-30 px-4 sm:px-6 py-3.5 sm:py-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] bg-[#121214] border-b border-white/5 flex items-center justify-between shrink-0 shadow-lg glass-panel">
         <div className="flex items-center gap-3.5 min-w-0">
           {/* Mobile Back Arrow Button */}
           <button
