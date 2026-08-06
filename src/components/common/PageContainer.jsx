@@ -17,7 +17,7 @@ export const PageContainer = ({
       {header && <div className="shrink-0">{header}</div>}
 
       <main
-        className={`flex-1 w-full ${maxWidthClass} mx-auto px-4 sm:px-6 md:px-8 pt-6 sm:pt-8 md:pt-10 pb-28 md:pb-12 space-y-6 sm:space-y-8 md:space-y-10 ${
+        className={`flex-1 w-full ${maxWidthClass} mx-auto px-4 sm:px-6 md:px-8 pt-6 sm:pt-8 md:pt-10 pb-6 sm:pb-8 space-y-6 sm:space-y-8 ${
           noScroll ? 'overflow-hidden flex flex-col' : 'overflow-y-auto custom-scrollbar'
         } ${className}`}
       >
